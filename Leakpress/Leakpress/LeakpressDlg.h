@@ -29,7 +29,7 @@ public:
 
     protected:
     virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
-
+    CString GetSoftwareVersion(); // 获取工程资源视图中 VERSION 文件中的软件版本号，需引用 Version.lib 库
 
 // 实现
 protected:

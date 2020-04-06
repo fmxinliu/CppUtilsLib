@@ -109,6 +109,8 @@ BOOL CLeakpressDlg::OnInitDialog()
     SetIcon(m_hIcon, TRUE);            // 设置大图标
     SetIcon(m_hIcon, FALSE);        // 设置小图标
 
+    SetWindowText("Leakpress v" + GetSoftwareVersion());
+
     //LoadConfig();
     InitTabShow();
 
@@ -972,4 +974,46 @@ CString CLeakpressDlg::getALAString(ALA_TYPE alarmType)
 bool CLeakpressDlg::needExit()
 {
     return exit;
+}
+
+CString CLeakpressDlg::GetSoftwareVersion()
+{
+    TCHAR szFullPath[MAX_PATH];
+    DWORD dwVerInfoSize = 0;
+    DWORD dwVerHnd;
+    VS_FIXEDFILEINFO * pFileInfo;
+
+    ::GetModuleFileName(NULL, szFullPath, sizeof(szFullPath));
+    dwVerInfoSize = ::GetFileVersionInfoSize(szFullPath, &dwVerHnd);
+    if (dwVerInfoSize)
+    {
+        // If we were able to get the information, process it:
+        HANDLE  hMem;
+        LPVOID  lpvMem;
+        unsigned int uInfoSize = 0;
+
+        hMem = GlobalAlloc(GMEM_MOVEABLE, dwVerInfoSize);
+        lpvMem = GlobalLock(hMem);
+        GetFileVersionInfo(szFullPath, dwVerHnd, dwVerInfoSize, lpvMem);
+
+        ::VerQueryValue(lpvMem, (LPTSTR)_T("\\"), (void**)&pFileInfo, &uInfoSize);
+
+        WORD m_nProdVersion[4];
+
+        // Product version from the FILEVERSION of the version info resource 
+        m_nProdVersion[0] = HIWORD(pFileInfo->dwProductVersionMS); 
+        m_nProdVersion[1] = LOWORD(pFileInfo->dwProductVersionMS);
+        m_nProdVersion[2] = HIWORD(pFileInfo->dwProductVersionLS);
+        m_nProdVersion[3] = LOWORD(pFileInfo->dwProductVersionLS); 
+
+        CString strVersion ;
+        //strVersion.Format(_T("The file's version : %d.%d.%d.%d"),m_nProdVersion[0],m_nProdVersion[1],m_nProdVersion[2],m_nProdVersion[3]);
+        strVersion.Format(_T("%d.%d.%d.%d"),m_nProdVersion[0],m_nProdVersion[1],m_nProdVersion[2],m_nProdVersion[3]);
+
+        GlobalUnlock(hMem);
+        GlobalFree(hMem);
+
+        //AfxMessageBox(strVersion);
+        return strVersion;
+    }
 }
