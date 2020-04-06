@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "Leakpress.h"
 #include "LeakpressDlg.h"
-#include "MiniDump.h"
+#include "MiniDumper.h"
 #include "Util.h"
 
 #ifdef _DEBUG
@@ -72,7 +72,8 @@ BOOL CLeakpressApp::InitInstance()
     // 例如修改为公司或组织名
     SetRegistryKey(_T("应用程序向导生成的本地应用程序"));
 
-    MiniDump::registerExceptionhandler();
+    MiniDumper::SetProcessName("Leakpress");
+    MiniDumper::RegisterExceptionhandler();
 
     CLeakpressDlg dlg;
     m_pMainWnd = &dlg;

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "MiniDump.h"
+#include "MiniDumper.h"
 #include <windows.h>
 #include <dbghelp.h>
 #include <shellapi.h>
@@ -8,32 +8,53 @@
 
 #pragma comment(lib,"dbghelp.lib")
 
-namespace MiniDump
+namespace MiniDumper
 {
-    void CreateDumpFileName()
-    {    
-        // 创建文件名
-        TCHAR szPath[MAX_PATH]; 
-        TCHAR szFileName[MAX_PATH]; 
-        TCHAR* szAppName = "Leakpress";
-        TCHAR* szVersion = "v1.0";
-        DWORD dwBufferSize = MAX_PATH;
-        HANDLE hDumpFile;
-        SYSTEMTIME stLocalTime;
+    LPCTSTR processSuffix = "";
 
-        GetLocalTime( &stLocalTime );
-        GetTempPath( dwBufferSize, szPath ); // C:\Users\Admin\AppData\Local\Temp
-        GetModuleFileName( NULL, szPath, MAX_PATH ); // exe 全路径
-        
-        StringCchPrintf( szFileName, MAX_PATH, "%s%s", szPath, szAppName );
+    void SetProcessName(LPCTSTR processName)
+    {
+        processSuffix = processName;
+    }
 
-        CreateDirectory( szFileName, NULL );
+    BOOL IsDataSectionNeeded(const WCHAR* pModuleName)
+    {
+        if (pModuleName == 0)
+        {
+            return FALSE;
+        }
 
-        StringCchPrintf( szFileName, MAX_PATH, "%s%s\\%s-%04d%02d%02d-%02d%02d%02d-%ld-%ld.dmp", 
-                   szPath, szAppName, szVersion, 
-                   stLocalTime.wYear, stLocalTime.wMonth, stLocalTime.wDay, 
-                   stLocalTime.wHour, stLocalTime.wMinute, stLocalTime.wSecond, 
-                   GetCurrentProcessId(), GetCurrentThreadId());
+        WCHAR szFileName[_MAX_FNAME] = L"";
+        _wsplitpath(pModuleName, NULL, NULL, szFileName, NULL);
+
+        if (_wcsicmp(szFileName, L"ntdll") == 0)
+            return TRUE;
+
+        return FALSE;
+    }
+
+    BOOL CALLBACK MiniDumpCallback(PVOID                            pParam, 
+                                   const PMINIDUMP_CALLBACK_INPUT   pInput, 
+                                   PMINIDUMP_CALLBACK_OUTPUT        pOutput)
+    {
+        if (pInput == 0 || pOutput == 0)
+            return FALSE;
+
+        switch (pInput->CallbackType)
+        {
+        case ModuleCallback:
+            if (pOutput->ModuleWriteFlags & ModuleWriteDataSeg)
+                if (!IsDataSectionNeeded(pInput->Module.FullPath))
+                    pOutput->ModuleWriteFlags &= (~ModuleWriteDataSeg);
+        case IncludeModuleCallback:
+        case IncludeThreadCallback:
+        case ThreadCallback:
+        case ThreadExCallback:
+            return TRUE;
+        default:;
+        }
+
+        return FALSE;
     }
 
     void CreateMiniDump(PEXCEPTION_POINTERS pep, LPCTSTR szFileName)
@@ -90,18 +111,18 @@ namespace MiniDump
         SYSTEMTIME stLocalTime;
         MINIDUMP_EXCEPTION_INFORMATION ExpParam;
         
-        GetLocalTime( &stLocalTime );
-        CreateDirectory( szFilePath, NULL );
+        GetLocalTime(&stLocalTime);
+        CreateDirectory(szFilePath, NULL);
 
-        StringCchPrintf( szFileName, MAX_PATH, "%s\\%04d%02d%02d%02d%02d%02d-%ld-%ld.dmp", 
+        StringCchPrintf(szFileName, MAX_PATH, "%s\\MiniDmp{%04d-%02d-%02d %02d-%02d-%02d}%s.dmp", 
                    szFilePath, 
                    stLocalTime.wYear, stLocalTime.wMonth, stLocalTime.wDay, 
-                   stLocalTime.wHour, stLocalTime.wMinute, stLocalTime.wSecond, 
-                   GetCurrentProcessId(), GetCurrentThreadId());
+                   stLocalTime.wHour, stLocalTime.wMinute, stLocalTime.wSecond,
+                   processSuffix);
 
         // 创建 dump 文件
         CreateMiniDump(pExceptionInfo, szFileName);
-        MessageBox( NULL, "发生异常", "应用程序", MB_ICONSTOP);
+        MessageBox(NULL, "发生异常", "应用程序", MB_ICONSTOP);
 
         /*printf("Error   address   %x/n", pExceptionInfo->ExceptionRecord->ExceptionAddress);
         printf("CPU   register:/n");
@@ -135,12 +156,12 @@ namespace MiniDump
     }
 
     // 注册异常处理函数
-    void registerExceptionhandler()
+    void RegisterExceptionhandler()
     {
         SetUnhandledExceptionFilter(UnhandledExceptionDump);
     }
 
-    void unregisterExceptionhandler()
+    void UnregisterExceptionhandler()
     {
         DisableSetUnhandledExceptionFilter();
     }

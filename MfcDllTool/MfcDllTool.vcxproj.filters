@@ -78,7 +78,7 @@
     <ClCompile Include="RegReader.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Dump\MiniDump.cpp">
+    <ClCompile Include="Dump\MiniDumper.cpp">
       <Filter>Dump</Filter>
     </ClCompile>
   </ItemGroup>
@@ -140,14 +140,14 @@
     <ClInclude Include="pthreads-w32\include\semaphore.h">
       <Filter>pthreads-w32</Filter>
     </ClInclude>
-    <ClInclude Include="dllExport.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="RegReader.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="Dump\MiniDump.h">
+    <ClInclude Include="Dump\MiniDumper.h">
       <Filter>Dump</Filter>
+    </ClInclude>
+    <ClInclude Include="dllexport.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
