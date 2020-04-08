@@ -706,7 +706,7 @@ afx_msg LRESULT CLeakpressDlg::OnAteqEventMsg(WPARAM wParam, LPARAM lParam)
     this->SetAteqState(e);
 
     CString log;
-    sprintf(log.GetBuffer(0), "[%s] [%s] {%d, %d}", getDevicePrefix2(e->id), logString, e->value1, e->value2);
+    log.Format("[%s] [%s] [%d, %d]", getDevicePrefix2(e->id), logString, e->value1, e->value2);
     OnRecord(log, "Ateq");
 
     delete e;
