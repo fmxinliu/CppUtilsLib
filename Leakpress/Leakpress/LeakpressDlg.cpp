@@ -109,7 +109,7 @@ BOOL CLeakpressDlg::OnInitDialog()
     SetIcon(m_hIcon, TRUE);            // 设置大图标
     SetIcon(m_hIcon, FALSE);        // 设置小图标
 
-    SetWindowText("Leakpress v" + GetSoftwareVersion());
+    SetWindowText(_T("Leakpress v") + GetSoftwareVersion());
 
     //LoadConfig();
     InitTabShow();
@@ -199,34 +199,34 @@ void CLeakpressDlg::LoadConfig()
 
         for (int k = 0; k < childs.size() && k < PLCADDSIZE; k++) {
             CString mKeyValueStr = childs[k];
-            CString mkeyStr = mKeyValueStr.Left(mKeyValueStr.Find("="));
-            CString mValueStr = mKeyValueStr.Mid(mKeyValueStr.Find("=") + 1);
-            addr[i].address[k] = (UINT)atoi(mValueStr);
+            CString mkeyStr = mKeyValueStr.Left(mKeyValueStr.Find(_T("=")));
+            CString mValueStr = mKeyValueStr.Mid(mKeyValueStr.Find(_T("=")) + 1);
+            addr[i].address[k] = (UINT)_ttoi(mValueStr);
         }
     }
 
     // 获取软件配置
-    vector<CString> childs = FileManager::ReadChildsOnGroup(configIni, "COMMON");
+    vector<CString> childs = FileManager::ReadChildsOnGroup(configIni, _T("COMMON"));
     for (int k = 0; k < childs.size(); k++) {
         CString mKeyValueStr = childs[k];
-        CString mkeyStr = mKeyValueStr.Left(mKeyValueStr.Find("="));
-        CString mValueStr = mKeyValueStr.Mid(mKeyValueStr.Find("=") + 1);
+        CString mkeyStr = mKeyValueStr.Left(mKeyValueStr.Find(_T("=")));
+        CString mValueStr = mKeyValueStr.Mid(mKeyValueStr.Find(_T("=")) + 1);
         if (mkeyStr == "IP") 
         {
             para.ip = mValueStr;
         } 
-        else if (strstr(mkeyStr, "COM"))
+        else if (_tcsstr(mkeyStr, _T("COM")))
         {
-            int port = (atoi)(mkeyStr.Right(1)) - 1;
+            int port = (_ttoi)(mkeyStr.Right(1)) - 1;
             para.coms[port] = mValueStr;
         }
-        else if (strstr(mkeyStr, "FILE_SAVE_DIR")) 
+        else if (_tcsstr(mkeyStr, _T("FILE_SAVE_DIR"))) 
         {
             para.fileSaveDir = mValueStr;
         }
-        else if (strstr(mkeyStr, "DEBUG"))
+        else if (_tcsstr(mkeyStr, _T("DEBUG")))
         {
-            para.recordType = (RecordType)(atoi)(mValueStr);
+            para.recordType = (RecordType)(_ttoi)(mValueStr);
         }
     }
 }
@@ -320,7 +320,7 @@ bool CLeakpressDlg::PLCConnect()
 {
     fins->SetRemote(para.ip.GetBuffer(0));
     if (!fins->Connect()) {
-        MessageBox("PLC连接错误", "PLC连接", MB_SYSTEMMODAL|MB_ICONEXCLAMATION|MB_OK);
+        MessageBox(_T("PLC连接错误"), _T("PLC连接"), MB_SYSTEMMODAL|MB_ICONEXCLAMATION|MB_OK);
         return false;
     }
 
@@ -335,7 +335,7 @@ bool CLeakpressDlg::AteqConnect()
         vector<CString> commPara = Util::SpiltString(para.coms[i], ' ');
 
         if (commPara.size() >= 2) {
-            int port = (atoi)(commPara[0]);
+            int port = (_ttoi)(commPara[0]);
             CString mCommStr = commPara[1];
 
             ateqs[i].connect(port, mCommStr.GetBuffer(0));
@@ -351,14 +351,14 @@ bool CLeakpressDlg::AteqConnect()
             mDlgChannleShow[i]->setConnectState(true);
             pthreads[i] = AfxBeginThread((AFX_THREADPROC)ThreadTestProcess, &mThreadParas[i], THREAD_PRIORITY_IDLE);
         } else {
-            info += para.deviceName[i] + "  ";
+            info += para.deviceName[i] + _T("  ");
         }
     }
 
     if (info.GetLength() > 0) 
     {
-        info += "连接失败";
-        MessageBox(info, "设备连接", MB_SYSTEMMODAL|MB_ICONEXCLAMATION|MB_OK); // 显示在所有窗口的最上面
+        info += _T("连接失败");
+        MessageBox(info,  _T("设备连接"), MB_SYSTEMMODAL|MB_ICONEXCLAMATION|MB_OK); // 显示在所有窗口的最上面
         return false;
     }
 
@@ -501,7 +501,7 @@ void CLeakpressDlg::WriteResult(int id, CString alarmStr, bool alarm)
         setResult(id, &r);
     }
     else {
-        printf("%s: errorCode = %s\n", getDevicePrefix2(id), alarmStr);
+        _tprintf(_T("%s: errorCode = %s\n"), getDevicePrefix2(id), alarmStr);
     }
 
     WriteResultToFile(para.fileSaveDir, dt, r, fileName, alarmStr, alarm);
@@ -539,36 +539,36 @@ void CLeakpressDlg::WriteResultToFile(CString dir, CString dt, RESULT r, CString
 
     } else {
         if ("G" == device_prefix) {
-            lineString.Append("NO, DATETIME, PRESS, LEAK, Workpress\n");
+            lineString.Append(_T("NO, DATETIME, PRESS, LEAK, Workpress\n"));
         } else if ("D" == device_prefix) {
-            lineString.Append("NO, DATETIME, PRESS, LEAK, P1, P2, P1-P2\n");
+            lineString.Append(_T("NO, DATETIME, PRESS, LEAK, P1, P2, P1-P2\n"));
         } else if ("Y" == device_prefix) {
-            lineString.Append("NO, DATETIME, PRESS, Position\n");
+            lineString.Append(_T("NO, DATETIME, PRESS, Position\n"));
         }
     }
 
     // 文件内容
     CString temp;    
-    temp.Format("%d, ", total_lines);
+    temp.Format(_T("%d, "), total_lines);
     lineString.Append(temp);
     lineString.Append(dt);
-    lineString.Append(", ");
+    lineString.Append(_T(", "));
     
     if (alarm) {
         if ("G" == device_prefix) {
-            temp.Format("%s, %s, %s\n", alarmStr, alarmStr, alarmStr);
+            temp.Format(_T("%s, %s, %s\n"), alarmStr, alarmStr, alarmStr);
         } else if ("D" == device_prefix) {
-            temp.Format("%s, %s, %s, %s, %s\n", alarmStr, alarmStr, alarmStr, alarmStr, alarmStr);
+            temp.Format(_T("%s, %s, %s, %s, %s\n"), alarmStr, alarmStr, alarmStr, alarmStr, alarmStr);
         } else if ("Y" == device_prefix) {
-            temp.Format("%s, %s\n", alarmStr, alarmStr);
+            temp.Format(_T("%s, %s\n"), alarmStr, alarmStr);
         }
     } else {
         if ("G" == device_prefix) {
-            temp.Format("%ld, %ld, %ld\n", r.dwLeakPress, r.dwLeakValue, r.dwWorkPress);
+            temp.Format(_T("%ld, %ld, %ld\n"), r.dwLeakPress, r.dwLeakValue, r.dwWorkPress);
         } else if ("D" == device_prefix) {
-            temp.Format("%ld, %ld, %ld, %ld, %ld\n", r.dwLeakPress, r.dwLeakValue, r.dwTestPress1, r.dwTestPress2, r.dwTestPress1 - r.dwTestPress2);
+            temp.Format(_T("%ld, %ld, %ld, %ld, %ld\n"), r.dwLeakPress, r.dwLeakValue, r.dwTestPress1, r.dwTestPress2, r.dwTestPress1 - r.dwTestPress2);
         } else if ("Y" == device_prefix) {
-            temp.Format("%ld, %ld\n", r.dwPress, r.dwPosition);
+            temp.Format(_T("%ld, %ld\n"), r.dwPress, r.dwPosition);
         }
     }
     
@@ -705,9 +705,9 @@ afx_msg LRESULT CLeakpressDlg::OnAteqEventMsg(WPARAM wParam, LPARAM lParam)
     this->setResult(e->id, &r);
     this->SetAteqState(e);
 
-    CString log;
-    log.Format("[%s] [%s] [%d, %d]", getDevicePrefix2(e->id), logString, e->value1, e->value2);
-    OnRecord(log, "Ateq");
+    CString logStr;
+    logStr.Format(_T("[%s] [%s] [%d, %d]"), getDevicePrefix2(e->id), logString, e->value1, e->value2);
+    OnRecord(logStr, _T("Ateq"));
 
     delete e;
     return 0;
@@ -723,7 +723,7 @@ void CLeakpressDlg::OnRecord(CString message, CString deviceName)
         //CString logString;
         CString dt = CTime::GetCurrentTime().Format("%Y-%m-%d %H:%M:%S");
         //sprintf(logString.GetBuffer(0), "%s: [%s] %s\n", dt, deviceName, message);
-        printf("%s: [%s] %s\n", dt, deviceName, message);
+        _tprintf(_T("%s: [%s] %s\n"), dt, deviceName, message);
     }
 }
 
@@ -741,7 +741,7 @@ void CLeakpressDlg::OnTest(int id)
         Sleep(500);
     } while (!bstart);
 
-    OnRecord("====start====", device_name);
+    OnRecord(_T("====start===="), device_name);
     ResetAteqState(id);
 
     if ("D" == device_prefix) {
@@ -762,11 +762,11 @@ void CLeakpressDlg::OnTest(int id)
         }
 
         if (error) {
-            OnRecord("2 段漏气", device_name);
+            OnRecord(_T("2 段漏气"), device_name);
             return;
         }
         else {
-            OnRecord("====2 段稳压结束====", device_name);
+            OnRecord(_T("====2 段稳压结束===="), device_name);
             //Sleep(1000);
         }
 
@@ -776,7 +776,7 @@ void CLeakpressDlg::OnTest(int id)
             Sleep(100);
         }
 
-        OnRecord("====查询2 段结果====", device_name);
+        OnRecord(_T("====查询2 段结果===="), device_name);
 
         // 4.查询 2 段结果
         do {
@@ -785,7 +785,7 @@ void CLeakpressDlg::OnTest(int id)
             Sleep(100);
         } while (!IsAteqStateMatch(id, ATEQ_RESULT_1, false));
 
-        OnRecord("====等待 3 段稳压====", device_name);
+        OnRecord(_T("====等待 3 段稳压===="), device_name);
 
         // 5. 等待 3 段稳压
         do {
@@ -795,7 +795,7 @@ void CLeakpressDlg::OnTest(int id)
         } while (!IsAteqStateMatch(id, ATEQ_STABLE_2, false));
 
         if (QueryAteqState(id) == ATEQ_STABLE_2) {
-            OnRecord("sending test press", device_name);
+            OnRecord(_T("sending test press"), device_name);
         }
 
         // 6. 3 段稳压，一直发送结果
@@ -805,11 +805,11 @@ void CLeakpressDlg::OnTest(int id)
             Sleep(100);
             SendTestPress(id);
         }
-        OnRecord("====3 段稳压结束====", device_name);
+        OnRecord(_T("====3 段稳压结束===="), device_name);
     }
 
     // 7.等待 PLC 获取结果
-    OnRecord("等待 PLC 读取结果", device_name);
+    OnRecord(_T("等待 PLC 读取结果"), device_name);
     while (!IsGetResult(id)) {
         CHECK_THREAD_RESET(id)
         Sleep(200);
@@ -817,7 +817,7 @@ void CLeakpressDlg::OnTest(int id)
 
     // 8.查询压机结果
     if ("Y" == device_prefix) {
-        OnRecord("query press result", device_name);
+        OnRecord(_T("query press result"), device_name);
         QueryPressResult(id);
         while (!IsAteqStateMatch(id, PRESS_RESULT, false)) {
             CHECK_THREAD_RESET(id)
@@ -826,10 +826,10 @@ void CLeakpressDlg::OnTest(int id)
         }
     }  
 
-    OnRecord("send result", device_name);
+    OnRecord(_T("send result"), device_name);
     SendResult(id); // 给 PLC 发送结果
 
-    OnRecord("waiting end", device_name);
+    OnRecord(_T("waiting end"), device_name);
 
     // 8.等待 PLC 结束
     while (!IsEndState(id)) {
@@ -839,7 +839,7 @@ void CLeakpressDlg::OnTest(int id)
 
     bstart = false;
 
-    OnRecord("====end====", device_name);
+    OnRecord(_T("====end===="), device_name);
 }
 
 void CLeakpressDlg::OnAlarm(int id)
@@ -848,14 +848,14 @@ void CLeakpressDlg::OnAlarm(int id)
     bool bFirstAlarm = false;
     while (!needExit() && (alarmType = getAlarmType(id))) {
         if (!bFirstAlarm) {
-            OnRecord("====报警====", getDevicePrefix2(id));
+            OnRecord(_T("====报警===="), getDevicePrefix2(id));
             WriteALAResult(id, alarmType);
             ResetClearAlarm(id);
         }
         bFirstAlarm = true;
     }
 
-    OnRecord("====报警解除====", getDevicePrefix2(id));
+    OnRecord(_T("====报警解除===="), getDevicePrefix2(id));
 }
 
 

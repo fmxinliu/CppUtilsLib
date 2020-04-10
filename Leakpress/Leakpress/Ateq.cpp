@@ -119,17 +119,17 @@ void Ateq::parsePress(const unsigned char* hexarray, int length)
 void Ateq::parseHigh(const unsigned char* hexarray)
 {
     vector<CString> splitVec = Util::SpiltString((char *)hexarray, 0x09); // Tab
-    
+
     LEAK_PARAMETERS leakFrame;
     memset(&leakFrame, 0, sizeof(LEAK_PARAMETERS));
-
+    
     int length = splitVec.size();
     if (length >= 5) {
-        leakFrame.wLeakValue = (atof)(splitVec[3]) * 1000;
+        leakFrame.wLeakValue = (UINT)((_ttof)(splitVec[3]) * 1000);
     }
 
     if (length >= 7) {
-        leakFrame.wLeakPress = (atof)(splitVec[5]) * 1000;
+        leakFrame.wLeakPress = (UINT)((_ttof)(splitVec[5]) * 1000);
     }
 
     ATEQ_EVENT *e = new ATEQ_EVENT(id, ATEQ_RESULT_1, leakFrame.wLeakPress, leakFrame.wLeakValue);

@@ -57,3 +57,5 @@
 
 
 #include "dllExport.h"
+#pragma warning(disable: 4482)
+#pragma warning(disable: 4996)

@@ -1,4 +1,3 @@
-
 #pragma once
 #include <cstdint>
 #ifndef _UNISTD_H
@@ -29,7 +28,7 @@ namespace OmronPlc
 
         bool Connect();
         void Close();
-        void SetRemote(string ipaddr, uint16_t port=DEFAULT_PORT);
+        void SetRemote(String ipaddr, uint16_t port=DEFAULT_PORT);
 
         bool MemoryAreaRead(MemoryArea area, uint16_t address, uint8_t bit_position, uint16_t count);
         bool MemoryAreaWrite(MemoryArea area, uint16_t address, uint8_t bit_position, uint16_t count, uint8_t data[]);

@@ -66,9 +66,6 @@
     <ClInclude Include="DllTool\Util.h">
       <Filter>DllTool</Filter>
     </ClInclude>
-    <ClInclude Include="DllTool\dllExport.h">
-      <Filter>DllTool</Filter>
-    </ClInclude>
     <ClInclude Include="DllTool\FmCom_NoActive.h">
       <Filter>DllTool</Filter>
     </ClInclude>
@@ -76,6 +73,9 @@
       <Filter>DllTool</Filter>
     </ClInclude>
     <ClInclude Include="DllTool\MiniDump.h">
+      <Filter>DllTool</Filter>
+    </ClInclude>
+    <ClInclude Include="DllTool\dllexport.h">
       <Filter>DllTool</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,7 +1,4 @@
 #pragma once
-
-#include "dllExport.h"
-
 // CLogFile ÃüÁîÄ¿±ê
 
 class DLL_API CLogFile : public CObject
@@ -11,7 +8,8 @@ public:
     virtual ~CLogFile();
     BOOL InitLogFile(void);
     BOOL WriteLog(DWORD dwError, CString strExtraInfo);
-    BOOL WriteLog(CString strMessage, CString strSuffix="");
+    BOOL WriteLog(const char *str, CString strSuffix=_T(""));
+    BOOL WriteLog(CString strMessage, CString strSuffix=_T(""));
     CString GetLastErrorMessage(void);
 
 private:

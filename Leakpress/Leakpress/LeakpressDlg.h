@@ -76,7 +76,7 @@ public:
     void setAlarmType(int id, ALA_TYPE alarmType);
 
     void WriteALAResult(int id, ALA_TYPE alarmType);
-    void WriteResult(int id, CString alarmStr = "", bool alarm = false);
+    void WriteResult(int id, CString alarmStr = _T(""), bool alarm = false);
     CString CreateFileName(int id, CString &dt);
 
     CString getDevicePrefix(int id); // 获取外设代号

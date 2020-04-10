@@ -53,7 +53,7 @@ BOOL CLeakpressApp::InitInstance()
 
     CWinApp::InitInstance();
 
-    if (!Util::IsSingleton("Leakpress")) {
+    if (!Util::IsSingleton(_T("Leakpress"))) {
         return FALSE;
     }
 
@@ -72,7 +72,7 @@ BOOL CLeakpressApp::InitInstance()
     // 例如修改为公司或组织名
     SetRegistryKey(_T("应用程序向导生成的本地应用程序"));
 
-    MiniDumper::SetProcessName("Leakpress");
+    MiniDumper::SetProcessName(_T("Leakpress"));
     MiniDumper::RegisterExceptionhandler();
 
     CLeakpressDlg dlg;

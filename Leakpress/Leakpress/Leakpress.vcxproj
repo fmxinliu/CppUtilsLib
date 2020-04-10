@@ -159,7 +159,7 @@
     <ClInclude Include="Ateq.h" />
     <ClInclude Include="dataStruct.h" />
     <ClInclude Include="DlgChannleShow.h" />
-    <ClInclude Include="DllTool\dllExport.h" />
+    <ClInclude Include="DllTool\dllexport.h" />
     <ClInclude Include="DllTool\FileManager.h" />
     <ClInclude Include="DllTool\fins.h" />
     <ClInclude Include="DllTool\FmCom_NoActive.h" />

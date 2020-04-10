@@ -131,20 +131,20 @@ void DlgChannleShow::SetChannle(int nID,CString mName)
     
     CString device_prefix = mChannleName.Left(1);
     if ("G" == device_prefix) {
-        item[0].init("Press");
-        item[1].init("Leak");
-        item[2].init("Wpress");
-        item[3].init("", FALSE);
+        item[0].init(_T("Press"));
+        item[1].init(_T("Leak"));
+        item[2].init(_T("Wpress"));
+        item[3].init(_T(""), FALSE);
     } else if ("D" == device_prefix) {
-        item[0].init("P1");
-        item[1].init("P2");
-        item[2].init("Press");
-        item[3].init("Leak");
+        item[0].init(_T("P1"));
+        item[1].init(_T("P2"));
+        item[2].init(_T("Press"));
+        item[3].init(_T("Leak"));
     } else if ("Y" == device_prefix) {
-        item[0].init("Press");
-        item[1].init("Position");
-        item[2].init("", FALSE);
-        item[3].init("", FALSE);
+        item[0].init(_T("Press"));
+        item[1].init(_T("Position"));
+        item[2].init(_T(""), FALSE);
+        item[3].init(_T(""), FALSE);
     }
 
     this->Init(item, 4);
@@ -171,7 +171,7 @@ void DlgChannleShow::Init(TAB_ITEM *items, int size)
     }
 
     // 设置字体
-    m_titleFont.CreatePointFont(0, "Arial");
+    m_titleFont.CreatePointFont(0, _T("Arial"));
     m_labelFont.CreatePointFont(100, _T("宋体"));
     m_editFont.CreatePointFont(100, _T("黑体"));
 

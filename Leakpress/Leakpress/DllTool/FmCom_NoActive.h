@@ -73,7 +73,7 @@ public:
         return IsOpen() ? ::SetCommState(_hCommHandle, pdcb == NULL ? &_DCB:pdcb) == TRUE: false;
     }
 //设置串口参数：波特率，停止位，等 支持设置字符串 "9600, 8, n, 1"
-    bool SetState(char *szSetStr)
+    bool SetState(TCHAR *szSetStr)
     {
         if (IsOpen())
         {
@@ -167,7 +167,7 @@ public:
         return SetState(dwBaudRate);
     }
 //打开串口, 使用类似"9600, 8, n, 1"的设置字符串设置串口
-    bool Open(DWORD dwPort, char *szSetStr)
+    bool Open(DWORD dwPort, TCHAR *szSetStr)
     {
         if (dwPort < 1 || dwPort > 1024)
         return false;
@@ -353,7 +353,7 @@ public:
 protected:
     volatile DWORD _dwPort; //串口号
     volatile HANDLE _hCommHandle; //串口句柄
-    char _szCommStr[20]; //保存COM1类似的字符串
+    TCHAR _szCommStr[20]; //保存COM1类似的字符串
     DCB _DCB; //波特率，停止位，等
     COMMTIMEOUTS _CO; //超时结构
     DWORD _dwIOMode; // 0 同步 默认 FILE_FLAG_OVERLAPPED重叠I/O异步
@@ -400,11 +400,11 @@ protected:
     void BindCommPort(DWORD dwPort)
     {
         assert(dwPort >= 1 && dwPort <= 1024);
-        char p[5];
+        TCHAR p[5];
         _dwPort = dwPort;
-        strcpy(_szCommStr, "\\\\.\\COM");
-        ltoa(_dwPort, p, 10);
-        strcat(_szCommStr, p);
+        _tcscpy(_szCommStr, _T("\\\\.\\COM"));
+        _ltot(_dwPort, p, 10);
+        _tcscat(_szCommStr, p);
     }
 //打开串口
     virtual bool OpenCommPort()
@@ -510,9 +510,9 @@ protected:
     {
         if (!::SetCommMask(_hCommHandle, _dwMaskEvent))
         {
-            char szBuffer[256];
-            _snprintf(szBuffer, 255,"%s(%d) : COM%d Call WINAPI SetCommMask(%x, %x) Fail, thread work invalid! GetLastError() = %d;", __FILE__, __LINE__, _dwPort, _hCommHandle, _dwMaskEvent, GetLastError());
-            MessageBox(NULL, (szBuffer), ("Class cnComm"), MB_OK);
+            TCHAR szBuffer[256];
+            _sntprintf(szBuffer, 255, _T("%s(%d) : COM%d Call WINAPI SetCommMask(%x, %x) Fail, thread work invalid! GetLastError() = %d;"), __FILE__, __LINE__, _dwPort, _hCommHandle, _dwMaskEvent, GetLastError());
+            MessageBox(NULL, (szBuffer), (_T("Class cnComm")), MB_OK);
             return 1;
         }
         COMSTAT Stat;
