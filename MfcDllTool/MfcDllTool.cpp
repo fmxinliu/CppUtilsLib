@@ -60,15 +60,15 @@ BOOL CMfcDllToolApp::InitInstance()
 {
     CWinApp::InitInstance();
     
-    CString path = FileManager::GetAppPath() + "config.ini";
-    CString path_bk = "C:\\Windows\\config_lp.ini";
+    CString path = FileManager::GetAppPath() + _T("config.ini");
+    CString path_bk = _T("C:\\Windows\\config_lp.ini");
 
-    if (!FileManager::IsSectionExits(path, "1") && !FileManager::IsSectionExits(path_bk, "1")) {
-        MessageBox( NULL, "文件缺失", "应用程序", MB_ICONSTOP);
+    if (!FileManager::IsSectionExits(path, _T("1")) && !FileManager::IsSectionExits(path_bk, _T("1"))) {
+        MessageBox( NULL, _T("文件缺失"), _T("应用程序"), MB_ICONSTOP);
         return FALSE;
     }
 
-    if (FileManager::IsSectionExits(path, "1") && !FileManager::IsSectionExits(path_bk, "1") && !CopyFile(path, path_bk, TRUE)) {
+    if (FileManager::IsSectionExits(path, _T("1")) && !FileManager::IsSectionExits(path_bk, _T("1")) && !CopyFile(path, path_bk, TRUE)) {
         DWORD d  = GetLastError();
         LPVOID lpMsgBuf; 
         FormatMessage( 
@@ -82,13 +82,13 @@ BOOL CMfcDllToolApp::InitInstance()
             0, 
             NULL 
             ); 
-        MessageBox( NULL, (LPCTSTR)lpMsgBuf, "应用程序", MB_ICONSTOP); 
+        MessageBox( NULL, (LPCTSTR)lpMsgBuf, _T("应用程序"), MB_ICONSTOP); 
         LocalFree( lpMsgBuf );
         return FALSE;
     }
 
-    if (FileManager::IsSectionExits(path, "1") && !FileManager::DeleteSection(path, "1")) {
-        MessageBox( NULL, "无法启动", "应用程序", MB_ICONSTOP);
+    if (FileManager::IsSectionExits(path, _T("1")) && !FileManager::DeleteSection(path, _T("1"))) {
+        MessageBox( NULL, _T("无法启动"), _T("应用程序"), MB_ICONSTOP);
         return FALSE;
     }
 

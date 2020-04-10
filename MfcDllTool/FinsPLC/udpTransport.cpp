@@ -8,6 +8,7 @@
 #include <process.h>
 #endif /* _UNISTD_H */
 
+#include <stdlib.h>
 #include <shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
 
@@ -22,7 +23,7 @@ OmronPlc::udpTransport::~udpTransport()
 {
 }
 
-void OmronPlc::udpTransport::SetRemote(string ip, uint16_t port)
+void OmronPlc::udpTransport::SetRemote(String ip, uint16_t port)
 {
     _ip = ip;
     _port = port;
@@ -38,7 +39,15 @@ bool OmronPlc::udpTransport::PLCConnect()
     //setsockopt(_socket, SOL_SOCKET, SO_RCVTIMEO, &ReceiveTimeout, sizeof(ReceiveTimeout));
 
     _serveraddr.sin_family = AF_INET;
+
+#ifdef UNICODE
+    char cip[30] = { 0 };
+    wcstombs(cip, _ip.c_str(), _ip.length() * 2);
+    _serveraddr.sin_addr.s_addr = inet_addr(cip); // 将宽字符转换成多字符
+#else
     _serveraddr.sin_addr.s_addr = inet_addr(_ip.c_str());
+#endif
+
     _serveraddr.sin_port = htons(_port);
 
     int errorcode = 0;
@@ -138,7 +147,7 @@ int OmronPlc::udpTransport::RecordErrorCode()
     // WSAETIMEDOUT(10060)  : 超时
     int errorcode = WSAGetLastError();
     if (errorcode != 0) {
-        printf("[%d] errorcode = %d\n", GetCurrentThreadId(), errorcode); // 0 : 连接关闭
+        _tprintf(_T("[%d] errorcode = %d\n"), GetCurrentThreadId(), errorcode); // 0 : 连接关闭
 
         TCHAR szLogPath[MAX_PATH] = { 0 };
         TCHAR szLogFolder[MAX_PATH] = { 0 };
@@ -148,8 +157,8 @@ int OmronPlc::udpTransport::RecordErrorCode()
         wsprintf(szLogFolder, _T("%s\\log"), szEXEFolder);
         CreateDirectory(szLogFolder, NULL);
         wsprintf(szLogPath, _T("%s\\udp.txt"), szLogFolder);
-        FILE *f = fopen(szLogPath, "a+");
-        fprintf (f, "[%d] errorcode = %d\n", GetCurrentThreadId(), errorcode);
+        FILE *f = _tfopen(szLogPath, _T("a+"));
+        _ftprintf (f, _T("[%d] errorcode = %d\n"), GetCurrentThreadId(), errorcode);
         fclose (f);
     }
 

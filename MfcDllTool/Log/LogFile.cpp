@@ -78,6 +78,11 @@ BOOL CLogFile::WriteLog(DWORD dwError, CString strExtraInfo)
     return WriteLog(strErrorMessage);
 }
 
+BOOL CLogFile::WriteLog(const char *str, CString strSuffix)
+{
+    CString mStr(str); // unicode Ò²ÊÊÓÃ
+    return WriteLog(mStr, strSuffix);
+}
 
 BOOL CLogFile::WriteLog(CString strMessage, CString strSuffix)
 {
@@ -88,7 +93,7 @@ BOOL CLogFile::WriteLog(CString strMessage, CString strSuffix)
     CString strFileName;
     GetLocalTime(&SysTime);
     strFileName.Format(_T("%s\\%d%02d%02d%s.txt"), m_strFilePath.GetBuffer(0), SysTime.wYear, SysTime.wMonth, SysTime.wDay, 
-        (strSuffix.GetLength() > 0) ? ("-" + strSuffix).GetBuffer(0) : "");
+        (strSuffix.GetLength() > 0) ? (_T("-") + strSuffix).GetBuffer(0) : _T(""));
 
     WaitForSingleObject(m_hMutex, INFINITE);
 
@@ -106,13 +111,13 @@ BOOL CLogFile::WriteLog(CString strMessage, CString strSuffix)
         File.SeekToEnd();
 
         CString strMessageTemp;
-        strMessageTemp.Format(_T("%02d:%02d:%02d: %s\r\n"), SysTime.wHour, SysTime.wMinute, SysTime.wSecond, strMessage.GetBuffer(0));
-        //printf(strMessageTemp);
-
-        char *pOldLocale = _strdup(setlocale(LC_CTYPE, NULL));
-        setlocale(LC_CTYPE, "chs");
+        strMessageTemp.Format(_T("%02d:%02d:%02d.%03d: %s\r\n"), SysTime.wHour, SysTime.wMinute, SysTime.wSecond, SysTime.wMilliseconds, strMessage.GetBuffer(0));
+        //_tprintf(strMessageTemp);
+        
+        TCHAR *pOldLocale = _tcsdup(_tsetlocale(LC_CTYPE, NULL));
+        _tsetlocale(LC_CTYPE, _T("chs"));
         File.WriteString(strMessageTemp);
-        setlocale(LC_CTYPE, pOldLocale);
+        _tsetlocale(LC_CTYPE, pOldLocale);
         free(pOldLocale);
     }
     catch (...)

@@ -32,9 +32,9 @@ std::wstring s2ws(const std::string& s)
     return result;
 }
 
-std::string RegReader::GetRegValue(int nKeyType, const std::string& strUrl, const std::string& strKey, bool bWow64_32KEY)
+String RegReader::GetRegValue(int nKeyType, const String& strUrl, const String& strKey, bool bWow64_32KEY)
 {
-    std::string strValue("");
+    String strValue(_T(""));
     HKEY hKey = NULL;
     HKEY hKeyResult = NULL;
     DWORD dwSize   = 0;
@@ -98,7 +98,7 @@ std::string RegReader::GetRegValue(int nKeyType, const std::string& strUrl, cons
         }
     }
 
-    //打开注册表
+    //打开注册表，SysWOW64 存放 32 位的注册表
     REGSAM accessMask = bWow64_32KEY ? KEY_READ | KEY_WOW64_64KEY : KEY_READ;
     if(ERROR_SUCCESS == ::RegOpenKeyEx(hKey, strUrl.c_str(), 0, accessMask, &hKeyResult))
     {
@@ -118,8 +118,8 @@ std::string RegReader::GetRegValue(int nKeyType, const std::string& strUrl, cons
         case REG_SZ:
             {
                 //分配内存大小
-                char* lpValue = new char[dwSize];
-                memset(lpValue, 0, dwSize * sizeof(char));
+                TCHAR* lpValue = new TCHAR[dwSize];
+                memset(lpValue, 0, dwSize * sizeof(TCHAR));
                 //获取注册表中指定的键所对应的值
                 if (ERROR_SUCCESS == ::RegQueryValueEx(hKeyResult, strKey.c_str(), 0, &dwDataType, (LPBYTE)lpValue, &dwSize))
                 {
@@ -135,7 +135,6 @@ std::string RegReader::GetRegValue(int nKeyType, const std::string& strUrl, cons
 
     //关闭注册表
     ::RegCloseKey(hKeyResult);
-
 
     return strValue;
 }

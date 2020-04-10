@@ -6,11 +6,11 @@
 #include <shlobj.h>
 #include <strsafe.h>
 
-#pragma comment(lib,"dbghelp.lib")
+#pragma comment(lib, "dbghelp.lib")
 
 namespace MiniDumper
 {
-    LPCTSTR processSuffix = "";
+    LPCTSTR processSuffix = _T("");
 
     void SetProcessName(LPCTSTR processName)
     {
@@ -105,16 +105,16 @@ namespace MiniDumper
         GetModuleFileName(NULL, szPathName, MAX_PATH);
         _tsplitpath_s(szPathName, szDriver, _MAX_DRIVE, szDirectory, _MAX_DIR, szFileName, _MAX_FNAME, szExt, _MAX_EXT);
 
-        wsprintf(szFilePath, _T("%s%slog"), szDriver, szDirectory);
+        _stprintf_s(szFilePath, _T("%s%slog"), szDriver, szDirectory);
 
-        HANDLE hDumpFile;
+        //HANDLE hDumpFile;
         SYSTEMTIME stLocalTime;
-        MINIDUMP_EXCEPTION_INFORMATION ExpParam;
+        //MINIDUMP_EXCEPTION_INFORMATION ExpParam;
         
         GetLocalTime(&stLocalTime);
         CreateDirectory(szFilePath, NULL);
 
-        StringCchPrintf(szFileName, MAX_PATH, "%s\\MiniDmp{%04d-%02d-%02d %02d-%02d-%02d}%s.dmp", 
+        StringCchPrintf(szFileName, MAX_PATH, _T("%s\\MiniDmp{%04d-%02d-%02d %02d-%02d-%02d}%s.dmp"), 
                    szFilePath, 
                    stLocalTime.wYear, stLocalTime.wMonth, stLocalTime.wDay, 
                    stLocalTime.wHour, stLocalTime.wMinute, stLocalTime.wSecond,
@@ -122,20 +122,15 @@ namespace MiniDumper
 
         // 创建 dump 文件
         CreateMiniDump(pExceptionInfo, szFileName);
-        MessageBox(NULL, "发生异常", "应用程序", MB_ICONSTOP);
+        MessageBox(NULL, _T("发生异常"), _T("应用程序"), MB_ICONSTOP);
 
-        /*printf("Error   address   %x/n", pExceptionInfo->ExceptionRecord->ExceptionAddress);
-        printf("CPU   register:/n");
-        printf("eax   %x   ebx   %x   ecx   %x   edx   %x/n", pExceptionInfo->ContextRecord->Eax,
-            pExceptionInfo->ContextRecord->Ebx, pExceptionInfo->ContextRecord->Ecx,
-            pExceptionInfo->ContextRecord->Edx);*/
         return EXCEPTION_EXECUTE_HANDLER;
     }
 
     // 此函数一旦成功调用，之后对 SetUnhandledExceptionFilter 的调用将无效  
     void DisableSetUnhandledExceptionFilter()
     {
-        void* addr = (void*)GetProcAddress(LoadLibrary("kernel32.dll"), "SetUnhandledExceptionFilter");
+        void* addr = (void*)GetProcAddress(LoadLibrary(_T("kernel32.dll")), "SetUnhandledExceptionFilter");
 
         if (addr)
         {

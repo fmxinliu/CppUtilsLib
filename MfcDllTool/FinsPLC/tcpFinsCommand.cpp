@@ -116,7 +116,7 @@ namespace OmronPlc
         transport->Close();
     }
 
-    void tcpFinsCommand::SetRemote(string ipaddr, uint16_t port)
+    void tcpFinsCommand::SetRemote(String ipaddr, uint16_t port)
     {
         transport->SetRemote(ipaddr, port);
     }

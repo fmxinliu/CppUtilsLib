@@ -75,10 +75,17 @@ void udpFinsCommand::Close()
     transport->Close();
 }
 
-void udpFinsCommand::SetRemote(string ipaddr, uint16_t port)
+void udpFinsCommand::SetRemote(String ipaddr, uint16_t port)
 {
     transport->SetRemote(ipaddr, port);
+
+#ifdef UNICODE
+    char cip[30] = { 0 };
+    wcstombs(cip, ipaddr.c_str(), ipaddr.length() * 2); // 将宽字符转换成多字符
+    unsigned long addr = inet_addr(cip);
+#else
     unsigned long addr = inet_addr(ipaddr.c_str());
+#endif
 
     cmdFins[ICF] = 0x80;            // 00 ICF Information control field 
     cmdFins[RSC] = 0x00;            // 01 RSC Reserved 

@@ -64,7 +64,7 @@ void FileManager::DeleteDirectory(CString FolderPath)   //删除一个文件夹下的所有
 {     
     CFileFind finder;  
     CString path;  
-    path.Format("%s/*.*",FolderPath);  
+    path.Format(_T("%s/*.*"),FolderPath);  
     BOOL bWorking = finder.FindFile(path);  
     while(bWorking){  
         bWorking = finder.FindNextFile();  
@@ -85,7 +85,7 @@ std::vector<MyFileNameStruct> FileManager::GetAllFileList(CString   strParent) /
     std::vector<MyFileNameStruct> mFileNameList;
     CString strText_i,str;  
     CFileFind finder;    
-    BOOL bFind=finder.FindFile(strParent   +   "*.*"); 
+    BOOL bFind=finder.FindFile(strParent + _T("*.*")); 
     while (bFind) 
     {      
         bFind=finder.FindNextFile();  
@@ -287,7 +287,7 @@ BOOL FileManager::SaveFile(vector<vector<CString>> strVecVec, CString strFilePat
                     if(strVecVec[j].size()-1>=i){
                         str.Append(strVecVec[j][i]);
                     }else{
-                        str.Append("-999");
+                        str.Append(_T("-999"));
                     }
                     if (j < col-1){
                         str.Append(SpitChar); // 行内数据分隔符
@@ -315,7 +315,11 @@ BOOL FileManager::SaveFile(vector<CString> strVec, CString strFilePath, CString 
 
 BOOL FileManager::SaveFile(CString str, CString strFilePath, BOOL app, BOOL hide)
 {
+#ifdef UNICODE
+    wofstream of;
+#else
     ofstream of;
+#endif
     ios_base::openmode mode = app ? ios::app : ios::trunc;
     of.open(strFilePath, mode);
     if (!of.is_open())
@@ -326,8 +330,8 @@ BOOL FileManager::SaveFile(CString str, CString strFilePath, BOOL app, BOOL hide
 
     // USES_CONVERSION;
     TCHAR *datas = NULL;
-    datas = str.GetBuffer();
-    of.write((const TCHAR *)datas, strlen(datas));
+    datas = str.GetBuffer(0);     
+    of.write((const TCHAR *)datas, _tcslen(datas));
     of.close();
     str.ReleaseBuffer();
 
@@ -345,7 +349,7 @@ BOOL FileManager::SaveFile(CString lineString, CString path, CString bkPath, BOO
         FileManager::SaveFile(lineString, bkPath, true, true);
         success = DeleteFile(path); // 存在备份文件，尝试删除原文件
         if (success) {
-            success = !rename(bkPath, path);
+            success = !_trename(bkPath, path);
             SetFileAttributes(path, FILE_ATTRIBUTE_NORMAL);
         }
     } else {
@@ -360,7 +364,11 @@ BOOL FileManager::SaveFile(CString lineString, CString path, CString bkPath, BOO
 
 BOOL FileManager::ReadFileByLine(vector<CString> &strVec, CString strFilePath)
 {
+#ifdef UNICODE
+    wifstream ifs;
+#else
     ifstream ifs;
+#endif
     ifs.open(strFilePath, ios::in);
     if (!ifs.is_open()) {
         //AfxMessageBox(_T("文件打开失败"));
@@ -400,15 +408,15 @@ void FileManager::InitConfigMap(CString mPath)
 {
     mIniPath=mPath;
 
-    std::vector<CString> mVec=ReadChildsOnGroup(mIniPath,"Map");
+    std::vector<CString> mVec=ReadChildsOnGroup(mIniPath, _T("Map"));
     if(mVec.size()>0)
     {
         for (int i=0;i<mVec.size();i++)
         {
             CString mKeyValueStr=mVec[i];
 
-            CString mkeyStr=mKeyValueStr.Left(mKeyValueStr.Find("="));
-            CString mValueStr=mKeyValueStr.Mid(mKeyValueStr.Find("=")+1);
+            CString mkeyStr=mKeyValueStr.Left(mKeyValueStr.Find(_T("=")));
+            CString mValueStr=mKeyValueStr.Mid(mKeyValueStr.Find(_T("="))+1);
             SetConfig(mkeyStr,mValueStr,false);
         }
     }
@@ -422,14 +430,14 @@ CString FileManager::GetConfig(CString mName)
         LockerGetConfig.Unlock();
         if (it == mConfigMap.end()) //值不存在
         {
-            return "";
+            return _T("");
         }
         else //值存在
         {
             return it->second;
         }
     }
-    return "";
+    return _T("");
 }
 void FileManager::SetConfig(CString mName,CString mValue,bool flagAutoSave)
 {
@@ -454,24 +462,24 @@ void FileManager::SetConfig(CString mName,CString mValue,bool flagAutoSave)
 
     if(flagAutoSave)
     {
-        WriteStringToIni(mIniPath,("Map"),mName,mValue);
+        WriteStringToIni(mIniPath,(_T("Map")),mName,mValue);
     }
 }
 void FileManager::SetConfig(CString mName,int mValue,bool flagAutoSave)
 {
     CString mStr;
-    mStr.Format("%d",mValue);
+    mStr.Format(_T("%d"),mValue);
     SetConfig(mName,mStr,flagAutoSave);
 }
 void FileManager::SetConfig(CString mName,float mValue,bool flagAutoSave)
 {
     CString mStr;
-    mStr.Format("%.8f",mValue);
+    mStr.Format(_T("%.8f"),mValue);
     SetConfig(mName,mStr,flagAutoSave);
 }
 void FileManager::SetConfig(CString mName,double mValue,bool flagAutoSave)
 {
     CString mStr;
-    mStr.Format("%f",mValue);
+    mStr.Format(_T("%f"),mValue);
     SetConfig(mName,mStr,flagAutoSave);
 }

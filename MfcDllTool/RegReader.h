@@ -29,7 +29,7 @@
 //---------------------------------------------------------------
 namespace RegReader
 {
-    std::string GetRegValue(int nKeyType, const std::string& strUrl, const std::string& strKey, bool bWow64_32KEY = true);
+    String GetRegValue(int nKeyType, const String& strUrl, const String& strKey, bool bWow64_32KEY = true);
 }
 
 

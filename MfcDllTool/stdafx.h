@@ -40,4 +40,10 @@
 
 #include <afxmt.h>
 
-#include "dllExport.h"
+#include "dllexport.h"
+#pragma warning(disable: 4482)
+#pragma warning(disable: 4996)
+
+#ifndef DEBUG
+#pragma warning(disable: 4018)
+#endif

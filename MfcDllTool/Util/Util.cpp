@@ -9,6 +9,18 @@ using namespace std;
 
 namespace Util
 {
+vector<CString> SpiltString(const char *str, char mFistChar)
+{
+    CString mStr(str); // unicode Ò²ÊÊÓÃ
+    return SpiltString(mStr, mFistChar);
+}
+
+vector<CString> SpiltString(const char *str, char mFistChar, char mSencodChar)
+{
+    CString mStr(str); // unicode Ò²ÊÊÓÃ
+    return SpiltString(mStr, mFistChar, mSencodChar);
+}
+
 vector<CString> SpiltString(CString mStr, char mFistChar)
 {
     vector<CString> mResultVec;
@@ -51,7 +63,7 @@ vector<CString> SpiltString(CString mStr, char mFistChar, char mSencodChar)
         int nLen=nPosEnd-nPosStart;
         if (nPosStart>=0 && nPosEnd>=0 && nPosEnd>nPosStart)
         {
-            CString sSubStr = mStr.Mid(nPosStart+1,nLen-1);//åŒ…å«$,ä¸æƒ³åŒ…å«æ—¶nPos+1
+            CString sSubStr = mStr.Mid(nPosStart+1,nLen-1);//°üº¬$,²»Ïë°üº¬Ê±nPos+1
             if (sSubStr.GetLength()>0)
             {
                 mResultVec.push_back(sSubStr);
@@ -205,13 +217,13 @@ int Get_DlgItem_Int(CDialog *pThis, UINT nItemID)
 {
     CString strData;
     pThis->GetDlgItem(nItemID)->GetWindowText(strData);
-    return atoi(strData);
+    return _ttoi(strData);
 }
 double Get_DlgItem_Double(CDialog *pThis, UINT nItemID)
 {
     CString strData;
     pThis->GetDlgItem(nItemID)->GetWindowText(strData);
-    return atof(strData);
+    return _ttof(strData);
 }
 
 CString Get_DlgItem_String(CDialog *pThis, UINT nItemID)
@@ -222,34 +234,44 @@ CString Get_DlgItem_String(CDialog *pThis, UINT nItemID)
 }
 
 /**
-    * #purpose    : å­—ç¬¦è½¬åå…­è¿›åˆ¶
-    * #note    : ä¸é€‚ç”¨äºæ±‰å­—å­—ç¬¦
-    * #param ch    : è¦è½¬æ¢æˆåå…­è¿›åˆ¶çš„å­—ç¬¦
-    * #return    : æ¥æ”¶è½¬æ¢åçš„å­—ç¬¦ä¸²
-    */
-std::string chToHex(unsigned char ch)
+ * #purpose  : ×Ö·û×ªÊ®Áù½øÖÆ
+ * #note     : ²»ÊÊÓÃÓÚºº×Ö×Ö·û
+ * #param ch : Òª×ª»»³ÉÊ®Áù½øÖÆµÄ×Ö·û
+ * #return   : ½ÓÊÕ×ª»»ºóµÄ×Ö·û´®
+ */
+String chToHex(unsigned char ch)
 {
-    const std::string hex = "0123456789ABCDEF";
+    const String hex = _T("0123456789ABCDEF");
 
-    std::stringstream ss;
+#ifdef UNICODE
+    wstringstream ss;
+#else
+    stringstream ss;
+#endif 
+    
     ss << hex[ch >> 4] << hex[ch & 0xf];
 
     return ss.str();
 }
 
 /**
- * #purpose    : å­—ç¬¦ä¸²è½¬åå…­è¿›åˆ¶å­—ç¬¦ä¸²
- * #note    : å¯ç”¨äºæ±‰å­—å­—ç¬¦ä¸²
- * #param str        : è¦è½¬æ¢æˆåå…­è¿›åˆ¶çš„å­—ç¬¦ä¸²
- * #param separator    : åå…­è¿›åˆ¶å­—ç¬¦ä¸²é—´çš„åˆ†éš”ç¬¦
- * #return    : æ¥æ”¶è½¬æ¢åçš„å­—ç¬¦ä¸²
+ * #purpose         : ×Ö·û´®×ªÊ®Áù½øÖÆ×Ö·û´®
+ * #note            : ¿ÉÓÃÓÚºº×Ö×Ö·û´®
+ * #param str       : Òª×ª»»³ÉÊ®Áù½øÖÆµÄ×Ö·û´®
+ * #param separator : Ê®Áù½øÖÆ×Ö·û´®¼äµÄ·Ö¸ô·û
+ * #return          : ½ÓÊÕ×ª»»ºóµÄ×Ö·û´®
  */
-std::string strToHex(std::string str, std::string separator)
+String strToHex(String str, String separator)
 {
-    const std::string hex = "0123456789ABCDEF";
-    std::stringstream ss;
+    const String hex = _T("0123456789ABCDEF");
+    
+#ifdef UNICODE
+    wstringstream ss;
+#else
+    stringstream ss;
+#endif 
  
-    for (std::string::size_type i = 0; i < str.size(); ++i)
+    for (String::size_type i = 0; i < str.size(); ++i)
         ss << hex[(unsigned char)str[i] >> 4] << hex[(unsigned char)str[i] & 0xf] << separator;
     
     return ss.str();
@@ -257,11 +279,11 @@ std::string strToHex(std::string str, std::string separator)
 
 bool DllInit()
 {
-    string guid = RegReader::GetRegValue(2, "SOFTWARE\\Microsoft\\Cryptography", "MachineGuid");
+    String guid = RegReader::GetRegValue(2, _T("SOFTWARE\\Microsoft\\Cryptography"), _T("MachineGuid"));
     return true;
 }
 
-//åˆ¤æ–­ç®¡ç†å‘˜æƒé™
+//ÅĞ¶Ï¹ÜÀíÔ±È¨ÏŞ
 BOOL IsAdmin()
 {
     BOOL b;
@@ -280,9 +302,9 @@ BOOL IsAdmin()
     return(b);
 }
 
-BOOL IsSingleton(string title)
+BOOL IsSingleton(String title)
 {
-    //å•ä¾‹è¿›ç¨‹æ¨¡å¼
+    //µ¥Àı½ø³ÌÄ£Ê½
     static HANDLE hMutex = CreateMutex( NULL, TRUE, title.c_str() );
     if ( GetLastError() == ERROR_ALREADY_EXISTS )  
     {

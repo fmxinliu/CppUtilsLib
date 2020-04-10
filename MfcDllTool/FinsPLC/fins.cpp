@@ -3,7 +3,6 @@
 #include "tcpFinsCommand.h"
 #include "udpFinsCommand.h"
 #include <stdexcept>
-
 using namespace OmronPlc;
 
 Fins::Fins(TransportType TType) : _finsCmd(NULL)
@@ -38,7 +37,7 @@ void Fins::Close()
     _finsCmd->Close();
 }
 
-void OmronPlc::Fins::SetRemote(string ipaddr, uint16_t port)
+void OmronPlc::Fins::SetRemote(String ipaddr, uint16_t port)
 {
     _finsCmd->SetRemote(ipaddr, port);
 }

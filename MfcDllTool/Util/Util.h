@@ -10,9 +10,10 @@ namespace Util
     DLL_API CString toString(float f, int nCntAfterMark);
     DLL_API CString toString(double f);
 
-
     DLL_API vector<CString> SpiltString(CString mStr, char mFistChar);
     DLL_API vector<CString> SpiltString(CString mStr, char mFistChar, char mSencodChar);
+    DLL_API vector<CString> SpiltString(const char *str, char mFistChar);
+    DLL_API vector<CString> SpiltString(const char *str, char mFistChar, char mSencodChar);
 
     DLL_API CString GetDateTimeString(CString strDateTimeType=_T("YY-MM-DD HH:MM:SS"));
 
@@ -22,11 +23,11 @@ namespace Util
     DLL_API double Get_DlgItem_Double(CDialog *pThis, UINT nItemID);
     DLL_API CString Get_DlgItem_String(CDialog *pThis, UINT nItemID);
 
-    DLL_API std::string chToHex(unsigned char ch);
-    DLL_API std::string strToHex(std::string str, std::string separator = "");
+    DLL_API String chToHex(unsigned char ch);
+    DLL_API String strToHex(String str, String separator = _T(""));
 
     DLL_API BOOL IsAdmin();
-    DLL_API BOOL IsSingleton(string title);
+    DLL_API BOOL IsSingleton(String title);
 
     bool DllInit();
 };

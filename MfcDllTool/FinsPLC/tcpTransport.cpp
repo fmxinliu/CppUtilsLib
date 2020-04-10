@@ -17,7 +17,7 @@ namespace OmronPlc
     {
     }
 
-    void tcpTransport::SetRemote(string ip, uint16_t port)
+    void tcpTransport::SetRemote(String ip, uint16_t port)
     {
         _ip = ip;
         _port = port;
@@ -32,7 +32,15 @@ namespace OmronPlc
             return true;
         }
         _serveraddr.sin_family = AF_INET;
+
+#ifdef UNICODE
+        char cip[30] = { 0 };
+        wcstombs(cip, _ip.c_str(), _ip.length() * 2);
+        _serveraddr.sin_addr.s_addr = inet_addr(cip); // 将宽字符转换成多字符
+#else
         _serveraddr.sin_addr.s_addr = inet_addr(_ip.c_str());
+#endif
+
         _serveraddr.sin_port = htons(_port);
 
         if (connect(_socket, (struct sockaddr *)&_serveraddr, sizeof(_serveraddr)) < 0)

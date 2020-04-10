@@ -2,7 +2,6 @@
 #include <cstdint>
 #include <string>
 #include <Windows.h>
-
 using namespace std;
 
 namespace OmronPlc
@@ -71,22 +70,22 @@ namespace OmronPlc
             wVersionRequested = MAKEWORD(2, 2);
             err = WSAStartup(wVersionRequested, &wsaData);
             if (err != 0) {
-                printf("WSAStartup failed with error: %d\n", err);
+                _tprintf(_T("WSAStartup failed with error: %d\n"), err);
             }
 
             if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2) {
-                printf("Could not find a usable version of Winsock.dll\n");
+                _tprintf(_T("Could not find a usable version of Winsock.dll\n"));
                 WSACleanup();
             }
             else
-                printf("The Winsock 2.2 dll was found okay\n");
+                _tprintf(_T("The Winsock 2.2 dll was found okay\n"));
         }
         virtual ~IFinsCommand() {
             WSACleanup();
         }
         virtual bool PLCConnect()=0;
         virtual void Close()=0;
-        virtual void SetRemote(string ipaddr, uint16_t port)=0;
+        virtual void SetRemote(String ipaddr, uint16_t port)=0;
         virtual bool MemoryAreaRead(MemoryArea area, uint16_t address, uint8_t bit_position, uint16_t count) = 0;
         virtual bool MemoryAreaWrite(MemoryArea area, uint16_t address, uint8_t bit_position, uint16_t count, uint8_t data[]) = 0;
     };
