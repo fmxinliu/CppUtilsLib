@@ -109,7 +109,7 @@ BOOL CLeakpressDlg::OnInitDialog()
     SetIcon(m_hIcon, TRUE);            // 设置大图标
     SetIcon(m_hIcon, FALSE);        // 设置小图标
 
-    SetWindowText(_T("Leakpress v") + GetSoftwareVersion());
+    SetWindowText(_T("Leakpress ") + GetSoftwareVersion());
 
     //LoadConfig();
     InitTabShow();
@@ -981,8 +981,7 @@ CString CLeakpressDlg::GetSoftwareVersion()
     TCHAR szFullPath[MAX_PATH];
     DWORD dwVerInfoSize = 0;
     DWORD dwVerHnd;
-    VS_FIXEDFILEINFO * pFileInfo;
-
+    
     ::GetModuleFileName(NULL, szFullPath, sizeof(szFullPath));
     dwVerInfoSize = ::GetFileVersionInfoSize(szFullPath, &dwVerHnd);
     if (dwVerInfoSize)
@@ -996,9 +995,11 @@ CString CLeakpressDlg::GetSoftwareVersion()
         lpvMem = GlobalLock(hMem);
         GetFileVersionInfo(szFullPath, dwVerHnd, dwVerInfoSize, lpvMem);
 
-        ::VerQueryValue(lpvMem, (LPTSTR)_T("\\"), (void**)&pFileInfo, &uInfoSize);
-
+        CString strVersion;
         WORD m_nProdVersion[4];
+        VS_FIXEDFILEINFO *pFileInfo;
+        
+        ::VerQueryValue(lpvMem, (LPTSTR)_T("\\"), (void**)&pFileInfo, &uInfoSize);
 
         // Product version from the FILEVERSION of the version info resource 
         m_nProdVersion[0] = HIWORD(pFileInfo->dwProductVersionMS); 
@@ -1006,9 +1007,8 @@ CString CLeakpressDlg::GetSoftwareVersion()
         m_nProdVersion[2] = HIWORD(pFileInfo->dwProductVersionLS);
         m_nProdVersion[3] = LOWORD(pFileInfo->dwProductVersionLS); 
 
-        CString strVersion ;
-        //strVersion.Format(_T("The file's version : %d.%d.%d.%d"),m_nProdVersion[0],m_nProdVersion[1],m_nProdVersion[2],m_nProdVersion[3]);
-        strVersion.Format(_T("%d.%d.%d.%d"),m_nProdVersion[0],m_nProdVersion[1],m_nProdVersion[2],m_nProdVersion[3]);
+        //strVersion.Format(_T("The file's version : %d.%d.%d.%d"), m_nProdVersion[0], m_nProdVersion[1], m_nProdVersion[2], m_nProdVersion[3]);
+        strVersion.Format(_T("v%d.%d.%d.%d"), m_nProdVersion[0], m_nProdVersion[1], m_nProdVersion[2], m_nProdVersion[3]);
 
         GlobalUnlock(hMem);
         GlobalFree(hMem);
@@ -1016,4 +1016,6 @@ CString CLeakpressDlg::GetSoftwareVersion()
         //AfxMessageBox(strVersion);
         return strVersion;
     }
+
+    return _T("");
 }
