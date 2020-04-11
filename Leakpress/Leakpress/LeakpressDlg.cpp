@@ -64,21 +64,23 @@ CLeakpressDlg::~CLeakpressDlg()
         FreeConsole();
     }
 
+    // 1.先退出线程
     exit = true;
-    fins->Close();
 
     for (int i = 0; i < NUM; i++) {
         if (mDlgChannleShow[i]) {
             delete mDlgChannleShow[i];
             mDlgChannleShow[i] = NULL;
             if (pthreads[i]) {
-                WaitForSingleObject(pthreads[i]->m_hThread, INFINITE);
+                WaitForSingleObject(pthreads[i]->m_hThread, INFINITE); // 等待检验线程退出
             }
         }
     }
     
-    WaitForSingleObject(pThreadListener->m_hThread, INFINITE);
-
+    WaitForSingleObject(pThreadListener->m_hThread, INFINITE); // 等待 PLC 报警监控线程退出
+    
+    // 2.关闭连接
+    fins->Close();
     delete fins;
 }
 

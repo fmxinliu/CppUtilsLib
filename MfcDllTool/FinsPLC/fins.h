@@ -47,6 +47,6 @@ namespace OmronPlc
         bool WriteCIOBit(uint16_t address, uint8_t bit_position, const bool value);
 
     private:
-        IFinsCommand * _finsCmd;;
+        IFinsCommand * _finsCmd;
     };
 }

@@ -14,7 +14,7 @@ namespace OmronPlc
     {
     private:
         struct sockaddr_in _serveraddr;
-        int _socket;
+        SOCKET _socket;
         uint16_t _port;
         String _ip;
 

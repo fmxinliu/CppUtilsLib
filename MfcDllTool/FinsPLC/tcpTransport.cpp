@@ -58,9 +58,9 @@ namespace OmronPlc
     {
         if (Connected)
         {
-            closesocket(_socket);
-            _socket = 0;
             Connected = false;
+            closesocket(_socket);
+            _socket = INVALID_SOCKET; 
         }
     }
 

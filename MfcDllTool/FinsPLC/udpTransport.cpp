@@ -79,9 +79,9 @@ bool OmronPlc::udpTransport::PLCConnect()
 void OmronPlc::udpTransport::Close()
 {
     if (Connected) {
-        closesocket(_socket);
-        _socket = 0;
         Connected = false;
+        closesocket(_socket);
+        _socket = INVALID_SOCKET;
     }
 }
 
@@ -141,6 +141,7 @@ int OmronPlc::udpTransport::PLCReceive(uint8_t response[], int respLen)
 
 int OmronPlc::udpTransport::RecordErrorCode()
 {
+    // WSAEINTR(10004)      : 函数调用中断
     // WSAENOTSOCK(10038)   : 无效套接字
     // WSAECONNRESET(10054) : 连接被远程主机强行关闭
     // WSAESHUTDOWN(10058)  : 套接字关闭后不能收发
