@@ -34,12 +34,6 @@
     <Filter Include="socket\include">
       <UniqueIdentifier>{60826d88-a434-47de-8ebc-caec2f136e6e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="plc">
-      <UniqueIdentifier>{b13ee9ef-cd44-4fd4-b344-805bcdccd517}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="plc\include">
-      <UniqueIdentifier>{a7c6b52e-63e6-46a3-9a5d-c930ac8bdf38}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -83,15 +77,6 @@
     </ClCompile>
     <ClCompile Include="socket\UdpTransport.cpp">
       <Filter>socket</Filter>
-    </ClCompile>
-    <ClCompile Include="plc\Fins.cpp">
-      <Filter>plc</Filter>
-    </ClCompile>
-    <ClCompile Include="plc\TcpFinsCommand.cpp">
-      <Filter>plc</Filter>
-    </ClCompile>
-    <ClCompile Include="plc\UdpFinsCommand.cpp">
-      <Filter>plc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -154,24 +139,6 @@
     </ClInclude>
     <ClInclude Include="socket\include\SocketData.h">
       <Filter>socket\include</Filter>
-    </ClInclude>
-    <ClInclude Include="plc\include\Fins.h">
-      <Filter>plc\include</Filter>
-    </ClInclude>
-    <ClInclude Include="plc\include\IFinsCommand.h">
-      <Filter>plc\include</Filter>
-    </ClInclude>
-    <ClInclude Include="plc\include\TcpFinsCommand.h">
-      <Filter>plc\include</Filter>
-    </ClInclude>
-    <ClInclude Include="plc\include\UdpFinsCommand.h">
-      <Filter>plc\include</Filter>
-    </ClInclude>
-    <ClInclude Include="FinsCmdEnum.h">
-      <Filter>plc\include</Filter>
-    </ClInclude>
-    <ClInclude Include="plc\include\FinsCmdEnum.h">
-      <Filter>plc\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -61,15 +61,7 @@ UdpFinsCommand::~UdpFinsCommand()
 
 bool UdpFinsCommand::Connect()
 {
-    try
-    {
-        return pTransport->Connect();
-    }
-    catch (const char * msg)
-    {
-        return false;
-    }
-    return false;
+    return pTransport->Connect();
 }
 
 void UdpFinsCommand::Close()

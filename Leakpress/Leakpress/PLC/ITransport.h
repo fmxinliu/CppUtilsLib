@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "dllexport.h"
 
-class DLL_API ITransport
+class ITransport
 {
 public:
     virtual ~ITransport() {};

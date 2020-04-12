@@ -16,6 +16,15 @@
     <Filter Include="DllTool">
       <UniqueIdentifier>{4453ed54-d184-40d6-bf64-d860d3a6686f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PLC">
+      <UniqueIdentifier>{571d1620-9829-4fac-b2e4-d0fc9558af13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PLC\include">
+      <UniqueIdentifier>{5a59ce02-35e0-4d0b-8afc-780f48d7428d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DllTool\socket">
+      <UniqueIdentifier>{f209d54c-102f-459a-a4a2-ebe3bd5ecad2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -54,9 +63,6 @@
     <ClInclude Include="DllTool\FileManager.h">
       <Filter>DllTool</Filter>
     </ClInclude>
-    <ClInclude Include="DllTool\fins.h">
-      <Filter>DllTool</Filter>
-    </ClInclude>
     <ClInclude Include="DllTool\IniFile.h">
       <Filter>DllTool</Filter>
     </ClInclude>
@@ -78,6 +84,42 @@
     <ClInclude Include="DllTool\dllexport.h">
       <Filter>DllTool</Filter>
     </ClInclude>
+    <ClInclude Include="PLC\include\Fins.h">
+      <Filter>PLC\include</Filter>
+    </ClInclude>
+    <ClInclude Include="PLC\include\FinsCmdEnum.h">
+      <Filter>PLC\include</Filter>
+    </ClInclude>
+    <ClInclude Include="PLC\include\IFinsCommand.h">
+      <Filter>PLC\include</Filter>
+    </ClInclude>
+    <ClInclude Include="PLC\include\TcpFinsCommand.h">
+      <Filter>PLC\include</Filter>
+    </ClInclude>
+    <ClInclude Include="PLC\include\UdpFinsCommand.h">
+      <Filter>PLC\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DllTool\MiniDumper.h">
+      <Filter>DllTool</Filter>
+    </ClInclude>
+    <ClInclude Include="DllTool\sched.h">
+      <Filter>DllTool</Filter>
+    </ClInclude>
+    <ClInclude Include="DllTool\semaphore.h">
+      <Filter>DllTool</Filter>
+    </ClInclude>
+    <ClInclude Include="DllTool\socket\ITransport.h">
+      <Filter>DllTool\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="DllTool\socket\TcpTransport.h">
+      <Filter>DllTool\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="DllTool\socket\Transport.h">
+      <Filter>DllTool\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="DllTool\socket\UdpTransport.h">
+      <Filter>DllTool\socket</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Leakpress.cpp">
@@ -94,6 +136,15 @@
     </ClCompile>
     <ClCompile Include="DlgChannleShow.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="PLC\Fins.cpp">
+      <Filter>PLC</Filter>
+    </ClCompile>
+    <ClCompile Include="PLC\TcpFinsCommand.cpp">
+      <Filter>PLC</Filter>
+    </ClCompile>
+    <ClCompile Include="PLC\UdpFinsCommand.cpp">
+      <Filter>PLC</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -6,7 +6,7 @@
 #include <WinSock.h>
 #pragma comment(lib, "ws2_32")
 
-class SocketData
+class DLL_API SocketData
 {
 public:
     SocketData() : _errorcode(0), _connected(false) {}

@@ -72,7 +72,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>DllTool;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>DllTool;DllTool\socket;PLC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -161,15 +161,26 @@
     <ClInclude Include="DlgChannleShow.h" />
     <ClInclude Include="DllTool\dllexport.h" />
     <ClInclude Include="DllTool\FileManager.h" />
-    <ClInclude Include="DllTool\fins.h" />
     <ClInclude Include="DllTool\FmCom_NoActive.h" />
     <ClInclude Include="DllTool\IniFile.h" />
     <ClInclude Include="DllTool\LogFile.h" />
     <ClInclude Include="DllTool\MiniDump.h" />
+    <ClInclude Include="DllTool\MiniDumper.h" />
     <ClInclude Include="DllTool\pthread.h" />
+    <ClInclude Include="DllTool\sched.h" />
+    <ClInclude Include="DllTool\semaphore.h" />
+    <ClInclude Include="DllTool\socket\ITransport.h" />
+    <ClInclude Include="DllTool\socket\TcpTransport.h" />
+    <ClInclude Include="DllTool\socket\Transport.h" />
+    <ClInclude Include="DllTool\socket\UdpTransport.h" />
     <ClInclude Include="DllTool\Util.h" />
     <ClInclude Include="Leakpress.h" />
     <ClInclude Include="LeakpressDlg.h" />
+    <ClInclude Include="PLC\include\Fins.h" />
+    <ClInclude Include="PLC\include\FinsCmdEnum.h" />
+    <ClInclude Include="PLC\include\IFinsCommand.h" />
+    <ClInclude Include="PLC\include\TcpFinsCommand.h" />
+    <ClInclude Include="PLC\include\UdpFinsCommand.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -179,6 +190,9 @@
     <ClCompile Include="DlgChannleShow.cpp" />
     <ClCompile Include="Leakpress.cpp" />
     <ClCompile Include="LeakpressDlg.cpp" />
+    <ClCompile Include="PLC\Fins.cpp" />
+    <ClCompile Include="PLC\TcpFinsCommand.cpp" />
+    <ClCompile Include="PLC\UdpFinsCommand.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

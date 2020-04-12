@@ -101,11 +101,11 @@ bool TcpFinsCommand::Connect()
     try
     {
         pTransport->Connect();
-
         return NodeAddressDataSend();
     }
-    catch (const char * msg)
+    catch (const char *msg)
     {
+        puts(msg);
         return false;
     }
 }
@@ -330,7 +330,6 @@ bool TcpFinsCommand::FrameSend(const vector<uint8_t> &data)
         lastError += respFins[13];
         lastError += ")";
         
-
         return false;
     }
     

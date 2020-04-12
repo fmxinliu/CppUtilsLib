@@ -70,7 +70,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>plc\include;socket\include;pthreads-w32\include;Util;COMM;Log;Dump;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>socket\include;pthreads-w32\include;Util;COMM;Log;Dump;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -161,9 +161,6 @@
     <ClCompile Include="Dump\MiniDumper.cpp" />
     <ClCompile Include="Log\LogFile.cpp" />
     <ClCompile Include="MfcDllTool.cpp" />
-    <ClCompile Include="plc\Fins.cpp" />
-    <ClCompile Include="plc\TcpFinsCommand.cpp" />
-    <ClCompile Include="plc\UdpFinsCommand.cpp" />
     <ClCompile Include="RegReader.cpp" />
     <ClCompile Include="socket\TcpTransport.cpp" />
     <ClCompile Include="socket\Transport.cpp" />
@@ -181,14 +178,8 @@
     <ClInclude Include="COMM\FmCom_NoActive.h" />
     <ClInclude Include="dllexport.h" />
     <ClInclude Include="Dump\MiniDumper.h" />
-    <ClInclude Include="FinsCmdEnum.h" />
     <ClInclude Include="Log\LogFile.h" />
     <ClInclude Include="MfcDllTool.h" />
-    <ClInclude Include="plc\include\Fins.h" />
-    <ClInclude Include="plc\include\FinsCmdEnum.h" />
-    <ClInclude Include="plc\include\IFinsCommand.h" />
-    <ClInclude Include="plc\include\TcpFinsCommand.h" />
-    <ClInclude Include="plc\include\UdpFinsCommand.h" />
     <ClInclude Include="pthreads-w32\include\pthread.h" />
     <ClInclude Include="pthreads-w32\include\sched.h" />
     <ClInclude Include="pthreads-w32\include\semaphore.h" />

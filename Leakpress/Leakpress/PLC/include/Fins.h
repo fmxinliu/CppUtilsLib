@@ -9,7 +9,7 @@
 namespace OmronPlc
 {
     class IFinsCommand;
-    class DLL_API Fins
+    class Fins
     {
     public:
         Fins(TransportType TType = TransportType::Tcp);
