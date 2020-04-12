@@ -162,7 +162,6 @@
     <ClInclude Include="DllTool\dllexport.h" />
     <ClInclude Include="DllTool\FileManager.h" />
     <ClInclude Include="DllTool\IniFile.h" />
-    <ClInclude Include="DllTool\LogFile.h" />
     <ClInclude Include="DllTool\MiniDumper.h" />
     <ClInclude Include="DllTool\pthread.h" />
     <ClInclude Include="DllTool\sched.h" />

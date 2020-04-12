@@ -718,7 +718,7 @@ afx_msg LRESULT CLeakpressDlg::OnAteqEventMsg(WPARAM wParam, LPARAM lParam)
 void CLeakpressDlg::OnRecord(CString message, CString deviceName)
 {
     if (para.recordType & LOG) {
-        logRecorder.WriteLog(message, deviceName);
+        logger.WriteLog(message.GetBuffer(0), deviceName.GetBuffer(0));
     } 
     
     if (para.recordType & CONSOLE) {

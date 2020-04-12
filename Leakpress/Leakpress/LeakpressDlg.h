@@ -105,7 +105,7 @@ private:
     CWinThread *pThreadListener;
 
     CString errorStr;
-    CLogFile logRecorder;
+    Logger logger;
 
 private:
     void MoveCtrl();

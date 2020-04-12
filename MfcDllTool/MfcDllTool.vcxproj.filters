@@ -19,9 +19,6 @@
     <Filter Include="Util">
       <UniqueIdentifier>{e4c96ee6-3433-478c-a098-72968528297f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Log">
-      <UniqueIdentifier>{020bc520-753d-4c90-80c6-835dd5825576}</UniqueIdentifier>
-    </Filter>
     <Filter Include="socket">
       <UniqueIdentifier>{b44274d9-4036-42c1-a3bc-c3eb872d4a79}</UniqueIdentifier>
     </Filter>
@@ -40,6 +37,12 @@
     <Filter Include="minidump\include">
       <UniqueIdentifier>{f33e5517-0297-4282-be4f-f4f48988f4ba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="logsys">
+      <UniqueIdentifier>{020bc520-753d-4c90-80c6-835dd5825576}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="logsys\include">
+      <UniqueIdentifier>{1eb167f0-3fd0-4074-b0a9-2d6783590122}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -56,9 +59,6 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Log\LogFile.cpp">
-      <Filter>Log</Filter>
     </ClCompile>
     <ClCompile Include="Util\FileManager.cpp">
       <Filter>Util</Filter>
@@ -87,6 +87,9 @@
     <ClCompile Include="minidump\MiniDumper.cpp">
       <Filter>minidump</Filter>
     </ClCompile>
+    <ClCompile Include="logsys\logger.cpp">
+      <Filter>logsys</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MfcDllTool.h">
@@ -100,9 +103,6 @@
     </ClInclude>
     <ClInclude Include="Resource.h">
       <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Log\LogFile.h">
-      <Filter>Log</Filter>
     </ClInclude>
     <ClInclude Include="Util\FileManager.h">
       <Filter>Util</Filter>
@@ -154,6 +154,9 @@
     </ClInclude>
     <ClInclude Include="minidump\include\MiniDumper.h">
       <Filter>minidump\include</Filter>
+    </ClInclude>
+    <ClInclude Include="logsys\include\logger.h">
+      <Filter>logsys\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

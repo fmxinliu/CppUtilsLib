@@ -69,9 +69,6 @@
     <ClInclude Include="DllTool\IniFile.h">
       <Filter>DllTool</Filter>
     </ClInclude>
-    <ClInclude Include="DllTool\LogFile.h">
-      <Filter>DllTool</Filter>
-    </ClInclude>
     <ClInclude Include="DllTool\Util.h">
       <Filter>DllTool</Filter>
     </ClInclude>

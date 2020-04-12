@@ -3,7 +3,7 @@
 #include "dataStruct.h"
 #include "serial.h"
 #include "pthread.h"
-#include "LogFile.h"
+#include "logger.h"
 #include <vector>
 #include <stdint.h>
 #include <vector>
@@ -45,7 +45,7 @@ protected:
 private:
     int id;
     CLeakpressDlg *mMainWnd;
-    CLogFile logger;
+    Logger logger;
     unsigned char data[66];
     int recvlength;
 };

@@ -1,14 +1,17 @@
 #include "StdAfx.h"
 #include "DBAdo.h"     
-#include "structinclude.h"
-#include "IniManager.h"
-CDBAdo::CDBAdo(void)    
+//#include "structinclude.h"
+//#include "IniManager.h"
+
+using namespace std;
+
+DBAdo::DBAdo(void)    
 {    
 	m_strConnect    = _T("");    
 	m_strErrorMsg   = _T(""); 
 }    
 
-CDBAdo::~CDBAdo(void)    
+DBAdo::~DBAdo(void)    
 {    
 	//关闭连接     
 	CloseConnection();    
@@ -23,7 +26,7 @@ CDBAdo::~CDBAdo(void)
 		CoUninitialize();
 }    
 
-bool CDBAdo::CreateInstance()    
+bool DBAdo::CreateInstance()    
 {    
 	//初始化 COM 
 	CoInitialize(NULL); // 调用初始化,特别在多线程中
@@ -54,13 +57,13 @@ bool CDBAdo::CreateInstance()
 	return  true;    
 }    
 
-void CDBAdo::DetectResult(HRESULT hResult)    
+void DBAdo::DetectResult(HRESULT hResult)    
 {    
 	if(FAILED(hResult))    
 		_com_issue_error(hResult);    
 }    
 
-void CDBAdo::RecordErrorMsg(_com_error comError)    
+void DBAdo::RecordErrorMsg(_com_error comError)    
 {    
 	_bstr_t bstrDescribe(comError.Description());    
 
@@ -68,7 +71,7 @@ void CDBAdo::RecordErrorMsg(_com_error comError)
 	mLogFile.WriteLog(m_strErrorMsg);
 }    
 
-bool CDBAdo::SetConnectionString(CString strDriver, CString strIP, WORD wPort, CString strCatalog, CString strUserID, CString strPassword)    
+bool DBAdo::SetConnectionString(CString strDriver, CString strIP, WORD wPort, CString strCatalog, CString strUserID, CString strPassword)    
 {    
 	CString strProvider, strPWD, strUID, strData, strDataSrc;    
 
@@ -84,7 +87,7 @@ bool CDBAdo::SetConnectionString(CString strDriver, CString strIP, WORD wPort, C
 	return true;    
 }    
 
-bool CDBAdo::SetConnectionString(CString strDriver, CString strIP, CString strCatalog, CString strUserID, CString strPassword)
+bool DBAdo::SetConnectionString(CString strDriver, CString strIP, CString strCatalog, CString strUserID, CString strPassword)
 {
 	CString	strProvider, strPWD,strUID, strData, strDataSrc;
 
@@ -101,7 +104,7 @@ bool CDBAdo::SetConnectionString(CString strDriver, CString strIP, CString strCa
 }
 
 
-bool CDBAdo::SetConnectionString(CString strDriver, CString strDataSrc, CString strUser, CString strPassword)    
+bool DBAdo::SetConnectionString(CString strDriver, CString strDataSrc, CString strUser, CString strPassword)    
 {    
 	CString strProvider, strDataSource, strUserId, strPWD;    
 
@@ -116,7 +119,7 @@ bool CDBAdo::SetConnectionString(CString strDriver, CString strDataSrc, CString 
 	return true;    
 }    
 
-bool CDBAdo::OpenConnection()    
+bool DBAdo::OpenConnection()    
 {    
 	try    
 	{    
@@ -138,7 +141,7 @@ bool CDBAdo::OpenConnection()
 	return false;    
 }    
 
-bool CDBAdo::CloseConnection()    
+bool DBAdo::CloseConnection()    
 {    
 	try    
 	{    
@@ -157,7 +160,7 @@ bool CDBAdo::CloseConnection()
 	return false;    
 }    
 
-bool CDBAdo::IsConnecting()    
+bool DBAdo::IsConnecting()    
 {    
 	try     
 	{    
@@ -190,7 +193,7 @@ bool CDBAdo::IsConnecting()
 	return false;    
 }    
 
-bool CDBAdo::OpenRecordset(char* szSQL)    
+bool DBAdo::OpenRecordset(char* szSQL)    
 {    
 	try    
 	{    
@@ -209,7 +212,7 @@ bool CDBAdo::OpenRecordset(char* szSQL)
 	return  false;    
 }    
 
-bool CDBAdo::CloseRecordset()    
+bool DBAdo::CloseRecordset()    
 {    
 	try    
 	{    
@@ -225,7 +228,7 @@ bool CDBAdo::CloseRecordset()
 	return false;    
 }    
 
-bool CDBAdo::IsRecordsetOpened()    
+bool DBAdo::IsRecordsetOpened()    
 {    
 	if(m_ptrRecordset==NULL)    
 		return  false;    
@@ -235,7 +238,7 @@ bool CDBAdo::IsRecordsetOpened()
 	return true;    
 }    
 
-bool CDBAdo::IsEndRecordset()    
+bool DBAdo::IsEndRecordset()    
 {    
 	try     
 	{    
@@ -249,7 +252,7 @@ bool CDBAdo::IsEndRecordset()
 	return true;    
 }    
 
-void CDBAdo::MoveToNext()    
+void DBAdo::MoveToNext()    
 {    
 	try     
 	{     
@@ -261,7 +264,7 @@ void CDBAdo::MoveToNext()
 	}    
 }    
 
-void CDBAdo::MoveToFirst()    
+void DBAdo::MoveToFirst()    
 {    
 	try     
 	{     
@@ -273,7 +276,7 @@ void CDBAdo::MoveToFirst()
 	}    
 }    
 
-void CDBAdo::MoveToLast()    
+void DBAdo::MoveToLast()    
 {    
 	try     
 	{     
@@ -285,7 +288,7 @@ void CDBAdo::MoveToLast()
 	}    
 }    
 
-long CDBAdo::GetRecordCount()    
+long DBAdo::GetRecordCount()    
 {    
 	try    
 	{    
@@ -301,7 +304,7 @@ long CDBAdo::GetRecordCount()
 	return 0;    
 }    
 
-void CDBAdo::ClearAllParameters()    
+void DBAdo::ClearAllParameters()    
 {    
 	try     
 	{    
@@ -323,7 +326,7 @@ void CDBAdo::ClearAllParameters()
 	}    
 }    
 
-void CDBAdo::AddParamter(LPCTSTR lpcsrName, ADOWE::ParameterDirectionEnum Direction, ADOWE::DataTypeEnum Type, long lSize, _variant_t & vtValue)    
+void DBAdo::AddParamter(LPCTSTR lpcsrName, ADOWE::ParameterDirectionEnum Direction, ADOWE::DataTypeEnum Type, long lSize, _variant_t & vtValue)    
 {    
 	ASSERT(lpcsrName!=NULL);    
 	try     
@@ -337,7 +340,7 @@ void CDBAdo::AddParamter(LPCTSTR lpcsrName, ADOWE::ParameterDirectionEnum Direct
 	}    
 }    
 
-void CDBAdo::SetSPName(LPCTSTR lpcsrSPName)    
+void DBAdo::SetSPName(LPCTSTR lpcsrSPName)    
 {    
 	try     
 	{     
@@ -349,7 +352,7 @@ void CDBAdo::SetSPName(LPCTSTR lpcsrSPName)
 	}    
 }    
 
-bool CDBAdo::ExecuteCommand(bool bIsRecordset)    
+bool DBAdo::ExecuteCommand(bool bIsRecordset)    
 {    
 	try     
 	{    
@@ -376,7 +379,7 @@ bool CDBAdo::ExecuteCommand(bool bIsRecordset)
 	return  false;    
 }    
 
-bool CDBAdo::Execute(LPCTSTR lpcsrCommand)    
+bool DBAdo::Execute(LPCTSTR lpcsrCommand)    
 {    
 	try    
 	{    
@@ -392,7 +395,7 @@ bool CDBAdo::Execute(LPCTSTR lpcsrCommand)
 	return  false;    
 }    
 
-long CDBAdo::GetReturnValue()    
+long DBAdo::GetReturnValue()    
 {    
 	try     
 	{    
@@ -413,7 +416,7 @@ long CDBAdo::GetReturnValue()
 	return  0;    
 }    
 
-bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, WORD& wValue)    
+bool DBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, WORD& wValue)    
 {    
 	wValue  = 0L;    
 	try    
@@ -432,7 +435,7 @@ bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, WORD& wValue)
 	return false;    
 }    
 
-bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, CString& strValue)    
+bool DBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, CString& strValue)    
 {    
 	try    
 	{    
@@ -453,7 +456,7 @@ bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, CString& strValue)
 	return  false;    
 }    
 
-bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, INT& nValue)    
+bool DBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, INT& nValue)    
 {    
 	nValue  = 0;    
 	try    
@@ -490,7 +493,7 @@ bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, INT& nValue)
 	return false;    
 }    
 
-bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, BYTE& bValue)    
+bool DBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, BYTE& bValue)    
 {    
 	bValue  = 0;    
 	try    
@@ -526,7 +529,7 @@ bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, BYTE& bValue)
 
 	return  false;    
 }    
-bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, UINT& ulValue)    
+bool DBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, UINT& ulValue)    
 {    
 	ulValue = 0L;    
 	try    
@@ -543,7 +546,7 @@ bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, UINT& ulValue)
 
 	return  false;    
 }    
-bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, DOUBLE& dbValue)    
+bool DBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, DOUBLE& dbValue)    
 {    
 	dbValue=0.0L;    
 	try    
@@ -576,7 +579,7 @@ bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, DOUBLE& dbValue)
 
 	return  false;    
 }    
-bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, LONG& lValue)    
+bool DBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, LONG& lValue)    
 {    
 	lValue  = 0L;    
 	try    
@@ -593,7 +596,7 @@ bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, LONG& lValue)
 
 	return  false;    
 }    
-bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, DWORD& dwValue)    
+bool DBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, DWORD& dwValue)    
 {    
 	dwValue = 0L;    
 	try    
@@ -610,7 +613,7 @@ bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, DWORD& dwValue)
 
 	return  false;    
 }    
-bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, __int64& llValue)    
+bool DBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, __int64& llValue)    
 {    
 	llValue = 0L;    
 	try    
@@ -628,7 +631,7 @@ bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, __int64& llValue)
 
 	return  false;    
 }    
-bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, COleDateTime& Time)    
+bool DBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, COleDateTime& Time)    
 {    
 	try    
 	{    
@@ -654,7 +657,7 @@ bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, COleDateTime& Time)
 	return  false;    
 }    
 
-bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, bool& bValue)    
+bool DBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, bool& bValue)    
 {    
 	try    
 	{    
@@ -677,7 +680,7 @@ bool CDBAdo::GetFieldValue(LPCTSTR lpcsrFieldName, bool& bValue)
 	return  false;    
 }    
 
-bool  CDBAdo::InsterDB(CString SheetName, std::vector<CString> NameVec, std::vector<CString> ValueVec)
+bool  DBAdo::InsterDB(CString SheetName, std::vector<CString> NameVec, std::vector<CString> ValueVec)
 {
 	if (NameVec.size()<=0 || ValueVec.size()<=0 ||NameVec.size()!=ValueVec.size())
 	{
@@ -717,7 +720,7 @@ bool  CDBAdo::InsterDB(CString SheetName, std::vector<CString> NameVec, std::vec
 	}
 }
 
-bool CDBAdo::DeleteDB(CString SheetName, CString KeyName, CString KeyValue)
+bool DBAdo::DeleteDB(CString SheetName, CString KeyName, CString KeyValue)
 {
 	CString mSqlStr;
 	mSqlStr.Format(_T("DELETE FROM %s WHERE %s = '%s'"), SheetName, KeyName, KeyValue);
@@ -734,7 +737,7 @@ bool CDBAdo::DeleteDB(CString SheetName, CString KeyName, CString KeyValue)
 	}
 }
 
-bool CDBAdo::ClearTableDB(CString SheetName)
+bool DBAdo::ClearTableDB(CString SheetName)
 {
 	CString mSqlStr;
 	mSqlStr.Format(_T("DELETE FROM %s"), SheetName);
@@ -750,7 +753,7 @@ bool CDBAdo::ClearTableDB(CString SheetName)
 	}
 }
 
-bool CDBAdo::UpdateDB(CString SheetName, std::vector<CString> NameVec, std::vector<CString> ValueVec, CString KeyName, CString mKeyValue)
+bool DBAdo::UpdateDB(CString SheetName, std::vector<CString> NameVec, std::vector<CString> ValueVec, CString KeyName, CString mKeyValue)
 {
 	if (NameVec.size()<=0 || ValueVec.size()<=0 ||NameVec.size()!=ValueVec.size())
 	{
@@ -792,7 +795,7 @@ bool CDBAdo::UpdateDB(CString SheetName, std::vector<CString> NameVec, std::vect
 	}
 }
 
-bool CDBAdo::DeleteResultsDBDatas(int mDayLimit)
+bool DBAdo::DeleteResultsDBDatas(int mDayLimit)
 {
 
 	//    QString timeLast;
@@ -820,7 +823,7 @@ bool CDBAdo::DeleteResultsDBDatas(int mDayLimit)
 
 }
 
-bool CDBAdo::ReadDB(CString SheetName, std::vector<CString> &NameVec, CString mSqlWhere, std::vector<std::vector<CString>> &mDataValue)
+bool DBAdo::ReadDB(CString SheetName, std::vector<CString> &NameVec, CString mSqlWhere, std::vector<std::vector<CString>> &mDataValue)
 {
 	mDataValue.clear();
 	if(!NameVec.size())
@@ -903,7 +906,7 @@ bool CDBAdo::ReadDB(CString SheetName, std::vector<CString> &NameVec, CString mS
 
 
 // 获取所有字段名
-bool CDBAdo::GetAllFieldName(CString SheetName, std::vector<CString> &fieldnameVec)
+bool DBAdo::GetAllFieldName(CString SheetName, std::vector<CString> &fieldnameVec)
 {
 	CString mSqlStr = _T("SELECT * FROM ") + SheetName;
 	try
@@ -934,7 +937,7 @@ bool CDBAdo::GetAllFieldName(CString SheetName, std::vector<CString> &fieldnameV
 }
 
 // 注意操作系统x64
-bool CDBAdo::Init(CString DB, CString User, CString Password, CString mConfigPath)
+bool DBAdo::Init(CString DB, CString User, CString Password, CString mConfigPath)
 {
 	if (!IniManager::CheckFileExist(DB)
 		&& !CreateDBFile(DB))
@@ -968,7 +971,7 @@ DB_ERROR:
 }
 
 // ADOX
-bool CDBAdo::CreateDBFile(CString DB)
+bool DBAdo::CreateDBFile(CString DB)
 {
 	//初始化 COM 
 	CoInitialize(NULL); // 调用初始化,特别在多线程中
@@ -1003,7 +1006,7 @@ bool CDBAdo::CreateDBFile(CString DB)
 }
 
 
-bool CDBAdo::CreateDBTable(CString mConfigPath)
+bool DBAdo::CreateDBTable(CString mConfigPath)
 {
 	if (!IniManager::CheckFileExist(mConfigPath))
 	{
@@ -1041,7 +1044,7 @@ bool CDBAdo::CreateDBTable(CString mConfigPath)
 ///*
 //	结果数据结构：
 //*/
-//bool CDBAdo::CreateResTable()
+//bool DBAdo::CreateResTable()
 //{
 //	//CString mSqlStr(_T("select name from MSysObjects where type=1 and flags=0"));
 //	//Execute(mSqlStr);

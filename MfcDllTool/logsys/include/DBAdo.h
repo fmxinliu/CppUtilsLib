@@ -1,11 +1,11 @@
 #pragma once
 #include <vector>
-#include "LogFile.h"
+#include "LogToFile.h"
 #import "c:\Program Files\Common Files\System\ado\msadox.dll" rename_namespace("ADOCG") rename("EOF", "adoXEOF")
 #import "c:\program files\common files\system\ado\msado15.dll"	rename_namespace("ADOWE") rename("EOF","EndOfFile")
 using namespace ADOWE;    
 
-class CDBAdo  
+class DBAdo  
 {  
 public:  
 	_CommandPtr     m_ptrCommand;       //命令对象  
@@ -16,8 +16,8 @@ public:
 		m_strErrorMsg;      //错误信息  
 
 public:  
-	CDBAdo(void);  
-	~CDBAdo(void);  
+	DBAdo(void);  
+	~DBAdo(void);  
 
 	void    DetectResult(HRESULT hResult);  
 	void    RecordErrorMsg(_com_error comError);  
@@ -71,5 +71,5 @@ public:
 	bool CreateDBFile(CString path);
 	bool CreateDBTable(CString mConfigPath); // 读取INI中SQL语句创建
 public:
-	CLogFile mLogFile;
+	LogFile mLogFile;
 }; 
