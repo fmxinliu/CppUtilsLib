@@ -80,7 +80,7 @@ CLeakpressDlg::~CLeakpressDlg()
     WaitForSingleObject(pThreadListener->m_hThread, INFINITE); // 等待 PLC 报警监控线程退出
     
     // 2.关闭连接
-    fins->Close();
+    fins->PLCClose();
     delete fins;
 }
 
@@ -321,7 +321,7 @@ void CLeakpressDlg::Init()
 bool CLeakpressDlg::PLCConnect()
 {
     fins->SetRemote(para.ip.GetBuffer(0));
-    if (!fins->Connect()) {
+    if (!fins->PLCConnect()) {
         MessageBox(_T("PLC连接错误"), _T("PLC连接"), MB_SYSTEMMODAL|MB_ICONEXCLAMATION|MB_OK);
         return false;
     }

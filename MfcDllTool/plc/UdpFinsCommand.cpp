@@ -1,12 +1,14 @@
 #include "stdafx.h"
-#include "udpFinsCommand.h"
+#include "UdpFinsCommand.h"
+#include "UdpTransport.h"
 
+using namespace std;
 using namespace OmronPlc;
 
-udpFinsCommand::udpFinsCommand(uint8_t ServiceID) :
+UdpFinsCommand::UdpFinsCommand(uint8_t ServiceID) :
     finsCommandLen(0), finsResponseLen(0)
 {
-    transport = new udpTransport();
+    pTransport = new UdpTransport();
 
     //cmdFins[SID] = ServiceID;
     //Response = &respFinsData[0];
@@ -44,24 +46,24 @@ udpFinsCommand::udpFinsCommand(uint8_t ServiceID) :
     {
         respFinsData.push_back(0); //新元素构造
     }
-    Response = &respFinsData[0];
+    _response = &respFinsData[0];
 
 
     finsCommandLen = 0;
     finsResponseLen = 0;
 }
 
-udpFinsCommand::~udpFinsCommand()
+UdpFinsCommand::~UdpFinsCommand()
 {
-    delete transport;
-    transport = NULL;
+    delete pTransport;
+    pTransport = NULL;
 }
 
-bool udpFinsCommand::PLCConnect()
+bool UdpFinsCommand::Connect()
 {
     try
     {
-        return transport->PLCConnect();
+        return pTransport->Connect();
     }
     catch (const char * msg)
     {
@@ -70,14 +72,14 @@ bool udpFinsCommand::PLCConnect()
     return false;
 }
 
-void udpFinsCommand::Close()
+void UdpFinsCommand::Close()
 {
-    transport->Close();
+    pTransport->Close();
 }
 
-void udpFinsCommand::SetRemote(String ipaddr, uint16_t port)
+void UdpFinsCommand::SetRemote(String ipaddr, uint16_t port)
 {
-    transport->SetRemote(ipaddr, port);
+    pTransport->SetRemote(ipaddr, port);
 
 #ifdef UNICODE
     char cip[30] = { 0 };
@@ -100,7 +102,7 @@ void udpFinsCommand::SetRemote(String ipaddr, uint16_t port)
 }
 
 
-bool udpFinsCommand::MemoryAreaRead(MemoryArea area, uint16_t address, uint8_t bit_position, uint16_t count)
+bool UdpFinsCommand::MemoryAreaRead(MemoryArea area, uint16_t address, uint8_t bit_position, uint16_t count)
 {
     try
     {
@@ -142,7 +144,7 @@ bool udpFinsCommand::MemoryAreaRead(MemoryArea area, uint16_t address, uint8_t b
     }
 }
 
-bool udpFinsCommand::MemoryAreaWrite(MemoryArea area, uint16_t address, uint8_t bit_position, uint16_t count, uint8_t data[])
+bool UdpFinsCommand::MemoryAreaWrite(MemoryArea area, uint16_t address, uint8_t bit_position, uint16_t count, uint8_t data[])
 {
     try
     {
@@ -185,7 +187,7 @@ bool udpFinsCommand::MemoryAreaWrite(MemoryArea area, uint16_t address, uint8_t 
     }
 }
 
-bool udpFinsCommand::FrameSend(const vector<uint8_t> &data)
+bool UdpFinsCommand::FrameSend(const vector<uint8_t> &data)
 {
     int fsLen = finsCommandLen;
     fsLen += data.size();
@@ -204,9 +206,9 @@ bool udpFinsCommand::FrameSend(const vector<uint8_t> &data)
     }
     // send FINS command
     //
-    transport->PLCSend(&cmdFins[0], fsLen);
+    pTransport->Send(&cmdFins[0], fsLen);
 
-    transport->PLCReceive(&respFins[0], finsResponseLen);
+    pTransport->Receive(&respFins[0], finsResponseLen);
 
     // check response code
     //

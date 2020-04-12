@@ -16,9 +16,6 @@
     <Filter Include="pthreads-w32">
       <UniqueIdentifier>{f123bad3-6ead-40ce-88d7-9baf2379132d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="FinsPLC">
-      <UniqueIdentifier>{b13ee9ef-cd44-4fd4-b344-805bcdccd517}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Util">
       <UniqueIdentifier>{e4c96ee6-3433-478c-a098-72968528297f}</UniqueIdentifier>
     </Filter>
@@ -30,6 +27,18 @@
     </Filter>
     <Filter Include="Dump">
       <UniqueIdentifier>{7736949c-5c7a-4bd8-b27e-5679ec3dc1c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="socket">
+      <UniqueIdentifier>{b44274d9-4036-42c1-a3bc-c3eb872d4a79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="socket\include">
+      <UniqueIdentifier>{60826d88-a434-47de-8ebc-caec2f136e6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="plc">
+      <UniqueIdentifier>{b13ee9ef-cd44-4fd4-b344-805bcdccd517}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="plc\include">
+      <UniqueIdentifier>{a7c6b52e-63e6-46a3-9a5d-c930ac8bdf38}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -51,21 +60,6 @@
     <ClCompile Include="Log\LogFile.cpp">
       <Filter>Log</Filter>
     </ClCompile>
-    <ClCompile Include="FinsPLC\fins.cpp">
-      <Filter>FinsPLC</Filter>
-    </ClCompile>
-    <ClCompile Include="FinsPLC\tcpFinsCommand.cpp">
-      <Filter>FinsPLC</Filter>
-    </ClCompile>
-    <ClCompile Include="FinsPLC\tcpTransport.cpp">
-      <Filter>FinsPLC</Filter>
-    </ClCompile>
-    <ClCompile Include="FinsPLC\udpFinsCommand.cpp">
-      <Filter>FinsPLC</Filter>
-    </ClCompile>
-    <ClCompile Include="FinsPLC\udpTransport.cpp">
-      <Filter>FinsPLC</Filter>
-    </ClCompile>
     <ClCompile Include="Util\FileManager.cpp">
       <Filter>Util</Filter>
     </ClCompile>
@@ -80,6 +74,24 @@
     </ClCompile>
     <ClCompile Include="Dump\MiniDumper.cpp">
       <Filter>Dump</Filter>
+    </ClCompile>
+    <ClCompile Include="socket\TcpTransport.cpp">
+      <Filter>socket</Filter>
+    </ClCompile>
+    <ClCompile Include="socket\Transport.cpp">
+      <Filter>socket</Filter>
+    </ClCompile>
+    <ClCompile Include="socket\UdpTransport.cpp">
+      <Filter>socket</Filter>
+    </ClCompile>
+    <ClCompile Include="plc\Fins.cpp">
+      <Filter>plc</Filter>
+    </ClCompile>
+    <ClCompile Include="plc\TcpFinsCommand.cpp">
+      <Filter>plc</Filter>
+    </ClCompile>
+    <ClCompile Include="plc\UdpFinsCommand.cpp">
+      <Filter>plc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -97,27 +109,6 @@
     </ClInclude>
     <ClInclude Include="Log\LogFile.h">
       <Filter>Log</Filter>
-    </ClInclude>
-    <ClInclude Include="FinsPLC\fins.h">
-      <Filter>FinsPLC</Filter>
-    </ClInclude>
-    <ClInclude Include="FinsPLC\IFinsCommand.h">
-      <Filter>FinsPLC</Filter>
-    </ClInclude>
-    <ClInclude Include="FinsPLC\ITransport.h">
-      <Filter>FinsPLC</Filter>
-    </ClInclude>
-    <ClInclude Include="FinsPLC\tcpFinsCommand.h">
-      <Filter>FinsPLC</Filter>
-    </ClInclude>
-    <ClInclude Include="FinsPLC\tcpTransport.h">
-      <Filter>FinsPLC</Filter>
-    </ClInclude>
-    <ClInclude Include="FinsPLC\udpFinsCommand.h">
-      <Filter>FinsPLC</Filter>
-    </ClInclude>
-    <ClInclude Include="FinsPLC\udpTransport.h">
-      <Filter>FinsPLC</Filter>
     </ClInclude>
     <ClInclude Include="COMM\FmCom_NoActive.h">
       <Filter>COMM</Filter>
@@ -148,6 +139,39 @@
     </ClInclude>
     <ClInclude Include="dllexport.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\include\ITransport.h">
+      <Filter>socket\include</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\include\TcpTransport.h">
+      <Filter>socket\include</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\include\Transport.h">
+      <Filter>socket\include</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\include\UdpTransport.h">
+      <Filter>socket\include</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\include\SocketData.h">
+      <Filter>socket\include</Filter>
+    </ClInclude>
+    <ClInclude Include="plc\include\Fins.h">
+      <Filter>plc\include</Filter>
+    </ClInclude>
+    <ClInclude Include="plc\include\IFinsCommand.h">
+      <Filter>plc\include</Filter>
+    </ClInclude>
+    <ClInclude Include="plc\include\TcpFinsCommand.h">
+      <Filter>plc\include</Filter>
+    </ClInclude>
+    <ClInclude Include="plc\include\UdpFinsCommand.h">
+      <Filter>plc\include</Filter>
+    </ClInclude>
+    <ClInclude Include="FinsCmdEnum.h">
+      <Filter>plc\include</Filter>
+    </ClInclude>
+    <ClInclude Include="plc\include\FinsCmdEnum.h">
+      <Filter>plc\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

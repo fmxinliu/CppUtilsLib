@@ -1,8 +1,12 @@
 #include "stdafx.h"
 #include "fins.h"
-#include "tcpFinsCommand.h"
-#include "udpFinsCommand.h"
+#include "TcpFinsCommand.h"
+#include "UdpFinsCommand.h"
 #include <stdexcept>
+
+#define Response(n) _finsCmd->Response()[n]
+
+using namespace std;
 using namespace OmronPlc;
 
 Fins::Fins(TransportType TType) : _finsCmd(NULL)
@@ -10,10 +14,10 @@ Fins::Fins(TransportType TType) : _finsCmd(NULL)
     switch (TType)
     {
     case TransportType::Tcp:
-        _finsCmd = new tcpFinsCommand();
+        _finsCmd = new TcpFinsCommand();
         break;
     case TransportType::Udp:
-        _finsCmd = new udpFinsCommand();
+        _finsCmd = new UdpFinsCommand();
         break;
     case TransportType::Hostlink:
     default:
@@ -27,17 +31,17 @@ Fins::~Fins()
     _finsCmd = NULL;
 }
 
-bool Fins::Connect()
+bool Fins::PLCConnect()
 {
-    return _finsCmd->PLCConnect();
+    return _finsCmd->Connect();
 }
 
-void Fins::Close()
+void Fins::PLCClose()
 {
     _finsCmd->Close();
 }
 
-void OmronPlc::Fins::SetRemote(String ipaddr, uint16_t port)
+void Fins::SetRemote(String ipaddr, uint16_t port)
 {
     _finsCmd->SetRemote(ipaddr, port);
 }
@@ -85,7 +89,7 @@ bool Fins::ReadDM(uint16_t address, uint16_t & value)
 {
     if (!MemoryAreaRead(DM, address, 0, 1)) return false;
 
-    value = (uint16_t)(((unsigned int)_finsCmd->Response[0] << 8) + (unsigned int)_finsCmd->Response[1]);
+    value = (uint16_t)(((unsigned int)Response(0) << 8) + (unsigned int)Response(1));
 
     return true;
 }
@@ -94,7 +98,7 @@ bool Fins::ReadDM(uint16_t address, int16_t & value)
 {
     if (!MemoryAreaRead(DM, address, 0, 1)) return false;
 
-    value = (int16_t)(((int)_finsCmd->Response[0] << 8) + (int16_t)_finsCmd->Response[1]);
+    value = (int16_t)(((int)Response(0) << 8) + (int16_t)Response(1));
 
     return true;
 }
@@ -104,8 +108,8 @@ bool Fins::ReadDM(uint16_t address, uint8_t data[], uint16_t count)
     if (!MemoryAreaRead(DM, address, 0, count)) return false;
 
     for (int i = 0; i < count - 1; i += 2) {
-        data[i] = (uint8_t)_finsCmd->Response[i + 1];
-        data[i + 1] = (uint8_t)_finsCmd->Response[i];
+        data[i] = (uint8_t)Response(i + 1);
+        data[i + 1] = (uint8_t)Response(i);
     }
 
     return true;
@@ -117,7 +121,7 @@ bool Fins::ReadDM(uint16_t address, uint16_t data[], uint16_t count)
 
     for (int x = 0; x < count; ++x)
     {
-        data[x] = (uint16_t)(((unsigned int)_finsCmd->Response[x * 2] << 8) + ((uint16_t)_finsCmd->Response[x * 2 + 1]));
+        data[x] = (uint16_t)(((unsigned int)Response(x * 2) << 8) + ((uint16_t)Response(x * 2 + 1)));
     }
 
     return true;
@@ -174,7 +178,7 @@ bool Fins::ReadCIOBit(uint16_t address, uint8_t bit_position, bool & value)
     // value
     //
     //value = BTool.BytesToUInt16(_finsCmd.Response[0], _finsCmd.Response[1]);
-    if(_finsCmd->Response[0])
+    if(Response(0))
          value = true;
     else
         value = false;
@@ -182,7 +186,7 @@ bool Fins::ReadCIOBit(uint16_t address, uint8_t bit_position, bool & value)
     return true;
 }
 
-bool OmronPlc::Fins::WriteCIOBit(uint16_t address, uint8_t bit_position, const bool value)
+bool Fins::WriteCIOBit(uint16_t address, uint8_t bit_position, const bool value)
 {
     // get the array
     //

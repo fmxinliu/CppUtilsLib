@@ -1,33 +1,22 @@
 #pragma once
+
 #include <cstdint>
-#ifndef _UNISTD_H
-
-#define _UNISTD_H 
- #include <io.h> 
- #include <process.h> 
-#endif /* _UNISTD_H */
-
-#include "IFinsCommand.h"
+#include "dllexport.h"
+#include "FinsCmdEnum.h"
 
 #define DEFAULT_PORT 9600
 
 namespace OmronPlc
 {
-    enum TransportType
-    {
-        Tcp,
-        Udp,
-        Hostlink
-    };
-
+    class IFinsCommand;
     class DLL_API Fins
     {
     public:
         Fins(TransportType TType = TransportType::Tcp);
         virtual ~Fins();
 
-        bool Connect();
-        void Close();
+        bool PLCConnect();
+        void PLCClose();
         void SetRemote(String ipaddr, uint16_t port=DEFAULT_PORT);
 
         bool MemoryAreaRead(MemoryArea area, uint16_t address, uint8_t bit_position, uint16_t count);
@@ -47,6 +36,6 @@ namespace OmronPlc
         bool WriteCIOBit(uint16_t address, uint8_t bit_position, const bool value);
 
     private:
-        IFinsCommand * _finsCmd;
+        IFinsCommand *_finsCmd;
     };
 }

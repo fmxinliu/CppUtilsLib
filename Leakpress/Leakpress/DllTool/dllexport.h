@@ -1,6 +1,8 @@
 #ifndef __DLLEXPORT__H__
 #define __DLLEXPORT__H__
 
+#include <string>
+
 #  ifndef UNICODE
 #    define String std::string   
 #  else

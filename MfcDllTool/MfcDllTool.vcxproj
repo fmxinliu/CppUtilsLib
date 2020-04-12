@@ -70,7 +70,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>pthreads-w32\include;FinsPLC;Util;COMM;Log;Dump;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>plc\include;socket\include;pthreads-w32\include;Util;COMM;Log;Dump;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -159,14 +159,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Dump\MiniDumper.cpp" />
-    <ClCompile Include="FinsPLC\fins.cpp" />
-    <ClCompile Include="FinsPLC\tcpFinsCommand.cpp" />
-    <ClCompile Include="FinsPLC\tcpTransport.cpp" />
-    <ClCompile Include="FinsPLC\udpFinsCommand.cpp" />
-    <ClCompile Include="FinsPLC\udpTransport.cpp" />
     <ClCompile Include="Log\LogFile.cpp" />
     <ClCompile Include="MfcDllTool.cpp" />
+    <ClCompile Include="plc\Fins.cpp" />
+    <ClCompile Include="plc\TcpFinsCommand.cpp" />
+    <ClCompile Include="plc\UdpFinsCommand.cpp" />
     <ClCompile Include="RegReader.cpp" />
+    <ClCompile Include="socket\TcpTransport.cpp" />
+    <ClCompile Include="socket\Transport.cpp" />
+    <ClCompile Include="socket\UdpTransport.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -180,20 +181,24 @@
     <ClInclude Include="COMM\FmCom_NoActive.h" />
     <ClInclude Include="dllexport.h" />
     <ClInclude Include="Dump\MiniDumper.h" />
-    <ClInclude Include="FinsPLC\fins.h" />
-    <ClInclude Include="FinsPLC\IFinsCommand.h" />
-    <ClInclude Include="FinsPLC\ITransport.h" />
-    <ClInclude Include="FinsPLC\tcpFinsCommand.h" />
-    <ClInclude Include="FinsPLC\tcpTransport.h" />
-    <ClInclude Include="FinsPLC\udpFinsCommand.h" />
-    <ClInclude Include="FinsPLC\udpTransport.h" />
+    <ClInclude Include="FinsCmdEnum.h" />
     <ClInclude Include="Log\LogFile.h" />
     <ClInclude Include="MfcDllTool.h" />
+    <ClInclude Include="plc\include\Fins.h" />
+    <ClInclude Include="plc\include\FinsCmdEnum.h" />
+    <ClInclude Include="plc\include\IFinsCommand.h" />
+    <ClInclude Include="plc\include\TcpFinsCommand.h" />
+    <ClInclude Include="plc\include\UdpFinsCommand.h" />
     <ClInclude Include="pthreads-w32\include\pthread.h" />
     <ClInclude Include="pthreads-w32\include\sched.h" />
     <ClInclude Include="pthreads-w32\include\semaphore.h" />
     <ClInclude Include="RegReader.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="socket\include\ITransport.h" />
+    <ClInclude Include="socket\include\SocketData.h" />
+    <ClInclude Include="socket\include\TcpTransport.h" />
+    <ClInclude Include="socket\include\Transport.h" />
+    <ClInclude Include="socket\include\UdpTransport.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Util\FileManager.h" />
