@@ -70,7 +70,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>socket\include;pthreads-w32\include;Util;COMM;Log;Dump;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>serial\include;socket\include;pthreads-w32\include;Util;Log;Dump;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -162,6 +162,7 @@
     <ClCompile Include="Log\LogFile.cpp" />
     <ClCompile Include="MfcDllTool.cpp" />
     <ClCompile Include="RegReader.cpp" />
+    <ClCompile Include="serial\serial.cpp" />
     <ClCompile Include="socket\TcpTransport.cpp" />
     <ClCompile Include="socket\Transport.cpp" />
     <ClCompile Include="socket\UdpTransport.cpp" />
@@ -175,7 +176,6 @@
     <ClCompile Include="Util\Util.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="COMM\FmCom_NoActive.h" />
     <ClInclude Include="dllexport.h" />
     <ClInclude Include="Dump\MiniDumper.h" />
     <ClInclude Include="Log\LogFile.h" />
@@ -185,6 +185,9 @@
     <ClInclude Include="pthreads-w32\include\semaphore.h" />
     <ClInclude Include="RegReader.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="serial\include\cncomm.h" />
+    <ClInclude Include="serial\include\icomcallback.h" />
+    <ClInclude Include="serial\include\serial.h" />
     <ClInclude Include="socket\include\ITransport.h" />
     <ClInclude Include="socket\include\SocketData.h" />
     <ClInclude Include="socket\include\TcpTransport.h" />
@@ -202,4 +205,9 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="MfcDllTool.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

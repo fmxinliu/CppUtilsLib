@@ -14,6 +14,7 @@ copyright(c) 2004.5 - 2005.8 llbird wushaojian@21cn.com
 #include <assert.h>
 #include <stdio.h>
 #include <windows.h>
+#include "icomcallback.h"
 //送到窗口的消息 WPARAM 端口号
 #define ON_COM_RECEIVE WM_USER + 618
 #define ON_COM_CTS WM_USER + 619 //LPARAM 1 valid
@@ -24,7 +25,6 @@ copyright(c) 2004.5 - 2005.8 llbird wushaojian@21cn.com
 #define ON_COM_TXEMPTY WM_USER + 626
 #define ON_COM_ERROR WM_USER + 627 //LPARAM save Error ID
 #define DEFAULT_COM_MASK_EVENT EV_RXCHAR | EV_ERR | EV_CTS | EV_DSR | EV_BREAK | EV_TXEMPTY | EV_RING | EV_RLSD
-
 
 
 class cnComm
@@ -114,6 +114,11 @@ public:
     bool SetBufferSize(DWORD dwInputSize, DWORD dwOutputSize)
     {
         return IsOpen() ? ::SetupComm(_hCommHandle, dwInputSize, dwOutputSize)== TRUE: false;
+    }
+//设置回调函数
+    inline void SetCallBack(IComCallBack *pReceiveCallBack)
+    {
+        _pReceiveCallBack = pReceiveCallBack;
     }
 //关联消息的窗口句柄
     inline void SetWnd(HWND hWnd)
@@ -365,6 +370,7 @@ protected:
     volatile bool _fRunFlag; //线程运行循环标志
     bool _fAutoBeginThread; //Open() 自动 BeginThread();
     OVERLAPPED _WaitOverlapped; //WaitCommEvent use
+    IComCallBack *_pReceiveCallBack; // 异步回调
 //初始化
     void Init()
     {
@@ -385,6 +391,7 @@ protected:
         memset(&_WaitOverlapped, 0, sizeof(_WaitOverlapped));
         _WaitOverlapped.hEvent = ::CreateEvent(NULL, true, false, NULL);
         assert(_WaitOverlapped.hEvent != INVALID_HANDLE_VALUE);
+        _pReceiveCallBack = NULL;
     }
 //析构
     void UnInit()
@@ -448,16 +455,18 @@ protected:
 //线程收到消息自动调用, 如窗口句柄有效, 送出消息, 包含串口编号， 均为虚函数可以在基层类中扩展
     virtual void OnReceive() //EV_RXCHAR
     {
-        CString m_comrecestr;
-        if (::IsWindow(_hNotifyWnd))
-        {
-            char str[100];
-            ReadString(str,100,1000);//函数返回带结束符的str
-            m_comrecestr += str;//此时str没有结束符
+        if (_pReceiveCallBack) {
+            _pReceiveCallBack->OnReceive();
         }
-
-        ::PostMessage(_hNotifyWnd, ON_COM_RECEIVE, WPARAM(_dwPort),  (LPARAM)new CString(m_comrecestr));
-    //::PostMessage(_hNotifyWnd, ON_COM_RECEIVE, WPARAM(_dwPort), LPARAM (0));
+        
+        if (::IsWindow(_hNotifyWnd)) {
+            CString m_comrecestr;
+            char str[100];
+            ReadString(str, 100, 100); // 函数返回带结束符的str
+            ::PostMessage(_hNotifyWnd, ON_COM_RECEIVE, WPARAM(_dwPort),  (LPARAM)str);
+        }
+        
+        //::PostMessage(_hNotifyWnd, ON_COM_RECEIVE, WPARAM(_dwPort), LPARAM (0));
     }
     virtual void OnDSR()
     {
@@ -562,7 +571,7 @@ protected:
         return 0;
     }
 private:
-//the function protected
+//the function private
 cnComm(const cnComm &);
 cnComm &operator = (const cnComm &);
 //base function for thread

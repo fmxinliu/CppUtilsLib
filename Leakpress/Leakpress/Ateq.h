@@ -1,7 +1,7 @@
 #pragma once
 
 #include "dataStruct.h"
-#include "FmCom_NoActive.h"
+#include "serial.h"
 #include "pthread.h"
 #include "LogFile.h"
 #include <vector>
@@ -14,7 +14,7 @@ using namespace std;
 
 
 class CLeakpressDlg;
-class Ateq : public cnComm
+class Ateq : public Serial
 {
 public:
     Ateq(void);

@@ -72,7 +72,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>DllTool;DllTool\socket;PLC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>DllTool;DllTool\serial;DllTool\socket;PLC\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -161,7 +161,6 @@
     <ClInclude Include="DlgChannleShow.h" />
     <ClInclude Include="DllTool\dllexport.h" />
     <ClInclude Include="DllTool\FileManager.h" />
-    <ClInclude Include="DllTool\FmCom_NoActive.h" />
     <ClInclude Include="DllTool\IniFile.h" />
     <ClInclude Include="DllTool\LogFile.h" />
     <ClInclude Include="DllTool\MiniDump.h" />
@@ -169,6 +168,8 @@
     <ClInclude Include="DllTool\pthread.h" />
     <ClInclude Include="DllTool\sched.h" />
     <ClInclude Include="DllTool\semaphore.h" />
+    <ClInclude Include="DllTool\serial\icomcallback.h" />
+    <ClInclude Include="DllTool\serial\serial.h" />
     <ClInclude Include="DllTool\socket\ITransport.h" />
     <ClInclude Include="DllTool\socket\TcpTransport.h" />
     <ClInclude Include="DllTool\socket\Transport.h" />

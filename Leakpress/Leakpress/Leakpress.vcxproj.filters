@@ -25,6 +25,9 @@
     <Filter Include="DllTool\socket">
       <UniqueIdentifier>{f209d54c-102f-459a-a4a2-ebe3bd5ecad2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DllTool\serial">
+      <UniqueIdentifier>{c0a5e770-0fe8-4d39-8e16-5c7c2c62cef3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -72,9 +75,6 @@
     <ClInclude Include="DllTool\Util.h">
       <Filter>DllTool</Filter>
     </ClInclude>
-    <ClInclude Include="DllTool\FmCom_NoActive.h">
-      <Filter>DllTool</Filter>
-    </ClInclude>
     <ClInclude Include="DllTool\pthread.h">
       <Filter>DllTool</Filter>
     </ClInclude>
@@ -119,6 +119,12 @@
     </ClInclude>
     <ClInclude Include="DllTool\socket\UdpTransport.h">
       <Filter>DllTool\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="DllTool\serial\icomcallback.h">
+      <Filter>DllTool\serial</Filter>
+    </ClInclude>
+    <ClInclude Include="DllTool\serial\serial.h">
+      <Filter>DllTool\serial</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -22,9 +22,6 @@
     <Filter Include="Log">
       <UniqueIdentifier>{020bc520-753d-4c90-80c6-835dd5825576}</UniqueIdentifier>
     </Filter>
-    <Filter Include="COMM">
-      <UniqueIdentifier>{0fe7d488-70d0-49e5-b33a-289673dba68b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Dump">
       <UniqueIdentifier>{7736949c-5c7a-4bd8-b27e-5679ec3dc1c1}</UniqueIdentifier>
     </Filter>
@@ -33,6 +30,12 @@
     </Filter>
     <Filter Include="socket\include">
       <UniqueIdentifier>{60826d88-a434-47de-8ebc-caec2f136e6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="serial">
+      <UniqueIdentifier>{0fe7d488-70d0-49e5-b33a-289673dba68b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="serial\include">
+      <UniqueIdentifier>{c259d7ee-f52d-46c2-8352-e8da18227cb1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -78,6 +81,9 @@
     <ClCompile Include="socket\UdpTransport.cpp">
       <Filter>socket</Filter>
     </ClCompile>
+    <ClCompile Include="serial\serial.cpp">
+      <Filter>serial</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MfcDllTool.h">
@@ -94,9 +100,6 @@
     </ClInclude>
     <ClInclude Include="Log\LogFile.h">
       <Filter>Log</Filter>
-    </ClInclude>
-    <ClInclude Include="COMM\FmCom_NoActive.h">
-      <Filter>COMM</Filter>
     </ClInclude>
     <ClInclude Include="Util\FileManager.h">
       <Filter>Util</Filter>
@@ -139,6 +142,15 @@
     </ClInclude>
     <ClInclude Include="socket\include\SocketData.h">
       <Filter>socket\include</Filter>
+    </ClInclude>
+    <ClInclude Include="serial\include\cncomm.h">
+      <Filter>serial\include</Filter>
+    </ClInclude>
+    <ClInclude Include="serial\include\icomcallback.h">
+      <Filter>serial\include</Filter>
+    </ClInclude>
+    <ClInclude Include="serial\include\serial.h">
+      <Filter>serial\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
