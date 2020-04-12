@@ -1,4 +1,4 @@
-#include "stdafx.h"
+Ôªø#include "stdafx.h"
 #include "Transport.h"
 #include "SocketData.h"
 
@@ -70,7 +70,7 @@ int Transport::Send(const uint8_t command[], int cmdLen)
 {
     if (!Connected) {
         SetErrorCode(GetLastError());
-        throw "Send Fail: Socket is not connected.";
+        throw "Socket is not connected.";
     }
 
     // sends the command
@@ -104,14 +104,6 @@ int Transport::Receive(uint8_t response[], int respLen)
     //
     int bytesRecv = recv(Socket, (char*)response, respLen, 0);
 
-    //
-    if (bytesRecv < 0) {
-        SetErrorCode(GetLastError());
-        throw "Socket Recv timeout.";
-    }
-    //else if ()
-    //{
-    //}
     // check the number of bytes received
     //
     if (bytesRecv != respLen) {
@@ -131,15 +123,26 @@ int Transport::Receive(uint8_t response[], int respLen)
 
 int Transport::RecordErrorCode()
 {
-    // WSAEINTR(10004)      : ∫Ø ˝µ˜”√÷–∂œ
-    // WSAENOTSOCK(10038)   : Œﬁ–ßÃ◊Ω”◊÷
-    // WSAECONNRESET(10054) : ¡¨Ω”±ª‘∂≥Ã÷˜ª˙«ø––πÿ±’
-    // WSAESHUTDOWN(10058)  : Ã◊Ω”◊÷πÿ±’∫Û≤ªƒ‹ ’∑¢
-    // WSAETIMEDOUT(10060)  : ≥¨ ±
+    // WSAEINTR(10004)      : ÂáΩÊï∞Ë∞ÉÁî®‰∏≠Êñ≠
+    // WSAENOTSOCK(10038)   : Êó†ÊïàÂ•óÊé•Â≠ó
+    // WSAECONNRESET(10054) : ËøûÊé•Ë¢´ËøúÁ®ã‰∏ªÊú∫Âº∫Ë°åÂÖ≥Èó≠
+    // WSAESHUTDOWN(10058)  : Â•óÊé•Â≠óÂÖ≥Èó≠Âêé‰∏çËÉΩÊî∂Âèë
+    // WSAETIMEDOUT(10060)  : Ë∂ÖÊó∂
     int errorcode = pSocketData->Errorcode();
     if (errorcode != 0) {
-        printf("[%d] errorcode = %d\n", GetCurrentThreadId(), errorcode); // 0 : ¡¨Ω”πÿ±’
+        // Ëé∑ÂèñÂΩìÂâçÊó∂Èó¥
+        SYSTEMTIME st = { 0 };
+        TCHAR szFormat[] = _T("%04u-%02u-%02u %02u:%02u:%02u.%03u");
+        TCHAR szCurTime[32] = { 0 };
+        GetLocalTime(&st);
+        wsprintf(szCurTime, szFormat, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
 
+        // Ê†ºÂºèÂåñÂΩìÂâçÈîôËØØ
+        TCHAR szResult[MAX_PATH] = { 0 };
+        wsprintf(szResult, _T("%s:[%d]\n"), szCurTime, /*GetCurrentThreadId(),*/ errorcode);
+        _tprintf(_T("%s"), szResult);
+
+        // ËÆ∞ÂΩï
         TCHAR szLogPath[MAX_PATH] = { 0 };
         TCHAR szLogFolder[MAX_PATH] = { 0 };
         TCHAR szEXEFolder[MAX_PATH] = { 0 };
@@ -147,10 +150,12 @@ int Transport::RecordErrorCode()
         PathRemoveFileSpec(szEXEFolder);
         wsprintf(szLogFolder, _T("%s\\log"), szEXEFolder);
         CreateDirectory(szLogFolder, NULL);
-        wsprintf(szLogPath, _T("%s\\udp.txt"), szLogFolder);
+        wsprintf(szLogPath, _T("%s\\socketcode.txt"), szLogFolder);
         FILE *f = _tfopen(szLogPath, _T("a+"));
-        _ftprintf (f, _T("[%d] errorcode = %d\n"), GetCurrentThreadId(), errorcode);
-        fclose (f);
+        if (f != NULL) {
+            _ftprintf(f, _T("%s"), szResult);
+            fclose(f);
+        }
     }
 
     return errorcode;
