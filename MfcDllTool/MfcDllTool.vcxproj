@@ -70,7 +70,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>serial\include;socket\include;pthreads-w32\include;Util;Log;Dump;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>serial\include;socket\include;minidump\include;pthreads-w32\include;Util;Log;Dump;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -158,9 +158,9 @@
     <None Include="res\MfcDllTool.rc2" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Dump\MiniDumper.cpp" />
     <ClCompile Include="Log\LogFile.cpp" />
     <ClCompile Include="MfcDllTool.cpp" />
+    <ClCompile Include="minidump\MiniDumper.cpp" />
     <ClCompile Include="RegReader.cpp" />
     <ClCompile Include="serial\serial.cpp" />
     <ClCompile Include="socket\TcpTransport.cpp" />
@@ -177,9 +177,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dllexport.h" />
-    <ClInclude Include="Dump\MiniDumper.h" />
     <ClInclude Include="Log\LogFile.h" />
     <ClInclude Include="MfcDllTool.h" />
+    <ClInclude Include="minidump\include\MiniDumper.h" />
     <ClInclude Include="pthreads-w32\include\pthread.h" />
     <ClInclude Include="pthreads-w32\include\sched.h" />
     <ClInclude Include="pthreads-w32\include\semaphore.h" />

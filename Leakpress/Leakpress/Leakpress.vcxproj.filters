@@ -78,9 +78,6 @@
     <ClInclude Include="DllTool\pthread.h">
       <Filter>DllTool</Filter>
     </ClInclude>
-    <ClInclude Include="DllTool\MiniDump.h">
-      <Filter>DllTool</Filter>
-    </ClInclude>
     <ClInclude Include="DllTool\dllexport.h">
       <Filter>DllTool</Filter>
     </ClInclude>

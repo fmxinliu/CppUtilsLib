@@ -22,9 +22,6 @@
     <Filter Include="Log">
       <UniqueIdentifier>{020bc520-753d-4c90-80c6-835dd5825576}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Dump">
-      <UniqueIdentifier>{7736949c-5c7a-4bd8-b27e-5679ec3dc1c1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="socket">
       <UniqueIdentifier>{b44274d9-4036-42c1-a3bc-c3eb872d4a79}</UniqueIdentifier>
     </Filter>
@@ -36,6 +33,12 @@
     </Filter>
     <Filter Include="serial\include">
       <UniqueIdentifier>{c259d7ee-f52d-46c2-8352-e8da18227cb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="minidump">
+      <UniqueIdentifier>{7736949c-5c7a-4bd8-b27e-5679ec3dc1c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="minidump\include">
+      <UniqueIdentifier>{f33e5517-0297-4282-be4f-f4f48988f4ba}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -69,9 +72,6 @@
     <ClCompile Include="RegReader.cpp">
       <Filter>Util</Filter>
     </ClCompile>
-    <ClCompile Include="Dump\MiniDumper.cpp">
-      <Filter>Dump</Filter>
-    </ClCompile>
     <ClCompile Include="socket\TcpTransport.cpp">
       <Filter>socket</Filter>
     </ClCompile>
@@ -83,6 +83,9 @@
     </ClCompile>
     <ClCompile Include="serial\serial.cpp">
       <Filter>serial</Filter>
+    </ClCompile>
+    <ClCompile Include="minidump\MiniDumper.cpp">
+      <Filter>minidump</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -122,9 +125,6 @@
     <ClInclude Include="RegReader.h">
       <Filter>Util</Filter>
     </ClInclude>
-    <ClInclude Include="Dump\MiniDumper.h">
-      <Filter>Dump</Filter>
-    </ClInclude>
     <ClInclude Include="dllexport.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -151,6 +151,9 @@
     </ClInclude>
     <ClInclude Include="serial\include\serial.h">
       <Filter>serial\include</Filter>
+    </ClInclude>
+    <ClInclude Include="minidump\include\MiniDumper.h">
+      <Filter>minidump\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
