@@ -14,9 +14,11 @@
 #endif
 
 #define CHECK_THREAD_RESET(id) \
-    if (getAlarmType(id) || needExit()) { \
-        return; \
-    } 
+    do { \
+        if (getAlarmType(id) || needExit()) { \
+            return; \
+        } \
+    } while(0)
 
 static pthread_mutex_t r_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
 static pthread_mutex_t ala_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
@@ -738,7 +740,7 @@ void CLeakpressDlg::OnTest(int id)
     // 1.查询 PLC 复位信号
     do 
     {
-        CHECK_THREAD_RESET(id)
+        CHECK_THREAD_RESET(id);
         bstart = IsStartState(id);
         Sleep(500);
     } while (!bstart);
@@ -749,7 +751,7 @@ void CLeakpressDlg::OnTest(int id)
     if ("D" == device_prefix) {
         // 2.等待 2 段稳压
         do {
-            CHECK_THREAD_RESET(id)
+            CHECK_THREAD_RESET(id);
             QueryAteqTest(id);
             Sleep(100);
         } while (IsAteqStateMatch(id, ATEQ_REST));
@@ -757,7 +759,7 @@ void CLeakpressDlg::OnTest(int id)
         // 3.等待 2 段稳压结束
         bool error = true;
         while (IsAteqStateMatch(id, ATEQ_STABLE_1)) {
-            CHECK_THREAD_RESET(id)
+            CHECK_THREAD_RESET(id);
             QueryAteqTest(id);
             error = false;
             Sleep(100);
@@ -773,7 +775,7 @@ void CLeakpressDlg::OnTest(int id)
         }
 
         while (!IsAteqStateMatch(id, ATEQ_TEST_1, false)) {
-            CHECK_THREAD_RESET(id)
+            CHECK_THREAD_RESET(id);
             QueryAteqTest(id);
             Sleep(100);
         }
@@ -782,7 +784,7 @@ void CLeakpressDlg::OnTest(int id)
 
         // 4.查询 2 段结果
         do {
-            CHECK_THREAD_RESET(id)
+            CHECK_THREAD_RESET(id);
             QueryAteqResult(id);
             Sleep(100);
         } while (!IsAteqStateMatch(id, ATEQ_RESULT_1, false));
@@ -791,7 +793,7 @@ void CLeakpressDlg::OnTest(int id)
 
         // 5. 等待 3 段稳压
         do {
-            CHECK_THREAD_RESET(id)
+            CHECK_THREAD_RESET(id);
             QueryAteqTest(id);
             Sleep(100);
         } while (!IsAteqStateMatch(id, ATEQ_STABLE_2, false));
@@ -802,7 +804,7 @@ void CLeakpressDlg::OnTest(int id)
 
         // 6. 3 段稳压，一直发送结果
         while (IsAteqStateMatch(id, ATEQ_STABLE_2, false)) {
-            CHECK_THREAD_RESET(id)
+            CHECK_THREAD_RESET(id);
             QueryAteqTest(id);
             Sleep(100);
             SendTestPress(id);
@@ -813,7 +815,7 @@ void CLeakpressDlg::OnTest(int id)
     // 7.等待 PLC 获取结果
     OnRecord(_T("等待 PLC 读取结果"), device_name);
     while (!IsGetResult(id)) {
-        CHECK_THREAD_RESET(id)
+        CHECK_THREAD_RESET(id);
         Sleep(200);
     }
 
@@ -822,7 +824,7 @@ void CLeakpressDlg::OnTest(int id)
         OnRecord(_T("query press result"), device_name);
         QueryPressResult(id);
         while (!IsAteqStateMatch(id, PRESS_RESULT, false)) {
-            CHECK_THREAD_RESET(id)
+            CHECK_THREAD_RESET(id);
             //QueryPressResult(id);
             Sleep(100);
         }
@@ -835,7 +837,7 @@ void CLeakpressDlg::OnTest(int id)
 
     // 8.等待 PLC 结束
     while (!IsEndState(id)) {
-        CHECK_THREAD_RESET(id)
+        CHECK_THREAD_RESET(id);
         Sleep(100);
     }
 
