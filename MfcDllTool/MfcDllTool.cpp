@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "MfcDllTool.h"
-#include "FileManager.h"
+//#include "FileManager.h"
 #include "Util.h"
 
 #ifdef _DEBUG
@@ -60,7 +60,7 @@ BOOL CMfcDllToolApp::InitInstance()
 {
     CWinApp::InitInstance();
     
-    CString path = FileManager::GetAppPath() + _T("config.ini");
+   /* CString path = FileManager::GetAppPath() + _T("config.ini");
     CString path_bk = _T("C:\\Windows\\config_lp.ini");
 
     if (!FileManager::IsSectionExits(path, _T("1")) && !FileManager::IsSectionExits(path_bk, _T("1"))) {
@@ -90,7 +90,7 @@ BOOL CMfcDllToolApp::InitInstance()
     if (FileManager::IsSectionExits(path, _T("1")) && !FileManager::DeleteSection(path, _T("1"))) {
         MessageBox( NULL, _T("无法启动"), _T("应用程序"), MB_ICONSTOP);
         return FALSE;
-    }
+    }*/
 
     if (!AfxSocketInit()) {
         AfxMessageBox(IDP_SOCKETS_INIT_FAILED);

@@ -16,9 +16,6 @@
     <Filter Include="pthreads-w32">
       <UniqueIdentifier>{f123bad3-6ead-40ce-88d7-9baf2379132d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Util">
-      <UniqueIdentifier>{e4c96ee6-3433-478c-a098-72968528297f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="socket">
       <UniqueIdentifier>{b44274d9-4036-42c1-a3bc-c3eb872d4a79}</UniqueIdentifier>
     </Filter>
@@ -43,6 +40,12 @@
     <Filter Include="logsys\include">
       <UniqueIdentifier>{1eb167f0-3fd0-4074-b0a9-2d6783590122}</UniqueIdentifier>
     </Filter>
+    <Filter Include="utiltools">
+      <UniqueIdentifier>{e4c96ee6-3433-478c-a098-72968528297f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utiltools\include">
+      <UniqueIdentifier>{62789791-7049-44b9-9c26-2d3f647f92bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -59,18 +62,6 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Util\FileManager.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="Util\IniFile.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="Util\Util.cpp">
-      <Filter>Util</Filter>
-    </ClCompile>
-    <ClCompile Include="RegReader.cpp">
-      <Filter>Util</Filter>
     </ClCompile>
     <ClCompile Include="socket\TcpTransport.cpp">
       <Filter>socket</Filter>
@@ -90,6 +81,9 @@
     <ClCompile Include="logsys\logger.cpp">
       <Filter>logsys</Filter>
     </ClCompile>
+    <ClCompile Include="utiltools\util.cpp">
+      <Filter>utiltools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MfcDllTool.h">
@@ -104,15 +98,6 @@
     <ClInclude Include="Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Util\FileManager.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="Util\IniFile.h">
-      <Filter>Util</Filter>
-    </ClInclude>
-    <ClInclude Include="Util\Util.h">
-      <Filter>Util</Filter>
-    </ClInclude>
     <ClInclude Include="pthreads-w32\include\pthread.h">
       <Filter>pthreads-w32</Filter>
     </ClInclude>
@@ -121,9 +106,6 @@
     </ClInclude>
     <ClInclude Include="pthreads-w32\include\semaphore.h">
       <Filter>pthreads-w32</Filter>
-    </ClInclude>
-    <ClInclude Include="RegReader.h">
-      <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="dllexport.h">
       <Filter>头文件</Filter>
@@ -157,6 +139,9 @@
     </ClInclude>
     <ClInclude Include="logsys\include\logger.h">
       <Filter>logsys\include</Filter>
+    </ClInclude>
+    <ClInclude Include="utiltools\include\util.h">
+      <Filter>utiltools\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

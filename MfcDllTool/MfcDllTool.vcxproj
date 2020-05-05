@@ -70,7 +70,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>serial\include;socket\include;logsys\include;minidump\include;pthreads-w32\include;Util;Log;Dump;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>serial\include;socket\include;logsys\include;minidump\include;pthreads-w32\include;utiltools\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -161,7 +161,6 @@
     <ClCompile Include="logsys\logger.cpp" />
     <ClCompile Include="MfcDllTool.cpp" />
     <ClCompile Include="minidump\MiniDumper.cpp" />
-    <ClCompile Include="RegReader.cpp" />
     <ClCompile Include="serial\serial.cpp" />
     <ClCompile Include="socket\TcpTransport.cpp" />
     <ClCompile Include="socket\Transport.cpp" />
@@ -171,9 +170,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_dll|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Util\FileManager.cpp" />
-    <ClCompile Include="Util\IniFile.cpp" />
-    <ClCompile Include="Util\Util.cpp" />
+    <ClCompile Include="utiltools\util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dllexport.h" />
@@ -183,7 +180,6 @@
     <ClInclude Include="pthreads-w32\include\pthread.h" />
     <ClInclude Include="pthreads-w32\include\sched.h" />
     <ClInclude Include="pthreads-w32\include\semaphore.h" />
-    <ClInclude Include="RegReader.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="serial\include\cncomm.h" />
     <ClInclude Include="serial\include\icomcallback.h" />
@@ -195,9 +191,7 @@
     <ClInclude Include="socket\include\UdpTransport.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="Util\FileManager.h" />
-    <ClInclude Include="Util\IniFile.h" />
-    <ClInclude Include="Util\Util.h" />
+    <ClInclude Include="utiltools\include\util.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MfcDllTool.rc" />
