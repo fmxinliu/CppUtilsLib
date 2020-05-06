@@ -19,4 +19,7 @@ namespace UtilTools
     DLL_API String format(const TCHAR *pszFmt, ...);
     DLL_API std::wstring StringToWString(const std::string &s);  // 多字节 转 宽字节
     DLL_API std::string WStringToString(const std::wstring &ws); // 宽字节 转 多字节
+
+    DLL_API std::vector<String> SpiltString(const String &s, TCHAR delimiter, bool bRemoveEmptyEntries);
+    DLL_API std::vector<String> SpiltString(const String &s, const String &delimiters, bool bRemoveEmptyEntries);
 };

@@ -1,8 +1,9 @@
 #include "StdAfx.h"
 #include "util.h"
-//#include <string>      // std::string
-//#include <sstream>     // std::stringstream
+#include <string>      // std::string
+#include <sstream>     // std::stringstream
 #include <codecvt>
+#include <assert.h>
 using namespace std;
 
 namespace UtilTools
@@ -64,6 +65,7 @@ double toDouble(const String &s)
 // 格式化字符串
 String format(const TCHAR *pszFmt, ...)
 {
+    assert(pszFmt);
     String str;
     va_list args;
     va_start(args, pszFmt);
@@ -92,5 +94,125 @@ string WStringToString(const wstring &ws)
     //string narrow = converter.to_bytes(wide_utf16_source_string);
     //wstring wide = converter.from_bytes(narrow_utf8_source_string);
     return converter.to_bytes(ws);
+}
+
+vector<String> SpiltString(const String &s, TCHAR delimiter, bool bRemoveEmptyEntries)
+{
+    String si;
+    vector<String> sv;
+    istringstream iss(s);
+    while (getline(iss, si, delimiter)) {
+        if (bRemoveEmptyEntries && !si.length()) {
+            continue;
+        }
+        sv.push_back(si);
+    }
+
+    // 处理字符串为空 or 以分隔符结尾的情况
+    if (s.empty() || s.back() == delimiter) {
+        sv.push_back(_T(""));
+    }
+
+    return sv;
+}
+
+// “单字符字符串”分隔符
+vector<String> _UseOneSeparator(const String &s, const String &delimiters)
+{
+    assert(delimiters.length() == 1);
+
+    String si;
+    vector<String> sv;
+
+    // 处理空串、空分割符的情况
+    if (s.empty() || delimiters.empty()) {
+        sv.push_back(_T(""));
+        return sv;
+    }
+
+    string::size_type startpos = 0;
+    string::size_type endpos = s.find(delimiters);
+    while(string::npos != endpos) {
+        sv.push_back(s.substr(startpos, endpos - startpos));
+        startpos = endpos + delimiters.size();
+        endpos = s.find(delimiters, startpos);
+    }
+
+    if(s.length() != startpos) {
+        sv.push_back(s.substr(startpos)); // 截取剩余字符串
+    } else {
+        sv.push_back(_T("")); // 处理字符串以分隔符结尾的情况
+    }
+
+    return sv;
+}
+
+// 将“字符串中的每个字符”作为分隔符
+vector<String> _UseMulSeparator(const String &s, const String &delimiters)
+{
+    String si;
+    vector<String> sv;
+
+    typedef string::size_type string_size;
+    string_size startpos = 0;
+    string_size endpos = 0;
+
+    bool found = true;
+    while(found && s.size() != startpos) {
+        // 查找分隔符
+        found = false;
+        while(!found && s.size() != endpos) {
+            for(string_size i = 0; i < delimiters.size(); ++i) {
+                if (s[endpos] == delimiters[i]) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                ++endpos;
+            }
+        }
+
+        // 分割字符串
+        if (found) {
+            sv.push_back(s.substr(startpos, endpos - startpos));
+            startpos = ++endpos;
+        } else {
+            sv.push_back(s.substr(startpos)); // 截取剩余字符串
+        }
+    }
+
+    // 处理字符串以分隔符结尾的情况
+    if (found && s.size() == startpos) {
+        sv.push_back(_T(""));
+    }
+
+    return sv;
+}
+
+vector<String> SpiltString(const String &s, const String &delimiters, bool bRemoveEmptyEntries)
+{
+    vector<String> sv;
+    vector<String> _sv;
+
+    if (delimiters.length() > 1) {
+        _sv = _UseMulSeparator(s, delimiters);
+    } else {
+        _sv = _UseOneSeparator(s, delimiters);
+    }
+
+    // 去除空字符串
+    if (bRemoveEmptyEntries) {
+        vector<String>::const_iterator it = _sv.cbegin();
+        while (it != _sv.cend()) {
+            const String &si = *it++;
+            if (bRemoveEmptyEntries && !si.length()) {
+                continue;
+            }
+            sv.push_back(si);
+        }
+    }
+
+    return sv;
 }
 }
