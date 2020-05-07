@@ -214,4 +214,54 @@ vector<String> SpiltString(const String &s, const String &delimiters, bool bRemo
 
     return sv;
 }
+
+bool isEmpty(const String &s)
+{
+    return s.empty();
+}
+
+// ÅÐ¶ÏÊÇ·ñÎª¿Õ°×·û
+static bool isWhitespace(TCHAR ch)
+{
+    return ch == ' ' || ch == '\t' || ch == '\n';
+}
+
+bool isBlank(const String &s)
+{
+    const String &str = s;
+
+    int length = s.length();
+    if (length != 0) {
+        for(int i = 0; i < length; ++i) {
+            // ÅÐ¶Ï×Ö·ûÊÇ·ñÎª¿Õ¸ñ¡¢ÖÆ±í·û¡¢»»ÐÐ·û
+            if (!isWhitespace(s.at(i))) {
+                return false;
+            }
+        }
+        return true;
+    } else {
+        return true;
+    }
+}
+
+bool equals(const String &s1, const String &s2)
+{
+    return s1 == s2;
+    //return s1.compare(s2) == 0;
+}
+
+bool contains(const String &s, const String &subs)
+{
+    return s.find(subs) != string::npos;
+}
+
+bool endsWith(const String &s, const String &subs)
+{
+    return subs.empty() || (s.find(subs) != string::npos) && (s.find(subs) == s.length() - subs.length());
+}
+
+bool startsWith(const String &s, const String &subs)
+{
+    return s.find(subs) == 0;
+}
 }

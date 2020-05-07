@@ -22,4 +22,12 @@ namespace UtilTools
 
     DLL_API std::vector<String> SpiltString(const String &s, TCHAR delimiter, bool bRemoveEmptyEntries = false);
     DLL_API std::vector<String> SpiltString(const String &s, const String &delimiters, bool bRemoveEmptyEntries = false, bool bDelimitersAsMulSeparator = false);
+
+    DLL_API bool isEmpty(const String &s); // 是否为空
+    DLL_API bool isBlank(const String &s); // 是否为空 or 字符串中的字符都为空白符（空格、制表符\t、换行符\n）
+
+    DLL_API bool equals(const String &s1, const String &s2);
+    DLL_API bool contains(const String &s, const String &subs);
+    DLL_API bool endsWith(const String &s, const String &subs);
+    DLL_API bool startsWith(const String &s, const String &subs);
 };
