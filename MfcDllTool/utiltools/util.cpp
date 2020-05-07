@@ -62,7 +62,6 @@ double toDouble(const String &s)
     return _ttof(s.c_str());
 }
 
-// 格式化字符串
 String format(const TCHAR *pszFmt, ...)
 {
     assert(pszFmt);
@@ -116,11 +115,9 @@ vector<String> SpiltString(const String &s, TCHAR delimiter, bool bRemoveEmptyEn
     return sv;
 }
 
-// “单字符字符串”分隔符
-vector<String> _UseOneSeparator(const String &s, const String &delimiters)
+// delimiters - “整体作为一个分隔符”
+static vector<String> SplitUseOneSeparator(const String &s, const String &delimiters)
 {
-    assert(delimiters.length() == 1);
-
     String si;
     vector<String> sv;
 
@@ -147,8 +144,8 @@ vector<String> _UseOneSeparator(const String &s, const String &delimiters)
     return sv;
 }
 
-// 将“字符串中的每个字符”作为分隔符
-vector<String> _UseMulSeparator(const String &s, const String &delimiters)
+// delimiters - “每个字符作为一个分隔符”
+static vector<String> SplitUseMulSeparator(const String &s, const String &delimiters)
 {
     String si;
     vector<String> sv;
@@ -190,15 +187,15 @@ vector<String> _UseMulSeparator(const String &s, const String &delimiters)
     return sv;
 }
 
-vector<String> SpiltString(const String &s, const String &delimiters, bool bRemoveEmptyEntries)
+vector<String> SpiltString(const String &s, const String &delimiters, bool bRemoveEmptyEntries, bool bDelimitersAsMulSeparator)
 {
     vector<String> sv;
     vector<String> _sv;
 
-    if (delimiters.length() > 1) {
-        _sv = _UseMulSeparator(s, delimiters);
+    if (bDelimitersAsMulSeparator) {
+        _sv = SplitUseMulSeparator(s, delimiters);
     } else {
-        _sv = _UseOneSeparator(s, delimiters);
+        _sv = SplitUseOneSeparator(s, delimiters);
     }
 
     // 去除空字符串
@@ -211,6 +208,8 @@ vector<String> SpiltString(const String &s, const String &delimiters, bool bRemo
             }
             sv.push_back(si);
         }
+    } else {
+        return _sv;
     }
 
     return sv;
