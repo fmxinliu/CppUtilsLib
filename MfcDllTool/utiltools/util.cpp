@@ -315,4 +315,26 @@ String trimRight(const String &s)
     String _s = s;
     return _s.erase(pos + 1);
 }
+
+String toLower(const String &s)
+{
+    String _s = s;
+    for (size_t i = 0; i < s.length(); i++) {
+        if (s[i] >= 'A' && s[i] <= 'Z') {
+            _s[i] += 32;
+        }
+    }
+    return _s;
+}
+
+String toUpper(const String &s)
+{
+    String _s = s;
+    for (size_t i = 0; i < s.length(); i++) {
+        if (s[i] >= 'a' && s[i] <= 'z') {
+            _s[i] -= 32;
+        }
+    }
+    return _s;
+}
 }

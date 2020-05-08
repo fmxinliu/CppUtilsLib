@@ -35,4 +35,8 @@ namespace UtilTools
     DLL_API String trim(const String &s);
     DLL_API String trimLeft(const String &s);
     DLL_API String trimRight(const String &s);
+
+    // ´óÐ¡Ð´×ª»»
+    DLL_API String toLower(const String &s);
+    DLL_API String toUpper(const String &s);
 };
