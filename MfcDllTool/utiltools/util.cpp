@@ -1,5 +1,6 @@
 #include "StdAfx.h"
 #include "util.h"
+#include "char.h"
 #include <string>      // std::string
 #include <sstream>     // std::stringstream
 #include <codecvt>
@@ -220,12 +221,6 @@ bool isEmpty(const String &s)
     return s.empty();
 }
 
-// ÅÐ¶ÏÊÇ·ñÎª¿Õ°×·û
-static bool isWhitespace(TCHAR ch)
-{
-    return ch == ' ' || ch == '\t' || ch == '\n';
-}
-
 bool isBlank(const String &s)
 {
     if (s.empty()) {
@@ -233,8 +228,7 @@ bool isBlank(const String &s)
     }
     size_t length = s.length();
     for(size_t i = 0; i < length; ++i) {
-        // ÅÐ¶Ï×Ö·ûÊÇ·ñÎª¿Õ¸ñ¡¢ÖÆ±í·û¡¢»»ÐÐ·û
-        if (!isWhitespace(s.at(i))) {
+        if (!Char::isWhitespace(s.at(i))) {
             return false;
         }
     }
@@ -269,13 +263,13 @@ String trim(const String &s)
     }
 
     std::size_t pos1 = 0;
-    while (pos1 != s.length() && isWhitespace(s.at(pos1))) {
+    while (pos1 != s.length() && Char::isWhitespace(s.at(pos1))) {
         ++pos1;
     }
 
     std::size_t pos2, lastpos;
     pos2 = lastpos = s.length() - 1;
-    while (pos2 < s.length() && isWhitespace(s.at(pos2))) {
+    while (pos2 < s.length() && Char::isWhitespace(s.at(pos2))) {
         --pos2;
     }
 
@@ -289,7 +283,7 @@ String trim(const String &s)
 String trimLeft(const String &s)
 {
     std::size_t pos = 0;
-    while (pos != s.length() && isWhitespace(s.at(pos))) {
+    while (pos != s.length() && Char::isWhitespace(s.at(pos))) {
         ++pos;
     }
     if (0 == pos) {
@@ -306,7 +300,7 @@ String trimRight(const String &s)
     }
     std::size_t pos, lastpos;
     pos = lastpos = s.length() - 1;
-    while (pos < s.length() && isWhitespace(s.at(pos))) {
+    while (pos < s.length() && Char::isWhitespace(s.at(pos))) {
         --pos;
     }
     if (lastpos == pos) {
@@ -320,8 +314,8 @@ String toLower(const String &s)
 {
     String _s = s;
     for (size_t i = 0; i < s.length(); i++) {
-        if (s[i] >= 'A' && s[i] <= 'Z') {
-            _s[i] += 32;
+        if (Char::isUpper(s[i])) {
+            _s[i] = Char::toLower(s[i]);
         }
     }
     return _s;
@@ -331,8 +325,8 @@ String toUpper(const String &s)
 {
     String _s = s;
     for (size_t i = 0; i < s.length(); i++) {
-        if (s[i] >= 'a' && s[i] <= 'z') {
-            _s[i] -= 32;
+        if (Char::isLower(s[i])) {
+            _s[i] = Char::toUpper(s[i]);
         }
     }
     return _s;

@@ -143,6 +143,9 @@
     <ClInclude Include="utiltools\include\util.h">
       <Filter>utiltools\include</Filter>
     </ClInclude>
+    <ClInclude Include="utiltools\include\char.h">
+      <Filter>utiltools\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="MfcDllTool.rc">
