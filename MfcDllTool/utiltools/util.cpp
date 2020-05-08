@@ -235,6 +235,36 @@ bool isBlank(const String &s)
     return true;
 }
 
+bool isAlpha(const String &s)
+{
+    for (size_t i = 0; i < s.length(); i++) {
+        if (!Char::isAlpha(s[i])) {
+            return false;
+        }
+    }
+    return !s.empty();
+}
+
+bool isLower(const String &s)
+{
+    for (size_t i = 0; i < s.length(); i++) {
+        if (!Char::isLower(s[i])) {
+            return false;
+        }
+    }
+    return !s.empty();
+}
+
+bool isUpper(const String &s)
+{
+    for (size_t i = 0; i < s.length(); i++) {
+        if (!Char::isUpper(s[i])) {
+            return false;
+        }
+    }
+    return !s.empty();
+}
+
 bool equals(const String &s1, const String &s2)
 {
     return s1 == s2;

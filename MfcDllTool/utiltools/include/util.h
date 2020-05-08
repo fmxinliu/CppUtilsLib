@@ -26,6 +26,11 @@ namespace UtilTools
     DLL_API bool isEmpty(const String &s); // ÊÇ·ñÎª¿Õ
     DLL_API bool isBlank(const String &s); // ÊÇ·ñÎª¿Õ or ×Ö·û´®ÖÐµÄ×Ö·û¶¼Îª¿Õ°×·û
 
+    // ÅÐ¶Ï´¿×ÖÄ¸×Ö·û´®
+    DLL_API bool isAlpha(const String &s);
+    DLL_API bool isLower(const String &s);
+    DLL_API bool isUpper(const String &s);
+
     DLL_API bool equals(const String &s1, const String &s2);
     DLL_API bool contains(const String &s, const String &subs);
     DLL_API bool endsWith(const String &s, const String &subs);
