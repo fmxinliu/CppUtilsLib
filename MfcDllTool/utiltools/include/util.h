@@ -31,7 +31,7 @@ namespace UtilTools
     DLL_API bool endsWith(const String &s, const String &subs);
     DLL_API bool startsWith(const String &s, const String &subs);
 
-    // 去除首 or 尾空格
+    // 去除首、尾空白符
     DLL_API String trim(const String &s);
     DLL_API String trimLeft(const String &s);
     DLL_API String trimRight(const String &s);

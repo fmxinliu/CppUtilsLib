@@ -228,11 +228,10 @@ static bool isWhitespace(TCHAR ch)
 
 bool isBlank(const String &s)
 {
-    size_t length = s.length();
-    if (length == 0) {
+    if (s.empty()) {
         return true;
     }
-
+    size_t length = s.length();
     for(size_t i = 0; i < length; ++i) {
         // 判断字符是否为空格、制表符、换行符
         if (!isWhitespace(s.at(i))) {
@@ -265,44 +264,55 @@ bool startsWith(const String &s, const String &subs)
 
 String trim(const String &s)
 {
-    std::size_t idx1 = s.find_first_not_of(_T(" "));
-    std::size_t idx2 = s.find_last_not_of(_T(" "));
-
-    if (string::npos == idx1 && string::npos == idx2) {
-        return _T(""); // 处理空串
-    } else if (0 == idx1 && s.length() - 1 == idx2) {
-        return s; // 处理无空白符的情况
+    if (s.empty()) {
+        return s; // 空字符串
     }
 
+    std::size_t pos1 = 0;
+    while (pos1 != s.length() && isWhitespace(s.at(pos1))) {
+        ++pos1;
+    }
+
+    std::size_t pos2, lastpos;
+    pos2 = lastpos = s.length() - 1;
+    while (pos2 < s.length() && isWhitespace(s.at(pos2))) {
+        --pos2;
+    }
+
+    if (0 == pos1 && lastpos == pos2) {
+        return s; // 首尾不包含空白符
+    }
     String _s = s;
-    if (string::npos != idx1) {
-        _s.erase(0, idx1);
-    }
-    if (string::npos != idx2) {
-        _s.erase(idx2 + 1);
-    }
-    return _s;
+    return _s.erase(pos2 + 1).erase(0, pos1);
 }
 
 String trimLeft(const String &s)
 {
-    std::size_t idx = s.find_first_not_of(_T(" "));
-    if (string::npos != idx) {
-        String _s = s;
-        _s.erase(0, idx);
-        return _s;
+    std::size_t pos = 0;
+    while (pos != s.length() && isWhitespace(s.at(pos))) {
+        ++pos;
     }
-    return (s.find_first_of(_T(" ")) != 0) ? s : _T(""); // 处理空串
+    if (0 == pos) {
+        return s; // 首部不包含空白符
+    }
+    String _s = s;
+    return _s.erase(0, pos);
 }
 
 String trimRight(const String &s)
 {
-    std::size_t idx = s.find_last_not_of(_T(" "));
-    if (string::npos != idx) {
-        String _s = s;
-        _s.erase(idx + 1);
-        return _s;
+    if (s.empty()) {
+        return s; // 空字符串
     }
-    return (s.find_last_of(_T(" ")) != s.length() - 1) ? s : _T(""); // 处理空串
+    std::size_t pos, lastpos;
+    pos = lastpos = s.length() - 1;
+    while (pos < s.length() && isWhitespace(s.at(pos))) {
+        --pos;
+    }
+    if (lastpos == pos) {
+        return s; // 尾部不包含空白符
+    }
+    String _s = s;
+    return _s.erase(pos + 1);
 }
 }
