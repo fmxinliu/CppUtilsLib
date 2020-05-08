@@ -228,20 +228,18 @@ static bool isWhitespace(TCHAR ch)
 
 bool isBlank(const String &s)
 {
-    const String &str = s;
-
-    int length = s.length();
-    if (length != 0) {
-        for(int i = 0; i < length; ++i) {
-            // 判断字符是否为空格、制表符、换行符
-            if (!isWhitespace(s.at(i))) {
-                return false;
-            }
-        }
-        return true;
-    } else {
+    size_t length = s.length();
+    if (length == 0) {
         return true;
     }
+
+    for(size_t i = 0; i < length; ++i) {
+        // 判断字符是否为空格、制表符、换行符
+        if (!isWhitespace(s.at(i))) {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool equals(const String &s1, const String &s2)
@@ -263,5 +261,48 @@ bool endsWith(const String &s, const String &subs)
 bool startsWith(const String &s, const String &subs)
 {
     return s.find(subs) == 0;
+}
+
+String trim(const String &s)
+{
+    std::size_t idx1 = s.find_first_not_of(_T(" "));
+    std::size_t idx2 = s.find_last_not_of(_T(" "));
+
+    if (string::npos == idx1 && string::npos == idx2) {
+        return _T(""); // 处理空串
+    } else if (0 == idx1 && s.length() - 1 == idx2) {
+        return s; // 处理无空白符的情况
+    }
+
+    String _s = s;
+    if (string::npos != idx1) {
+        _s.erase(0, idx1);
+    }
+    if (string::npos != idx2) {
+        _s.erase(idx2 + 1);
+    }
+    return _s;
+}
+
+String trimLeft(const String &s)
+{
+    std::size_t idx = s.find_first_not_of(_T(" "));
+    if (string::npos != idx) {
+        String _s = s;
+        _s.erase(0, idx);
+        return _s;
+    }
+    return (s.find_first_of(_T(" ")) != 0) ? s : _T(""); // 处理空串
+}
+
+String trimRight(const String &s)
+{
+    std::size_t idx = s.find_last_not_of(_T(" "));
+    if (string::npos != idx) {
+        String _s = s;
+        _s.erase(idx + 1);
+        return _s;
+    }
+    return (s.find_last_of(_T(" ")) != s.length() - 1) ? s : _T(""); // 处理空串
 }
 }

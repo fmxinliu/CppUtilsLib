@@ -30,4 +30,9 @@ namespace UtilTools
     DLL_API bool contains(const String &s, const String &subs);
     DLL_API bool endsWith(const String &s, const String &subs);
     DLL_API bool startsWith(const String &s, const String &subs);
+
+    // È¥³ýÊ× or Î²¿Õ¸ñ
+    DLL_API String trim(const String &s);
+    DLL_API String trimLeft(const String &s);
+    DLL_API String trimRight(const String &s);
 };
