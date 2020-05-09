@@ -235,99 +235,6 @@ bool isBlank(const String &s)
     return true;
 }
 
-bool isInteger(const String &s)
-{
-    if (s.empty()) {
-        return false;
-    }
-    // 判断符号
-    size_t i = 0;
-    if (Char::isSign(s[i])) {
-        if (s.length() == ++i) {
-            return false;
-        }
-    }
-    while (i < s.length()) {
-        if (!Char::isDigit(s[i++])) {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool isNumeric(const String &s)
-{
-    if (s.empty()) {
-        return false;
-    }
-
-    int dotCount = 0;
-    int digitCount = 0;
-
-    // 判断符号
-    size_t i = 0;
-    if (Char::isSign(s[i])) {
-        if (s.length() == ++i) {
-            return false;
-        }
-    }
-    for (; i < s.length(); ++i) {
-        if (Char::isDot(s[i])) {
-            if (0 == digitCount) {
-                return false; // 小数点前无数字
-            }
-            if (++dotCount > 1) {
-                return false; // 多个小数点
-            }
-            if (s.length() == i + 1) {
-                return false; // 小数点在最后一位
-            }
-            continue; // 小数点
-        }
-        if (!Char::isDigit(s[i])) {
-            return false;
-        }
-        ++digitCount;
-    }
-    return true;
-}
-
-bool isBoolean(const String &s)
-{
-    String _s = toLower(s);
-    return _T("true") == _s || _T("false") == _s;
-}
-
-bool isAlpha(const String &s)
-{
-    for (size_t i = 0; i < s.length(); i++) {
-        if (!Char::isAlpha(s[i])) {
-            return false;
-        }
-    }
-    return !s.empty();
-}
-
-bool isLower(const String &s)
-{
-    for (size_t i = 0; i < s.length(); i++) {
-        if (!Char::isLower(s[i])) {
-            return false;
-        }
-    }
-    return !s.empty();
-}
-
-bool isUpper(const String &s)
-{
-    for (size_t i = 0; i < s.length(); i++) {
-        if (!Char::isUpper(s[i])) {
-            return false;
-        }
-    }
-    return !s.empty();
-}
-
 bool equals(const String &s1, const String &s2)
 {
     return s1 == s2;
@@ -403,6 +310,36 @@ String trimRight(const String &s)
     return _s.erase(pos + 1);
 }
 
+bool isAlpha(const String &s)
+{
+    for (size_t i = 0; i < s.length(); i++) {
+        if (!Char::isAlpha(s[i])) {
+            return false;
+        }
+    }
+    return !s.empty();
+}
+
+bool isLower(const String &s)
+{
+    for (size_t i = 0; i < s.length(); i++) {
+        if (!Char::isLower(s[i])) {
+            return false;
+        }
+    }
+    return !s.empty();
+}
+
+bool isUpper(const String &s)
+{
+    for (size_t i = 0; i < s.length(); i++) {
+        if (!Char::isUpper(s[i])) {
+            return false;
+        }
+    }
+    return !s.empty();
+}
+
 String toLower(const String &s)
 {
     String _s = s;
@@ -423,5 +360,193 @@ String toUpper(const String &s)
         }
     }
     return _s;
+}
+
+bool isBoolean(const String &s)
+{
+    String _s = toLower(s);
+    return _T("true") == _s || _T("false") == _s;
+}
+
+bool isInteger(const String &s)
+{
+    if (s.empty()) {
+        return false;
+    }
+    // 判断符号
+    size_t i = 0;
+    if (Char::isSign(s[i])) {
+        if (s.length() == ++i) {
+            return false;
+        }
+    }
+    while (i < s.length()) {
+        if (!Char::isDigit(s[i++])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool isNumeric(const String &s)
+{
+    if (s.empty()) {
+        return false;
+    }
+
+    int dotCount = 0;
+    int digitCount = 0;
+
+    // 判断符号
+    size_t i = 0;
+    if (Char::isSign(s[i])) {
+        if (s.length() == ++i) {
+            return false;
+        }
+    }
+    for (; i < s.length(); ++i) {
+        if (Char::isDot(s[i])) {
+            if (0 == digitCount) {
+                return false; // 小数点前无数字
+            }
+            if (++dotCount > 1) {
+                return false; // 多个小数点
+            }
+            if (s.length() == i + 1) {
+                return false; // 小数点在最后一位
+            }
+            continue; // 小数点
+        }
+        if (!Char::isDigit(s[i])) {
+            return false;
+        }
+        ++digitCount;
+    }
+    return true;
+}
+
+bool parseInteger(const String &s, int &value)
+{
+    if (s.empty()) {
+        return false;
+    }
+
+    int sign = 1;
+
+    size_t i = 0;
+    size_t startpos = 0;
+
+    // 解析符号
+    if (Char::isSign(s[i])) {
+        if (s.length() == i) {
+            return false;
+        }
+        if ('-' == s[i]) {
+            sign = -1;
+        }
+        ++i;
+        ++startpos;
+    }
+    while (i < s.length()) {
+        if (!Char::isDigit(s[i++])) {
+            return false;
+        }
+    }
+
+    // 解析
+    value = sign * toInt(s.substr(startpos));
+    return true;
+}
+
+bool parseBoolean(const String &s, bool &value)
+{
+    String _s = toLower(s);
+    if (_T("true") == _s) {
+        value = true;
+        return true;
+    }
+    if (_T("false") == _s) {
+        value = false;
+        return true;
+    }
+    return false;
+}
+
+bool parseNumeric(const String &s, double &value)
+{
+    if (s.empty()) {
+        return false;
+    }
+
+    int sign = 1;
+    int dotCount = 0;
+    int digitCount = 0;
+
+    size_t i = 0;
+    size_t startpos = 0;
+
+    // 解析符号
+    if (Char::isSign(s[i])) {
+        if (s.length() == i) {
+            return false;
+        }
+        if ('-' == s[i]) {
+            sign = -1;
+        }
+        ++i;
+        ++startpos;
+    }
+    for (; i < s.length(); ++i) {
+        if (Char::isDot(s[i])) {
+            if (0 == digitCount) {
+                return false; // 小数点前无数字
+            }
+            if (++dotCount > 1) {
+                return false; // 多个小数点
+            }
+            if (s.length() == i + 1) {
+                return false; // 小数点在最后一位
+            }
+            continue; // 小数点
+        }
+        if (!Char::isDigit(s[i])) {
+            return false;
+        }
+        ++digitCount;
+    }
+
+    // 解析
+    value = sign * toDouble(s.substr(startpos));
+    return true;
+}
+
+int parseInteger(const String &s, bool *ok)
+{
+    int value = 0;
+    bool ret = parseInteger(s, value);
+    if (ok) {
+        *ok = ret;
+    }
+    return value;
+}
+
+bool parseBoolean(const String &s, bool *ok)
+{
+    bool value = 0;
+    bool ret = parseBoolean(s, value);
+    if (ok) {
+        *ok = ret;
+    }
+    return value;
+}
+
+double parseNumeric(const String &s, bool *ok)
+{
+    double value = 0;
+    bool ret = parseNumeric(s, value);
+    if (ok) {
+        *ok = ret;
+    }
+    return value;
 }
 }
