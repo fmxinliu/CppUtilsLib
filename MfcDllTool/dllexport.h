@@ -15,4 +15,10 @@
 #    define DLL_API __declspec (dllimport)
 #  endif
 
+#  if defined(UTILTOOLS_EXPORTS_STATIC)
+#    define STATIC static
+#  else
+#    define STATIC
+#  endif
+
 #endif

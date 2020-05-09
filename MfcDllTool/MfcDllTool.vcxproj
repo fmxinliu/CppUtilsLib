@@ -69,7 +69,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;DLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;DLL_EXPORTS;UTILTOOLS_EXPORTS_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>serial\include;socket\include;logsys\include;minidump\include;pthreads-w32\include;utiltools\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -170,6 +170,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_dll|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="utiltools\StringUtils.cpp" />
     <ClCompile Include="utiltools\util.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -192,6 +193,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="utiltools\include\char.h" />
+    <ClInclude Include="utiltools\include\StringUtils.h" />
     <ClInclude Include="utiltools\include\util.h" />
   </ItemGroup>
   <ItemGroup>
