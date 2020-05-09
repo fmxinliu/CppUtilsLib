@@ -29,6 +29,7 @@ namespace UtilTools
     // ÅÐ¶ÏÊÇ·ñÎªÊý×Ö
     DLL_API bool isInteger(const String &s);
     DLL_API bool isNumeric(const String &s);
+    DLL_API bool isBoolean(const String &s);
 
     // ÅÐ¶Ï´¿×ÖÄ¸×Ö·û´®
     DLL_API bool isAlpha(const String &s);

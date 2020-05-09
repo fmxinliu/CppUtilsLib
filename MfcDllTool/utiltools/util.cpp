@@ -292,6 +292,12 @@ bool isNumeric(const String &s)
     return true;
 }
 
+bool isBoolean(const String &s)
+{
+    String _s = toLower(s);
+    return _T("true") == _s || _T("false") == _s;
+}
+
 bool isAlpha(const String &s)
 {
     for (size_t i = 0; i < s.length(); i++) {
