@@ -235,6 +235,63 @@ bool isBlank(const String &s)
     return true;
 }
 
+bool isInteger(const String &s)
+{
+    if (s.empty()) {
+        return false;
+    }
+    // 判断符号
+    size_t i = 0;
+    if (Char::isSign(s[i])) {
+        if (s.length() == ++i) {
+            return false;
+        }
+    }
+    while (i < s.length()) {
+        if (!Char::isDigit(s[i++])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool isNumeric(const String &s)
+{
+    if (s.empty()) {
+        return false;
+    }
+
+    int dotCount = 0;
+    int digitCount = 0;
+
+    // 判断符号
+    size_t i = 0;
+    if (Char::isSign(s[i])) {
+        if (s.length() == ++i) {
+            return false;
+        }
+    }
+    for (; i < s.length(); ++i) {
+        if (Char::isDot(s[i])) {
+            if (0 == digitCount) {
+                return false; // 小数点前无数字
+            }
+            if (++dotCount > 1) {
+                return false; // 多个小数点
+            }
+            if (s.length() == i + 1) {
+                return false; // 小数点在最后一位
+            }
+            continue; // 小数点
+        }
+        if (!Char::isDigit(s[i])) {
+            return false;
+        }
+        ++digitCount;
+    }
+    return true;
+}
+
 bool isAlpha(const String &s)
 {
     for (size_t i = 0; i < s.length(); i++) {

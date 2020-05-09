@@ -19,8 +19,18 @@ namespace UtilTools
         {
             return !!isspace(ch);
         }
+        // 判断是否为小数点
+        static inline bool isDot(TCHAR ch)
+        {
+            return ch == '.';
+        }
+        // 判断是否为正负号
+        static inline bool isSign(TCHAR ch)
+        {
+            return ch == '+' || ch == '-';
+        }
         // 判断是否为数字
-        static inline bool isDigit(TCHAR ch, bool ishex=false)
+        static inline bool isDigit(TCHAR ch, bool ishex = false)
         {
             if (ishex) {
                 return !!isxdigit(ch); // 十六进制
