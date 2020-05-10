@@ -67,5 +67,10 @@ namespace UtilTools
         STATIC int parseInteger(const String &s, bool *ok = NULL);
         STATIC bool parseBoolean(const String &s, bool *ok = NULL);
         STATIC double parseNumeric(const String &s, bool *ok = NULL);
+
+        // 转十六进制
+        STATIC String toHexWString(wchar_t ch); // 支持汉字字符
+        STATIC String toHexString(unsigned char ch); // 不支持汉字字符
+        STATIC String toHexString(const String &s, const String &separator = _T(""));
     };
 }

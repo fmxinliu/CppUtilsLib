@@ -552,4 +552,76 @@ namespace UtilTools
         }
         return value;
     }
+
+    /**
+     * #purpose  : 字符转十六进制
+     * #note     : 不支持汉字字符
+     * #param ch : 要转换成十六进制的字符
+     * #return   : 转换后的字符串
+     */
+    String StringUtils::toHexString(unsigned char ch)
+    {
+        const String hex = _T("0123456789ABCDEF");
+
+    #ifdef UNICODE
+        wstringstream ss;
+    #else
+        stringstream ss;
+    #endif
+        ss << hex[ch >> 4] << hex[ch & 0xf];
+
+        return ss.str();
+    }
+
+    /**
+     * #purpose  : 字符转十六进制
+     * #note     : 支持汉字字符
+     * #param ch : 要转换成十六进制的字符
+     * #return   : 转换后的字符串
+     */
+    String StringUtils::toHexWString(wchar_t ch)
+    {
+        const String hex = _T("0123456789ABCDEF");
+
+    #ifdef UNICODE
+        wstringstream ss;
+    #else
+        stringstream ss;
+    #endif
+        unsigned char hi = ch >> 8;
+        unsigned char lo = ch & 0xff;
+        ss << hex[hi >> 4] << hex[hi & 0xf]
+           << hex[lo >> 4] << hex[lo & 0xf];
+
+        return ss.str();
+    }
+
+    /**
+     * #purpose         : 字符串转十六进制字符串
+     * #note            : 支持汉字字符串
+     * #param s         : 要转换成十六进制的字符串
+     * #param separator : 十六进制字符串间的分隔符
+     * #return          : 转换后的字符串
+     */
+    String StringUtils::toHexString(const String &s, const String &separator)
+    {
+        const String hex = _T("0123456789ABCDEF");
+
+    #ifdef UNICODE
+        wstringstream ss;
+        #define _toHexString toHexWString
+    #else
+        stringstream ss;
+        #define _toHexString toHexString
+    #endif
+
+        for (String::size_type i = 0; i < s.length(); ++i) {
+            ss << _toHexString(s[i]);
+            if (s.length() != i + 1) {
+                ss << separator;
+            }
+        }
+
+        return ss.str();
+    }
 }
