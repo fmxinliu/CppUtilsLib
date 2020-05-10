@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "MfcDllTool.h"
 //#include "FileManager.h"
-#include "Util.h"
+#include "apps.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

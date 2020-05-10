@@ -1,6 +1,6 @@
 #include "StdAfx.h"
-#include "StringUtils.h"
 #include "char.h"
+#include "StringUtils.h"
 #include <string>      // std::string
 #include <sstream>     // std::stringstream
 #include <codecvt>

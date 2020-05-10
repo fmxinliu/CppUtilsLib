@@ -81,10 +81,10 @@
     <ClCompile Include="logsys\logger.cpp">
       <Filter>logsys</Filter>
     </ClCompile>
-    <ClCompile Include="utiltools\util.cpp">
+    <ClCompile Include="utiltools\StringUtils.cpp">
       <Filter>utiltools</Filter>
     </ClCompile>
-    <ClCompile Include="utiltools\StringUtils.cpp">
+    <ClCompile Include="utiltools\apps.cpp">
       <Filter>utiltools</Filter>
     </ClCompile>
   </ItemGroup>
@@ -143,13 +143,13 @@
     <ClInclude Include="logsys\include\logger.h">
       <Filter>logsys\include</Filter>
     </ClInclude>
-    <ClInclude Include="utiltools\include\util.h">
+    <ClInclude Include="utiltools\include\StringUtils.h">
       <Filter>utiltools\include</Filter>
     </ClInclude>
     <ClInclude Include="utiltools\include\char.h">
       <Filter>utiltools\include</Filter>
     </ClInclude>
-    <ClInclude Include="utiltools\include\StringUtils.h">
+    <ClInclude Include="utiltools\include\apps.h">
       <Filter>utiltools\include</Filter>
     </ClInclude>
   </ItemGroup>
