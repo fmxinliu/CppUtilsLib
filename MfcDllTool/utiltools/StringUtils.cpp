@@ -83,20 +83,40 @@ namespace UtilTools
         return str;
     }
 
-    wstring StringUtils::StringToWString(const string &s)
+    wstring StringUtils::stringToWString(const string &s)
     {
-        //std::wstring ws(s.begin(), s.end());
-        //return ws;
-        wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
-        return converter.from_bytes(s);
+        wstring ws;
+        int len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), s.size(), NULL, 0);
+        if (len <= 0) {
+            return ws;
+        }
+        wchar_t* buffer = new wchar_t[len + 1];
+        if (NULL == buffer) {
+            return ws;
+        }
+        MultiByteToWideChar(CP_ACP, 0, s.c_str(), s.size(), buffer, len);
+        buffer[len] = '\0';
+        ws.append(buffer);
+        delete[] buffer;
+        return ws;
     }
 
-    string StringUtils::WStringToString(const wstring &ws)
+    string StringUtils::wstringToString(const wstring &ws)
     {
-        wstring_convert<codecvt_utf8_utf16<wchar_t>> converter;
-        //string narrow = converter.to_bytes(wide_utf16_source_string);
-        //wstring wide = converter.from_bytes(narrow_utf8_source_string);
-        return converter.to_bytes(ws);
+        string s;
+        int len = WideCharToMultiByte(CP_ACP, 0, ws.c_str(), ws.size(), NULL, 0, NULL, NULL);
+        if (len <= 0) {
+            return s;
+        }
+        char *buffer = new char[len + 1];
+        if (NULL == buffer) {
+            return s;
+        }
+        WideCharToMultiByte(CP_ACP, 0, ws.c_str(), ws.size(), buffer, len, NULL, NULL);
+        buffer[len] = '\0';
+        s.append(buffer);
+        delete[] buffer;
+        return s;
     }
 
     vector<String> StringUtils::spilt(const String &s, TCHAR delimiter, bool bRemoveEmptyEntries)

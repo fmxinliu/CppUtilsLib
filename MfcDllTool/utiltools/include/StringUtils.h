@@ -21,10 +21,10 @@ namespace UtilTools
         STATIC float toFloat(const String &s);
         STATIC double toDouble(const String &s);
 
-        // 字符串转换
-        STATIC String format(const TCHAR *pszFmt, ...); // 格式化
-        STATIC std::wstring StringToWString(const std::string &s);
-        STATIC std::string WStringToString(const std::wstring &ws);
+        // 字符串转换 && 支持汉字
+        STATIC String format(const TCHAR *pszFmt, ...);
+        STATIC std::wstring stringToWString(const std::string &s);
+        STATIC std::string wstringToString(const std::wstring &ws);
 
         // 分割
         STATIC std::vector<String> spilt(const String &s, TCHAR delimiter, bool bRemoveEmptyEntries = false);
