@@ -99,7 +99,7 @@ namespace UtilTools
         return converter.to_bytes(ws);
     }
 
-    vector<String> StringUtils::SpiltString(const String &s, TCHAR delimiter, bool bRemoveEmptyEntries)
+    vector<String> StringUtils::spilt(const String &s, TCHAR delimiter, bool bRemoveEmptyEntries)
     {
         String si;
         vector<String> sv;
@@ -191,7 +191,7 @@ namespace UtilTools
         return sv;
     }
 
-    vector<String> StringUtils::SpiltString(const String &s, const String &delimiters, bool bRemoveEmptyEntries, bool bDelimitersAsMulSeparator)
+    vector<String> StringUtils::spilt(const String &s, const String &delimiters, bool bRemoveEmptyEntries, bool bDelimitersAsMulSeparator)
     {
         vector<String> sv;
         vector<String> _sv;

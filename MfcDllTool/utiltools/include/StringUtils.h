@@ -27,8 +27,8 @@ namespace UtilTools
         STATIC std::string WStringToString(const std::wstring &ws);
 
         // ·Ö¸î
-        STATIC std::vector<String> SpiltString(const String &s, TCHAR delimiter, bool bRemoveEmptyEntries = false);
-        STATIC std::vector<String> SpiltString(const String &s, const String &delimiters, bool bRemoveEmptyEntries = false, bool bDelimitersAsMulSeparator = false);
+        STATIC std::vector<String> spilt(const String &s, TCHAR delimiter, bool bRemoveEmptyEntries = false);
+        STATIC std::vector<String> spilt(const String &s, const String &delimiters, bool bRemoveEmptyEntries = false, bool bDelimitersAsMulSeparator = false);
 
         // ¿Õ(°×)´®ÅÐ¶Ï
         STATIC bool isEmpty(const String &s); // ÊÇ·ñÎª¿Õ
