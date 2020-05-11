@@ -87,6 +87,9 @@
     <ClCompile Include="utiltools\apps.cpp">
       <Filter>utiltools</Filter>
     </ClCompile>
+    <ClCompile Include="utiltools\RegistryHelper.cpp">
+      <Filter>utiltools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MfcDllTool.h">
@@ -150,6 +153,9 @@
       <Filter>utiltools\include</Filter>
     </ClInclude>
     <ClInclude Include="utiltools\include\apps.h">
+      <Filter>utiltools\include</Filter>
+    </ClInclude>
+    <ClInclude Include="utiltools\include\RegistryHelper.h">
       <Filter>utiltools\include</Filter>
     </ClInclude>
   </ItemGroup>
