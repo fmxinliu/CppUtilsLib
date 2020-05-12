@@ -13,7 +13,7 @@ namespace UtilTools
 
     public:
         void Close();
-        BOOL Open(LPCTSTR lpSubKey);
+        BOOL Open(LPCTSTR lpSubKey, bool bWow6432Node, bool bWrite = false);
         BOOL CreateKey(LPCTSTR lpSubKey);
         BOOL DeleteKey(HKEY hKey, LPCTSTR lpSubKey);
         BOOL DeleteValue(LPCTSTR lpValueName);
@@ -49,18 +49,39 @@ namespace UtilTools
         }
     }
 
-    BOOL RegistryHelperPrivate::Open(LPCTSTR lpSubKey)
+    BOOL RegistryHelperPrivate::Open(LPCTSTR lpSubKey, bool bWow6432Node, bool bWrite)
     {
         assert(m_hKey);
         assert(lpSubKey);
 
         HKEY hKey;
-        long lReturn = ::RegOpenKeyEx(m_hKey, lpSubKey, 0L, KEY_ALL_ACCESS, &hKey);
+        REGSAM accessMask;
+        if (bWrite) {
+            accessMask = KEY_ALL_ACCESS; // 需要管理员权限
+        } else {
+            accessMask = KEY_READ;
+        }
+        // System32 存放 64 位的注册表
+        // SysWOW64 存放 32 位的注册表
+        // 32 位程序在64 位系统上，注册表自动跳转到 WoW6432Node 下面
+        // 32位程序打开注册表，默认为“KEY_WOW64_32KEY”标志
+        // 64位程序打开注册表，默认为“KEY_WOW64_64KEY”标志
+        // 32位程序想访问64位的注册表，就是不带bWow6432Node的路径，则必须加上“KEY_WOW64_64KEY”。
+        if (bWow6432Node) {
+            accessMask |= KEY_WOW64_32KEY; // 访问 32 位注册表
+        } else {
+            accessMask |= KEY_WOW64_64KEY; // 访问 64 位注册表
+        }
 
-        if(ERROR_SUCCESS == lReturn)
-        {
+        long lReturn = ::RegOpenKeyEx(m_hKey, lpSubKey, 0L, accessMask, &hKey);
+        if (ERROR_SUCCESS == lReturn) {
             m_hKey = hKey;
             return TRUE;
+        }
+        if (ERROR_FILE_NOT_FOUND == lReturn) {
+            OutputDebugString("ERROR_FILE_NOT_FOUND");
+        } else if (ERROR_ACCESS_DENIED == lReturn) {
+            OutputDebugString("ERROR_ACCESS_DENIED");
         }
         return FALSE;
     }
@@ -140,7 +161,6 @@ namespace UtilTools
         DWORD dwSize = sizeof(DWORD);
         DWORD dwDest;
         long lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, (BYTE *)&dwDest, &dwSize);
-
         if(ERROR_SUCCESS == lReturn)
         {
             *pnVal = (int)dwDest;
@@ -182,6 +202,7 @@ namespace UtilTools
 
         if(ERROR_SUCCESS == lReturn)
         {
+
             *lpVal = szString;
             return TRUE;
         }
@@ -224,6 +245,56 @@ namespace UtilTools
         if(lReturn==ERROR_SUCCESS)
             return TRUE;
         return FALSE;
+    }
+}
+
+#define READ(m_hKey, lpSubKey, value, bWow64_32KEY) \
+    do { \
+    RegistryHelperPrivate d(m_hKey);\
+    if (!d.Open(lpSubKey, bWow64_32KEY, false)) { \
+    return false; \
+    } \
+    return !!d.Read(lpValueName, &value); \
+    } while(0)
+#define WRITE(m_hKey, lpSubKey, value, bWow64_32KEY) \
+    do { \
+    RegistryHelperPrivate d(m_hKey);\
+    if (!d.Open(lpSubKey, bWow64_32KEY, true)) { \
+    return false; \
+    } \
+    return !!d.Write(lpValueName, value); \
+    } while(0)
+
+namespace UtilTools
+{
+    bool RegistryHelper::read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, int &value, bool bWow64_32KEY)
+    {
+        READ(m_hKey, lpSubKey, value, bWow64_32KEY);
+    }
+
+    bool RegistryHelper::read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, DWORD &value, bool bWow64_32KEY)
+    {
+        READ(m_hKey, lpSubKey, value, bWow64_32KEY);
+    }
+
+    bool RegistryHelper::read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, String &value, bool bWow64_32KEY)
+    {
+        READ(m_hKey, lpSubKey, value, bWow64_32KEY);
+    }
+
+    bool RegistryHelper::write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, int &value, bool bWow64_32KEY)
+    {
+        WRITE(m_hKey, lpSubKey, value, bWow64_32KEY);
+    }
+
+    bool RegistryHelper::write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, DWORD &value, bool bWow64_32KEY)
+    {
+        WRITE(m_hKey, lpSubKey, value, bWow64_32KEY);
+    }
+
+    bool RegistryHelper::write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, String &value, bool bWow64_32KEY)
+    {
+        WRITE(m_hKey, lpSubKey, value.c_str(), bWow64_32KEY);
     }
 }
 
