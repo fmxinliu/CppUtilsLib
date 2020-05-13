@@ -3,6 +3,7 @@
 #include <winreg.h>
 #include <assert.h>
 
+using namespace std;
 namespace UtilTools
 {
     class RegistryHelperPrivate
@@ -25,6 +26,8 @@ namespace UtilTools
         BOOL Write(LPCTSTR lpSubKey, int nVal);
         BOOL Write(LPCTSTR lpSubKey, DWORD dwVal);
         BOOL Write(LPCTSTR lpSubKey, LPCTSTR lpVal);
+        BOOL Read(LPCTSTR lpValueName, vector<String> *lpVal);
+        BOOL Write(LPCTSTR lpValueName, vector<String> lpVal);
 
     protected:
         HKEY m_hKey;
@@ -188,25 +191,57 @@ namespace UtilTools
         return FALSE;
     }
 
+    // 读字符串
     BOOL RegistryHelperPrivate::Read(LPCTSTR lpValueName, String *lpVal)
     {
         assert(m_hKey);
         assert(lpValueName);
         assert(lpVal);
 
-        DWORD dwType;
-        DWORD dwSize = 200;
-        char szString[2550];
-
-        long lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, (BYTE *)szString, &dwSize);
-
-        if(ERROR_SUCCESS == lReturn)
-        {
-
-            *lpVal = szString;
-            return TRUE;
+        DWORD dwType; // 类型
+        DWORD dwSize; // 长度
+        // 获取缓存的长度及数据类型类型
+        long lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, NULL, &dwSize);
+        if (ERROR_SUCCESS != lReturn || REG_SZ != dwType) {
+            return FALSE;
         }
-        return FALSE;
+
+        char *pszString = new char[dwSize];
+        lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, (LPBYTE)pszString, &dwSize);
+        if (ERROR_SUCCESS == lReturn) {
+            *lpVal = pszString;
+        }
+        delete[] pszString;
+        return ERROR_SUCCESS == lReturn;
+    }
+
+    // 读多字符串
+    BOOL RegistryHelperPrivate::Read(LPCTSTR lpValueName, vector<String> *lpVal)
+    {
+        assert(m_hKey);
+        assert(lpValueName);
+        assert(lpVal);
+
+        DWORD dwType; // 类型
+        DWORD dwSize; // 长度
+        // 获取缓存的长度及数据类型类型
+        long lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, NULL, &dwSize);
+        if (ERROR_SUCCESS != lReturn || REG_MULTI_SZ != dwType) {
+            return FALSE;
+        }
+
+        unsigned char *pszString = new unsigned char[dwSize];
+        lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, pszString, &dwSize);
+        if (ERROR_SUCCESS == lReturn) {
+            size_t i = 0;
+            const char *p = (const char *)pszString;
+            while (i < dwSize - 1) { // 去掉最末尾的1个字符
+                lpVal->push_back(p + i);
+                i += strlen(p + i) + 1;
+            }
+        }
+        delete[] pszString;
+        return ERROR_SUCCESS == lReturn;
     }
 
     BOOL RegistryHelperPrivate::Write(LPCTSTR lpSubKey, int nVal)
@@ -215,7 +250,7 @@ namespace UtilTools
         assert(lpSubKey);
 
         DWORD dwValue = (DWORD)nVal;
-        long lReturn = ::RegSetValueEx(m_hKey, lpSubKey, 0L, REG_DWORD, (const BYTE *)&dwValue, sizeof(DWORD));
+        long lReturn = ::RegSetValueEx(m_hKey, lpSubKey, 0L, REG_DWORD, (CONST BYTE *)&dwValue, sizeof(DWORD));
 
         if(ERROR_SUCCESS == lReturn)
             return TRUE;
@@ -227,20 +262,53 @@ namespace UtilTools
         assert(m_hKey);
         assert(lpSubKey);
 
-        long lReturn = ::RegSetValueEx(m_hKey, lpSubKey, 0L, REG_DWORD, (const BYTE *)&dwVal, sizeof(DWORD));
+        long lReturn = ::RegSetValueEx(m_hKey, lpSubKey, 0L, REG_DWORD, (CONST BYTE *)&dwVal, sizeof(DWORD));
 
         if(ERROR_SUCCESS == lReturn)
             return TRUE;
         return FALSE;
     }
 
-    BOOL RegistryHelperPrivate::Write(LPCTSTR lpValueName, LPCTSTR lpValue)
+    // 写字符串
+    BOOL RegistryHelperPrivate::Write(LPCTSTR lpValueName, LPCTSTR lpVal)
     {
         assert(m_hKey);
         assert(lpValueName);
-        assert(lpValue);
+        assert(lpVal);
 
-        long lReturn = ::RegSetValueEx(m_hKey, lpValueName, 0L, REG_SZ, (const BYTE *)lpValue, strlen(lpValue) + 1);
+        long lReturn = ::RegSetValueEx(m_hKey, lpValueName, 0L, REG_SZ, (CONST BYTE *)lpVal, strlen(lpVal) + 1);
+
+        if(lReturn==ERROR_SUCCESS)
+            return TRUE;
+        return FALSE;
+    }
+
+    // 写多字符串
+    BOOL RegistryHelperPrivate::Write(LPCTSTR lpValueName, vector<String> lpVal)
+    {
+        assert(m_hKey);
+        assert(lpValueName);
+
+        // 计算字符长度
+        size_t length = 0;
+        for (size_t i= 0; i < lpVal.size(); ++i) {
+            length += strlen(lpVal[i].c_str()) + 1;
+        }
+        length++; // 最末尾填充1个字符
+
+        // 转化为字符数字
+        unsigned char *pszString = new unsigned char[length];
+        memset(pszString, 0, length);
+        char *p = (char *)pszString;
+        for (size_t i = 0; i < lpVal.size(); ++i) {
+            const char *s = lpVal[i].c_str();
+            size_t len = strlen(s) + 1;
+            strcpy(p, s);
+            p += len;
+        }
+
+        long lReturn = ::RegSetValueEx(m_hKey, lpValueName, 0L, REG_MULTI_SZ, (CONST BYTE *)pszString, length);
+        delete []pszString;
 
         if(lReturn==ERROR_SUCCESS)
             return TRUE;
@@ -248,18 +316,18 @@ namespace UtilTools
     }
 }
 
-#define READ(m_hKey, lpSubKey, value, bWow64_32KEY) \
+#define READ(m_hKey, lpSubKey, value, bWow6432Node) \
     do { \
     RegistryHelperPrivate d(m_hKey);\
-    if (!d.Open(lpSubKey, bWow64_32KEY, false)) { \
+    if (!d.Open(lpSubKey, bWow6432Node, false)) { \
     return false; \
     } \
     return !!d.Read(lpValueName, &value); \
     } while(0)
-#define WRITE(m_hKey, lpSubKey, value, bWow64_32KEY) \
+#define WRITE(m_hKey, lpSubKey, value, bWow6432Node) \
     do { \
     RegistryHelperPrivate d(m_hKey);\
-    if (!d.Open(lpSubKey, bWow64_32KEY, true)) { \
+    if (!d.Open(lpSubKey, bWow6432Node, true)) { \
     return false; \
     } \
     return !!d.Write(lpValueName, value); \
@@ -267,34 +335,44 @@ namespace UtilTools
 
 namespace UtilTools
 {
-    bool RegistryHelper::read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, int &value, bool bWow64_32KEY)
+    bool RegistryHelper::read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, int &value, bool bWow6432Node)
     {
-        READ(m_hKey, lpSubKey, value, bWow64_32KEY);
+        READ(m_hKey, lpSubKey, value, bWow6432Node);
     }
 
-    bool RegistryHelper::read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, DWORD &value, bool bWow64_32KEY)
+    bool RegistryHelper::read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, DWORD &value, bool bWow6432Node)
     {
-        READ(m_hKey, lpSubKey, value, bWow64_32KEY);
+        READ(m_hKey, lpSubKey, value, bWow6432Node);
     }
 
-    bool RegistryHelper::read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, String &value, bool bWow64_32KEY)
+    bool RegistryHelper::read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, String &value, bool bWow6432Node)
     {
-        READ(m_hKey, lpSubKey, value, bWow64_32KEY);
+        READ(m_hKey, lpSubKey, value, bWow6432Node);
     }
 
-    bool RegistryHelper::write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, int &value, bool bWow64_32KEY)
+    bool RegistryHelper::write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, int value, bool bWow6432Node)
     {
-        WRITE(m_hKey, lpSubKey, value, bWow64_32KEY);
+        WRITE(m_hKey, lpSubKey, value, bWow6432Node);
     }
 
-    bool RegistryHelper::write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, DWORD &value, bool bWow64_32KEY)
+    bool RegistryHelper::write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, DWORD value, bool bWow6432Node)
     {
-        WRITE(m_hKey, lpSubKey, value, bWow64_32KEY);
+        WRITE(m_hKey, lpSubKey, value, bWow6432Node);
     }
 
-    bool RegistryHelper::write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, String &value, bool bWow64_32KEY)
+    bool RegistryHelper::write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, String value, bool bWow6432Node)
     {
-        WRITE(m_hKey, lpSubKey, value.c_str(), bWow64_32KEY);
+        WRITE(m_hKey, lpSubKey, value.c_str(), bWow6432Node);
+    }
+
+    bool RegistryHelper::read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, std::vector<String> &value, bool bWow6432Node)
+    {
+        READ(m_hKey, lpSubKey, value, bWow6432Node);
+    }
+
+    bool RegistryHelper::write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, std::vector<String> value, bool bWow6432Node)
+    {
+        WRITE(m_hKey, lpSubKey, value, bWow6432Node);
     }
 }
 
