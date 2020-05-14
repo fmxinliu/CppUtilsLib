@@ -56,36 +56,36 @@ namespace UtilTools
 
         switch (dwType) {
         case REG_SZ: { // 字符串值
-            char *pszString = new char[dwSize];
-            lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, (LPBYTE)pszString, &dwSize);
-            if (ERROR_SUCCESS == lReturn) {
-                *pValue = pszString;
-            }
-            delete[] pszString;
-                     } break;
-        case REG_MULTI_SZ: { // 多字符串值
-            unsigned char *pszString = new unsigned char[dwSize];
-            lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, pszString, &dwSize);
-            if (ERROR_SUCCESS == lReturn) {
-                size_t i = 0;
-                const char *p = (const char *)pszString;
-                while (i < dwSize - 1) { // 去掉最末尾的1个字符
-                    pValue->push_back(p + i);
-                    i += strlen(p + i) + 1;
+                char *pszString = new char[dwSize];
+                lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, (LPBYTE)pszString, &dwSize);
+                if (ERROR_SUCCESS == lReturn) {
+                    *pValue = pszString;
                 }
-            }
-            delete[] pszString;
-                           } break;
+                delete[] pszString;
+            } break;
+        case REG_MULTI_SZ: { // 多字符串值
+                unsigned char *pszString = new unsigned char[dwSize];
+                lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, pszString, &dwSize);
+                if (ERROR_SUCCESS == lReturn) {
+                    size_t i = 0;
+                    const char *p = (const char *)pszString;
+                    while (i < dwSize - 1) { // 去掉最末尾的1个字符
+                        pValue->push_back(p + i);
+                        i += strlen(p + i) + 1;
+                    }
+                }
+                delete[] pszString;
+            } break;
         case REG_DWORD: { // （32-位）值
-            DWORD dwValue;
-            lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, (BYTE *)&dwValue, &dwSize);
-            *pValue = dwValue;
-                        } break;
+                DWORD dwValue;
+                lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, (BYTE *)&dwValue, &dwSize);
+                *pValue = dwValue;
+            } break;
         case REG_QWORD: { // （64-位）值
-            QWORD qwValue;
-            lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, (BYTE *)&qwValue, &dwSize);
-            *pValue = qwValue;
-                        } break;
+                QWORD qwValue;
+                lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, (BYTE *)&qwValue, &dwSize);
+                *pValue = qwValue;
+            } break;
         default:
             break;
         }
@@ -141,9 +141,9 @@ namespace UtilTools
             return TRUE;
         }
         if (ERROR_FILE_NOT_FOUND == lReturn) {
-            OutputDebugString("ERROR_FILE_NOT_FOUND");
+            OutputDebugString(_T("ERROR_FILE_NOT_FOUND"));
         } else if (ERROR_ACCESS_DENIED == lReturn) {
-            OutputDebugString("ERROR_ACCESS_DENIED");
+            OutputDebugString(_T("ERROR_ACCESS_DENIED"));
         }
         return FALSE;
     }
@@ -232,16 +232,16 @@ namespace UtilTools
     DWORD dwType; /*数据类型*/ \
     DWORD dwSize; /*数据长度*/ \
     do { \
-    if (!Check(m_hKey, lpValueName, pValue, dwType, dwSize)) { \
-    return FALSE; \
-    } \
+        if (!Check(m_hKey, lpValueName, pValue, dwType, dwSize)) { \
+            return FALSE; \
+        } \
     } while(0)
 
     BOOL RegistryHelperPrivate::Read(LPCTSTR lpValueName, int *pValue)
     {
         READ_CHECK();
         DWORD dwValue; // 数据
-        long lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, (BYTE *)&dwValue, &dwSize);
+        long lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, (LPBYTE)&dwValue, &dwSize);
         if(ERROR_SUCCESS == lReturn) {
             *pValue = (int)dwValue;
             return TRUE;
@@ -253,7 +253,7 @@ namespace UtilTools
     {
         READ_CHECK();
         DWORD dwValue; // 数据
-        long lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, (BYTE *)&dwValue, &dwSize);
+        long lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, (LPBYTE)&dwValue, &dwSize);
         if(ERROR_SUCCESS == lReturn) {
             *pValue = dwValue;
             return TRUE;
@@ -265,7 +265,7 @@ namespace UtilTools
     {
         READ_CHECK();
         QWORD qwValue; // 数据
-        long lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, (BYTE *)&qwValue, &dwSize);
+        long lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, (LPBYTE)&qwValue, &dwSize);
         if(ERROR_SUCCESS == lReturn) {
             *pValue = qwValue;
             return TRUE;
@@ -276,10 +276,10 @@ namespace UtilTools
     BOOL RegistryHelperPrivate::Read(LPCTSTR lpValueName, String *pValue)
     {
         READ_CHECK();
-        char *pszString = new char[dwSize];
-        long lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, (LPBYTE)pszString, &dwSize);
+        LPBYTE pszString = new BYTE[dwSize];
+        long lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, pszString, &dwSize);
         if (ERROR_SUCCESS == lReturn) {
-            *pValue = pszString;
+            *pValue = (LPCTSTR)pszString;
         }
         delete[] pszString;
         return ERROR_SUCCESS == lReturn;
@@ -289,14 +289,18 @@ namespace UtilTools
     BOOL RegistryHelperPrivate::Read(LPCTSTR lpValueName, vector<String> *pValue)
     {
         READ_CHECK();
-        unsigned char *pszString = new unsigned char[dwSize];
+        pValue->clear();
+        LPBYTE pszString = new BYTE[dwSize];
         long lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, pszString, &dwSize);
         if (ERROR_SUCCESS == lReturn) {
-            size_t i = 0;
-            const char *p = (const char *)pszString;
-            while (i < dwSize - 1) { // 去掉最末尾的1个字符
-                pValue->push_back(p + i);
-                i += strlen(p + i) + 1;
+            size_t offset = 0;
+            size_t bytes = dwSize - sizeof(TCHAR); // 去掉末尾多余的结束符
+            LPCTSTR end = (LPCTSTR)(pszString + bytes); // 多余的结束符
+            LPTSTR start = (LPTSTR)pszString;
+            while (start < end) {
+                pValue->push_back(start);
+                offset = _tcslen(start) + 1;
+                start += offset;
             }
         }
         delete[] pszString;
@@ -331,7 +335,8 @@ namespace UtilTools
         assert(m_hKey);
         assert(lpValueName);
         LPCTSTR lpVal = value.c_str();
-        long lReturn = ::RegSetValueEx(m_hKey, lpValueName, 0L, REG_SZ, (CONST BYTE *)lpVal, strlen(lpVal) + 1);
+        DWORD dwSize = (1 + _tcslen(lpVal))* sizeof(TCHAR);
+        long lReturn = ::RegSetValueEx(m_hKey, lpValueName, 0L, REG_SZ, (CONST BYTE *)lpVal, dwSize);
         return ERROR_SUCCESS == lReturn;
     }
 
@@ -341,26 +346,26 @@ namespace UtilTools
         assert(m_hKey);
         assert(lpValueName);
 
-        // 计算字符长度
-        size_t length = 0;
-        for (size_t i= 0; i < value.size(); ++i) {
-            length += strlen(value[i].c_str()) + 1;
-        }
-        length++; // 最末尾填充1个字符
-
-        // 转化为字符数字
-        unsigned char *pszString = new unsigned char[length];
-        memset(pszString, 0, length);
-        char *p = (char *)pszString;
+        // 统计字节数
+        DWORD dwSize = 0;
         for (size_t i = 0; i < value.size(); ++i) {
-            const char *s = value[i].c_str();
-            size_t len = strlen(s) + 1;
-            strcpy(p, s);
+            dwSize += (1 + _tcslen(value[i].c_str())) * sizeof(TCHAR);
+        }
+        dwSize += sizeof(TCHAR); // 末尾多填充一个结束字符
+
+        // 转化为字节数组
+        LPBYTE pszString = new BYTE[dwSize];
+        LPTSTR p = (LPTSTR)pszString;
+        for (size_t i = 0; i < value.size(); ++i) {
+            LPCTSTR s = value[i].c_str();
+            size_t len = _tcslen(s) + 1;
+            _tcscpy(p, s);
             p += len;
         }
+        *p  = '\0'; // 结束字符，代表整个多字符串结束
 
         // 写注册表
-        long lReturn = ::RegSetValueEx(m_hKey, lpValueName, 0L, REG_MULTI_SZ, (CONST BYTE *)pszString, length);
+        long lReturn = ::RegSetValueEx(m_hKey, lpValueName, 0L, REG_MULTI_SZ, (CONST BYTE *)pszString, dwSize);
         delete []pszString;
         return ERROR_SUCCESS == lReturn;
     }
