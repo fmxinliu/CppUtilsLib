@@ -24,11 +24,13 @@ namespace UtilTools
         BOOL Read(LPCTSTR lpValueName, DWORD *pValue);
         BOOL Read(LPCTSTR lpValueName, QWORD *pValue);
         BOOL Read(LPCTSTR lpValueName, String *pValue);
+        BOOL Read(LPCTSTR lpValueName, vector<BYTE> *pValue);
         BOOL Read(LPCTSTR lpValueName, vector<String> *pValue);
         BOOL Write(LPCTSTR lpValueName, int value);
         BOOL Write(LPCTSTR lpValueName, DWORD value);
         BOOL Write(LPCTSTR lpValueName, QWORD value);
         BOOL Write(LPCTSTR lpValueName, String value);
+        BOOL Write(LPCTSTR lpValueName, vector<BYTE> value);
         BOOL Write(LPCTSTR lpValueName, vector<String> value);
 
     protected:
@@ -57,24 +59,8 @@ namespace UtilTools
         switch (dwType) {
         case REG_SZ: { // 字符串值
                 char *pszString = new char[dwSize];
-                lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, (LPBYTE)pszString, &dwSize);
-                if (ERROR_SUCCESS == lReturn) {
-                    *pValue = pszString;
-                }
-                delete[] pszString;
             } break;
         case REG_MULTI_SZ: { // 多字符串值
-                unsigned char *pszString = new unsigned char[dwSize];
-                lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, pszString, &dwSize);
-                if (ERROR_SUCCESS == lReturn) {
-                    size_t i = 0;
-                    const char *p = (const char *)pszString;
-                    while (i < dwSize - 1) { // 去掉最末尾的1个字符
-                        pValue->push_back(p + i);
-                        i += strlen(p + i) + 1;
-                    }
-                }
-                delete[] pszString;
             } break;
         case REG_DWORD: { // （32-位）值
                 DWORD dwValue;
@@ -86,6 +72,8 @@ namespace UtilTools
                 lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, (BYTE *)&qwValue, &dwSize);
                 *pValue = qwValue;
             } break;
+        case REG_BINARY: { // 二进制值
+            }break;
         default:
             break;
         }
@@ -285,7 +273,6 @@ namespace UtilTools
         return ERROR_SUCCESS == lReturn;
     }
 
-    // 读多字符串
     BOOL RegistryHelperPrivate::Read(LPCTSTR lpValueName, vector<String> *pValue)
     {
         READ_CHECK();
@@ -304,6 +291,21 @@ namespace UtilTools
             }
         }
         delete[] pszString;
+        return ERROR_SUCCESS == lReturn;
+    }
+
+    BOOL RegistryHelperPrivate::Read(LPCTSTR lpValueName, vector<BYTE> *pValue)
+    {
+        READ_CHECK();
+        pValue->clear();
+        LPBYTE buffer = new BYTE[dwSize];
+        long lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, &dwType, buffer, &dwSize);
+        if (ERROR_SUCCESS == lReturn) {
+            for (size_t i = 0; i < dwSize; ++i) {
+                pValue->push_back(buffer[i]);
+            }
+        }
+        delete[] buffer;
         return ERROR_SUCCESS == lReturn;
     }
 
@@ -340,7 +342,6 @@ namespace UtilTools
         return ERROR_SUCCESS == lReturn;
     }
 
-    // 写多字符串
     BOOL RegistryHelperPrivate::Write(LPCTSTR lpValueName, vector<String> value)
     {
         assert(m_hKey);
@@ -366,7 +367,21 @@ namespace UtilTools
 
         // 写注册表
         long lReturn = ::RegSetValueEx(m_hKey, lpValueName, 0L, REG_MULTI_SZ, (CONST BYTE *)pszString, dwSize);
-        delete []pszString;
+        delete[] pszString;
+        return ERROR_SUCCESS == lReturn;
+    }
+
+    BOOL RegistryHelperPrivate::Write(LPCTSTR lpValueName, vector<BYTE> value)
+    {
+        assert(m_hKey);
+        assert(lpValueName);
+        size_t dwSize = value.size();
+        LPBYTE buffer = new BYTE[dwSize];
+        for (size_t i = 0; i < dwSize; ++i) {
+            buffer[i] = value[i];
+        }
+        long lReturn = ::RegSetValueEx(m_hKey, lpValueName, 0L, REG_BINARY, (CONST BYTE *)buffer, dwSize);
+        delete[] buffer;
         return ERROR_SUCCESS == lReturn;
     }
 }
@@ -407,11 +422,13 @@ namespace UtilTools
     READ(DWORD);
     READ(QWORD);
     READ(String);
+    READ(vector<BYTE>);
     READ(vector<String>);
 
     WRITE(int);
     WRITE(DWORD);
     WRITE(QWORD);
     WRITE(String);
+    WRITE(vector<BYTE>);
     WRITE(vector<String>);
 }
