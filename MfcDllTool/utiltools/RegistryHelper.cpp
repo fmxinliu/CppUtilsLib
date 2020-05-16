@@ -15,9 +15,10 @@ namespace UtilTools
 
     public:
         void Close();
+        BOOL IsKeyExist(LPCTSTR lpSubKey, AccessType type = RegbitDefault);
         BOOL Open(LPCTSTR lpSubKey, AccessMode mode, AccessType type = RegbitDefault);
         BOOL CreateKey(LPCTSTR lpSubKey, AccessType type = RegbitDefault);
-        BOOL DeleteKey(HKEY hKey, LPCTSTR lpSubKey);
+        BOOL DeleteKey(LPCTSTR lpSubKey, AccessType type = RegbitDefault);
         BOOL DeleteValue(LPCTSTR lpValueName);
         BOOL RestoreKey(LPCTSTR lpFileName);
         BOOL SaveKey(LPCTSTR lpFileName);
@@ -37,6 +38,7 @@ namespace UtilTools
     protected:
         BOOL ReadCheck(HKEY hKey, LPCTSTR lpValueName, DWORD &dwType, DWORD &dwSize);
         REGSAM GetAccessMask(AccessMode mode, AccessType type);
+        REGSAM GetAccessMask(AccessType type);
 
     protected:
         HKEY m_hKey;
@@ -60,6 +62,15 @@ namespace UtilTools
         } else {
             access = KEY_ALL_ACCESS; // 需要管理员权限
         }
+        if (RegbitDefault != type) {
+            access |= GetAccessMask(type);
+        }
+        return access;
+    }
+
+    REGSAM RegistryHelperPrivate::GetAccessMask(AccessType type)
+    {
+        REGSAM access;
         // System32 存放 64 位的注册表
         // SysWOW64 存放 32 位的注册表
         // 32 位程序在64 位系统上，注册表自动跳转到 WoW6432Node 下面
@@ -67,9 +78,9 @@ namespace UtilTools
         // 64位程序打开注册表，默认为“KEY_WOW64_64KEY”标志
         // 32位程序想访问64位的注册表，就是不带bWow6432Node的路径，则必须加上“KEY_WOW64_64KEY”。
         if (Regbit32 == type) {
-            access |= KEY_WOW64_32KEY; // 访问 32 位注册表
+            access = KEY_WOW64_32KEY; // 访问 32 位注册表
         } else if (Regbit64 == type) {
-            access |= KEY_WOW64_64KEY; // 访问 64 位注册表
+            access = KEY_WOW64_64KEY; // 访问 64 位注册表
         } else {
             // 根据应用程序的位数，确定访问多少位的注册表
         }
@@ -104,18 +115,29 @@ namespace UtilTools
         return FALSE;
     }
 
+    BOOL RegistryHelperPrivate::IsKeyExist(LPCTSTR lpSubKey, AccessType type)
+    {
+        assert(m_hKey);
+        assert(lpSubKey);
+
+        HKEY hKey;
+        REGSAM accessMask = GetAccessMask(OnlyRead, type);
+        long lReturn = ::RegOpenKeyEx(m_hKey, lpSubKey, 0L, accessMask, &hKey);
+        if (ERROR_FILE_NOT_FOUND == lReturn) {
+            return FALSE;
+        }
+        return TRUE;
+    }
+
     BOOL RegistryHelperPrivate::CreateKey(LPCTSTR lpSubKey, AccessType type)
     {
         assert(m_hKey);
         assert(lpSubKey);
 
         HKEY hKey;
-        DWORD dw;
         REGSAM accessMask = GetAccessMask(AllAccess, type);
-        long lReturn = ::RegCreateKeyEx(m_hKey, lpSubKey, 0L, NULL, REG_OPTION_VOLATILE, accessMask, NULL, &hKey, &dw);
-
-        if(ERROR_SUCCESS == lReturn)
-        {
+        long lReturn = ::RegCreateKeyEx(m_hKey, lpSubKey, 0L, NULL, REG_OPTION_VOLATILE, accessMask, NULL, &hKey, NULL);
+        if(ERROR_SUCCESS == lReturn) {
             m_hKey = hKey;
             return TRUE;
         }
@@ -128,21 +150,27 @@ namespace UtilTools
         assert(lpValueName);
 
         long lReturn = ::RegDeleteValue(m_hKey, lpValueName);
-
-        if(ERROR_SUCCESS == lReturn)
+        if(ERROR_SUCCESS == lReturn) {
             return TRUE;
+        }
         return FALSE;
     }
 
-    BOOL RegistryHelperPrivate::DeleteKey(HKEY hKey, LPCTSTR lpSubKey)
+    BOOL RegistryHelperPrivate::DeleteKey(LPCTSTR lpSubKey, AccessType type)
     {
-        assert(hKey);
+        assert(m_hKey);
         assert(lpSubKey);
 
-        long lReturn = ::RegDeleteValue(hKey, lpSubKey);
-
-        if(ERROR_SUCCESS == lReturn)
+        long lReturn;
+        if (RegbitDefault == type) {
+            lReturn = ::RegDeleteKey(m_hKey, lpSubKey);
+        } else {
+            REGSAM accessMask = GetAccessMask(type);
+            lReturn = ::RegDeleteKeyEx(m_hKey, lpSubKey, accessMask, 0);
+        }
+        if(ERROR_SUCCESS == lReturn) {
             return TRUE;
+        }
         return FALSE;
     }
 
@@ -402,4 +430,25 @@ namespace UtilTools
     WRITE(String);
     WRITE(vector<BYTE>);
     WRITE(vector<String>);
+}
+
+namespace UtilTools
+{
+    bool RegistryHelper::createKey(HKEY hKey, LPCTSTR lpSubKey, AccessType type)
+    {
+        RegistryHelperPrivate d(hKey);
+        if (!d.IsKeyExist(lpSubKey, type)) {
+            return !!d.CreateKey(lpSubKey, type);
+        }
+        return true;
+    }
+
+    bool RegistryHelper::deleteKey(HKEY hKey, LPCTSTR lpSubKey, AccessType type)
+    {
+        RegistryHelperPrivate d(hKey);
+        if (d.IsKeyExist(lpSubKey, type)) {
+            return !!d.DeleteKey(lpSubKey, type);
+        }
+        return true;
+    }
 }
