@@ -24,5 +24,7 @@ namespace UtilTools
         static bool createKey(HKEY m_hKey, LPCTSTR lpSubKey, AccessType type = RegbitDefault);
         static bool deleteKey(HKEY m_hKey, LPCTSTR lpSubKey, AccessType type = RegbitDefault);
         static bool deleteValue(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, AccessType type = RegbitDefault);
+        static bool saveKey(HKEY hKey, LPCTSTR lpFileName);
+        static bool restoreKey(HKEY hKey, LPCTSTR lpFileName);
     };
 }

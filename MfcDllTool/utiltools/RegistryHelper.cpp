@@ -109,9 +109,9 @@ namespace UtilTools
             return TRUE;
         }
         if (ERROR_FILE_NOT_FOUND == lReturn) {
-            OutputDebugString(_T("ERROR_FILE_NOT_FOUND"));
+            OutputDebugString(_T("ERROR_FILE_NOT_FOUND：注册表项不存在\n"));
         } else if (ERROR_ACCESS_DENIED == lReturn) {
-            OutputDebugString(_T("ERROR_ACCESS_DENIED"));
+            OutputDebugString(_T("ERROR_ACCESS_DENIED：注册表项访问被拒绝\n"));
         }
         return FALSE;
     }
@@ -192,9 +192,14 @@ namespace UtilTools
         assert(lpFileName);
 
         long lReturn = ::RegRestoreKey(m_hKey, lpFileName, REG_WHOLE_HIVE_VOLATILE);
-
-        if(ERROR_SUCCESS == lReturn)
+        if(ERROR_SUCCESS == lReturn) {
             return TRUE;
+        }
+        if (ERROR_FILE_NOT_FOUND == lReturn) {
+            OutputDebugString(_T("ERROR_FILE_NOT_FOUND：文件已经存在\n"));
+        } else if (ERROR_PRIVILEGE_NOT_HELD == lReturn) {
+            OutputDebugString(_T("ERROR_PRIVILEGE_NOT_HELD：没有读写权限\n"));
+        }
         return FALSE;
     }
 
@@ -204,9 +209,14 @@ namespace UtilTools
         assert(lpFileName);
 
         long lReturn = ::RegSaveKey(m_hKey, lpFileName, NULL);
-
-        if(ERROR_SUCCESS == lReturn)
+        if(ERROR_SUCCESS == lReturn) {
             return TRUE;
+        }
+        if (ERROR_ALREADY_EXISTS == lReturn) {
+            OutputDebugString(_T("ERROR_ALREADY_EXISTS：文件已经存在\n"));
+        } else if (ERROR_PRIVILEGE_NOT_HELD == lReturn) {
+            OutputDebugString(_T("ERROR_PRIVILEGE_NOT_HELD：没有读写权限\n"));
+        }
         return FALSE;
     }
 
@@ -474,5 +484,17 @@ namespace UtilTools
             return !!d.DeleteValue(lpValueName);
         }
         return true;
+    }
+
+    bool RegistryHelper::saveKey(HKEY hKey, LPCTSTR lpFileName)
+    {
+        RegistryHelperPrivate d(hKey);
+        return !!d.SaveKey(lpFileName);
+    }
+
+    bool RegistryHelper::restoreKey(HKEY hKey, LPCTSTR lpFileName)
+    {
+        RegistryHelperPrivate d(hKey);
+        return !!d.RestoreKey(lpFileName);
     }
 }
