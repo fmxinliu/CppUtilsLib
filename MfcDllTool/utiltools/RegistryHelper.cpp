@@ -11,11 +11,12 @@ namespace UtilTools
     public:
         RegistryHelperPrivate(HKEY hKey = HKEY_LOCAL_MACHINE);
         virtual ~RegistryHelperPrivate();
+        enum AccessMode { OnlyRead, AllAccess }; // 操作权限
 
     public:
         void Close();
-        BOOL Open(LPCTSTR lpSubKey, bool bWow6432Node, bool bWrite = false);
-        BOOL CreateKey(LPCTSTR lpSubKey);
+        BOOL Open(LPCTSTR lpSubKey, AccessMode mode, AccessType type = RegbitDefault);
+        BOOL CreateKey(LPCTSTR lpSubKey, AccessType type = RegbitDefault);
         BOOL DeleteKey(HKEY hKey, LPCTSTR lpSubKey);
         BOOL DeleteValue(LPCTSTR lpValueName);
         BOOL RestoreKey(LPCTSTR lpFileName);
@@ -35,6 +36,7 @@ namespace UtilTools
 
     protected:
         BOOL ReadCheck(HKEY hKey, LPCTSTR lpValueName, DWORD &dwType, DWORD &dwSize);
+        REGSAM GetAccessMask(AccessMode mode, AccessType type);
 
     protected:
         HKEY m_hKey;
@@ -50,6 +52,30 @@ namespace UtilTools
         Close();
     }
 
+    REGSAM RegistryHelperPrivate::GetAccessMask(AccessMode mode, AccessType type)
+    {
+        REGSAM access;
+        if (OnlyRead == mode) {
+            access = KEY_READ;
+        } else {
+            access = KEY_ALL_ACCESS; // 需要管理员权限
+        }
+        // System32 存放 64 位的注册表
+        // SysWOW64 存放 32 位的注册表
+        // 32 位程序在64 位系统上，注册表自动跳转到 WoW6432Node 下面
+        // 32位程序打开注册表，默认为“KEY_WOW64_32KEY”标志
+        // 64位程序打开注册表，默认为“KEY_WOW64_64KEY”标志
+        // 32位程序想访问64位的注册表，就是不带bWow6432Node的路径，则必须加上“KEY_WOW64_64KEY”。
+        if (Regbit32 == type) {
+            access |= KEY_WOW64_32KEY; // 访问 32 位注册表
+        } else if (Regbit64 == type) {
+            access |= KEY_WOW64_64KEY; // 访问 64 位注册表
+        } else {
+            // 根据应用程序的位数，确定访问多少位的注册表
+        }
+        return access;
+    }
+
     void RegistryHelperPrivate::Close()
     {
         if(m_hKey) {
@@ -58,30 +84,13 @@ namespace UtilTools
         }
     }
 
-    BOOL RegistryHelperPrivate::Open(LPCTSTR lpSubKey, bool bWow6432Node, bool bWrite)
+    BOOL RegistryHelperPrivate::Open(LPCTSTR lpSubKey, AccessMode mode, AccessType type)
     {
         assert(m_hKey);
         assert(lpSubKey);
 
         HKEY hKey;
-        REGSAM accessMask;
-        if (bWrite) {
-            accessMask = KEY_ALL_ACCESS; // 需要管理员权限
-        } else {
-            accessMask = KEY_READ;
-        }
-        // System32 存放 64 位的注册表
-        // SysWOW64 存放 32 位的注册表
-        // 32 位程序在64 位系统上，注册表自动跳转到 WoW6432Node 下面
-        // 32位程序打开注册表，默认为“KEY_WOW64_32KEY”标志
-        // 64位程序打开注册表，默认为“KEY_WOW64_64KEY”标志
-        // 32位程序想访问64位的注册表，就是不带bWow6432Node的路径，则必须加上“KEY_WOW64_64KEY”。
-        if (bWow6432Node) {
-            accessMask |= KEY_WOW64_32KEY; // 访问 32 位注册表
-        } else {
-            accessMask |= KEY_WOW64_64KEY; // 访问 64 位注册表
-        }
-
+        REGSAM accessMask = GetAccessMask(mode, type);
         long lReturn = ::RegOpenKeyEx(m_hKey, lpSubKey, 0L, accessMask, &hKey);
         if (ERROR_SUCCESS == lReturn) {
             m_hKey = hKey;
@@ -95,14 +104,15 @@ namespace UtilTools
         return FALSE;
     }
 
-    BOOL RegistryHelperPrivate::CreateKey(LPCTSTR lpSubKey)
+    BOOL RegistryHelperPrivate::CreateKey(LPCTSTR lpSubKey, AccessType type)
     {
         assert(m_hKey);
         assert(lpSubKey);
 
         HKEY hKey;
         DWORD dw;
-        long lReturn = ::RegCreateKeyEx(m_hKey, lpSubKey, 0L, NULL, REG_OPTION_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, &dw);
+        REGSAM accessMask = GetAccessMask(AllAccess, type);
+        long lReturn = ::RegCreateKeyEx(m_hKey, lpSubKey, 0L, NULL, REG_OPTION_VOLATILE, accessMask, NULL, &hKey, &dw);
 
         if(ERROR_SUCCESS == lReturn)
         {
@@ -350,33 +360,33 @@ namespace UtilTools
 namespace UtilTools
 {
     template<class T>
-    static bool Read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, T &value, bool bWow6432Node)
+    static bool Read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, T &value, AccessType type)
     {
         RegistryHelperPrivate d(m_hKey);
-        if (!d.Open(lpSubKey, bWow6432Node, false)) {
+        if (!d.Open(lpSubKey, RegistryHelperPrivate::OnlyRead, type)) {
             return false;
         }
         return !!d.Read(lpValueName, &value);
     }
 
     template<class T>
-    static bool Write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const T &value, bool bWow6432Node)
+    static bool Write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const T &value, AccessType type)
     {
         RegistryHelperPrivate d(m_hKey);
-        if (!d.Open(lpSubKey, bWow6432Node, true)) {
+        if (!d.Open(lpSubKey, RegistryHelperPrivate::AllAccess, type)) {
             return false;
         }
         return !!d.Write(lpValueName, value);
     }
 
 #define READ(TYPE) \
-    bool RegistryHelper::read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, TYPE &value, bool bWow6432Node) { \
-    return Read(m_hKey, lpSubKey, lpValueName, value, bWow6432Node); \
+    bool RegistryHelper::read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, TYPE &value, AccessType type) { \
+        return Read(m_hKey, lpSubKey, lpValueName, value, type); \
     }
 
 #define WRITE(TYPE) \
-    bool RegistryHelper::write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const TYPE &value, bool bWow6432Node) { \
-    return Write(m_hKey, lpSubKey, lpValueName, value, bWow6432Node); \
+    bool RegistryHelper::write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const TYPE &value, AccessType type) { \
+        return Write(m_hKey, lpSubKey, lpValueName, value, type); \
     } \
 
     READ(int);

@@ -4,20 +4,22 @@
 
 namespace UtilTools
 {
+    enum AccessType { RegbitDefault, Regbit32, Regbit64 }; // ·ÃÎÊ32/64Î»×¢²á±í
+
     class DLL_API RegistryHelper
     {
     public:
-        static bool read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, int &value, bool bWow6432Node = true);
-        static bool read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, DWORD &value, bool bWow6432Node = true);
-        static bool read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, QWORD &value, bool bWow6432Node = true);
-        static bool read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, String &value, bool bWow6432Node = true);
-        static bool read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, std::vector<BYTE> &value, bool bWow6432Node = true);
-        static bool read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, std::vector<String> &value, bool bWow6432Node = true);
-        static bool write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const int &value, bool bWow6432Node = true);
-        static bool write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const DWORD &value, bool bWow6432Node = true);
-        static bool write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const QWORD &value, bool bWow6432Node = true);
-        static bool write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const String &value, bool bWow6432Node = true);
-        static bool write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const std::vector<BYTE> &value, bool bWow6432Node = true);
-        static bool write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const std::vector<String> &value, bool bWow6432Node = true);
+        static bool read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, int &value, AccessType type = RegbitDefault);
+        static bool read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, DWORD &value, AccessType type = RegbitDefault);
+        static bool read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, QWORD &value, AccessType type = RegbitDefault);
+        static bool read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, String &value, AccessType type = RegbitDefault);
+        static bool read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, std::vector<BYTE> &value, AccessType type = RegbitDefault);
+        static bool read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, std::vector<String> &value, AccessType type = RegbitDefault);
+        static bool write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const int &value, AccessType type = RegbitDefault);
+        static bool write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const DWORD &value, AccessType type = RegbitDefault);
+        static bool write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const QWORD &value, AccessType type = RegbitDefault);
+        static bool write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const String &value, AccessType type = RegbitDefault);
+        static bool write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const std::vector<BYTE> &value, AccessType type = RegbitDefault);
+        static bool write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const std::vector<String> &value, AccessType type = RegbitDefault);
     };
 }
