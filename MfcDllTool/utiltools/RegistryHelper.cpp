@@ -34,7 +34,7 @@ namespace UtilTools
         BOOL Write(LPCTSTR lpValueName, const vector<String> &value);
 
     protected:
-        BOOL Check(HKEY hKey, LPCTSTR lpValueName, void *pValue, DWORD &dwType, DWORD &dwSize);
+        BOOL ReadCheck(HKEY hKey, LPCTSTR lpValueName, DWORD &dwType, DWORD &dwSize);
 
     protected:
         HKEY m_hKey;
@@ -160,11 +160,10 @@ namespace UtilTools
         return FALSE;
     }
 
-    BOOL RegistryHelperPrivate::Check(HKEY hKey, LPCTSTR lpValueName, void *pValue, DWORD &dwType, DWORD &dwSize)
+    BOOL RegistryHelperPrivate::ReadCheck(HKEY hKey, LPCTSTR lpValueName, DWORD &dwType, DWORD &dwSize)
     {
         assert(hKey);
         assert(lpValueName);
-        assert(pValue);
 
         // 获取数据类型、数据长度
         long lReturn = ::RegQueryValueEx(hKey, lpValueName, NULL, &dwType, NULL, &dwSize);
@@ -179,8 +178,11 @@ namespace UtilTools
     DWORD dwType; /*数据类型*/ \
     DWORD dwSize; /*数据长度*/ \
     do { \
-        if (!Check(m_hKey, lpValueName, pValue, dwType, dwSize)) { \
+        if (!ReadCheck(m_hKey, lpValueName, dwType, dwSize)) { \
             return FALSE; \
+        } \
+        if (!pValue) { \
+            return TRUE; \
         } \
     } while(0)
 
