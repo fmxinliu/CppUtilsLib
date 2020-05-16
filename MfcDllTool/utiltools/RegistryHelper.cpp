@@ -16,6 +16,7 @@ namespace UtilTools
     public:
         void Close();
         BOOL IsKeyExist(LPCTSTR lpSubKey, AccessType type = RegbitDefault);
+        BOOL IsValueExist(LPCTSTR lpValueName, AccessType type = RegbitDefault);
         BOOL Open(LPCTSTR lpSubKey, AccessMode mode, AccessType type = RegbitDefault);
         BOOL CreateKey(LPCTSTR lpSubKey, AccessType type = RegbitDefault);
         BOOL DeleteKey(LPCTSTR lpSubKey, AccessType type = RegbitDefault);
@@ -113,6 +114,17 @@ namespace UtilTools
             OutputDebugString(_T("ERROR_ACCESS_DENIED"));
         }
         return FALSE;
+    }
+
+    BOOL RegistryHelperPrivate::IsValueExist(LPCTSTR lpValueName, AccessType type)
+    {
+        assert(m_hKey);
+        assert(lpValueName);
+        long lReturn = ::RegQueryValueEx(m_hKey, lpValueName, NULL, NULL, NULL, NULL);
+        if (ERROR_FILE_NOT_FOUND == lReturn) {
+            return FALSE;
+        }
+        return TRUE;
     }
 
     BOOL RegistryHelperPrivate::IsKeyExist(LPCTSTR lpSubKey, AccessType type)
@@ -448,6 +460,18 @@ namespace UtilTools
         RegistryHelperPrivate d(hKey);
         if (d.IsKeyExist(lpSubKey, type)) {
             return !!d.DeleteKey(lpSubKey, type);
+        }
+        return true;
+    }
+
+    bool RegistryHelper::deleteValue(HKEY hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, AccessType type)
+    {
+        RegistryHelperPrivate d(hKey);
+        if (!d.Open(lpSubKey, RegistryHelperPrivate::AllAccess, type)) {
+            return false;
+        }
+        if (d.IsValueExist(lpValueName, type)) {
+            return !!d.DeleteValue(lpValueName);
         }
         return true;
     }

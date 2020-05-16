@@ -23,5 +23,6 @@ namespace UtilTools
         static bool write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const std::vector<String> &value, AccessType type = RegbitDefault);
         static bool createKey(HKEY m_hKey, LPCTSTR lpSubKey, AccessType type = RegbitDefault);
         static bool deleteKey(HKEY m_hKey, LPCTSTR lpSubKey, AccessType type = RegbitDefault);
+        static bool deleteValue(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, AccessType type = RegbitDefault);
     };
 }
