@@ -12,6 +12,7 @@ namespace UtilTools
         RegistryHelperPrivate(HKEY hKey = HKEY_LOCAL_MACHINE);
         virtual ~RegistryHelperPrivate();
         enum AccessMode { OnlyRead, AllAccess }; // 操作权限
+        enum PrivilegeMode { Backup, Restore }; // 读写特权
 
     public:
         void Close();
@@ -38,6 +39,7 @@ namespace UtilTools
 
     protected:
         BOOL ReadCheck(HKEY hKey, LPCTSTR lpValueName, DWORD &dwType, DWORD &dwSize);
+        BOOL SetPrivilege(PrivilegeMode mode, BOOL bEnablePrivilege);
         REGSAM GetAccessMask(AccessMode mode, AccessType type);
         REGSAM GetAccessMask(AccessType type);
 
@@ -53,6 +55,54 @@ namespace UtilTools
     RegistryHelperPrivate::~RegistryHelperPrivate()
     {
         Close();
+    }
+
+    BOOL RegistryHelperPrivate::SetPrivilege(PrivilegeMode mode, BOOL bEnablePrivilege)
+    {
+        BOOL ret;
+        LUID luid;
+        HANDLE hToken;
+        TOKEN_PRIVILEGES tp;
+        LPCTSTR lpszPrivilege;
+
+        ret = OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken);
+        if (!ret) {
+            OutputDebugString(_T("无法打开进程操作令牌\n"));
+        }
+
+        if (Backup == mode) {
+            lpszPrivilege = SE_BACKUP_NAME;
+        } else if (Restore == mode) {
+            lpszPrivilege = SE_RESTORE_NAME;
+        } else {
+            ret = FALSE;
+        }
+
+        if (ret && !LookupPrivilegeValue(NULL, lpszPrivilege, &luid)) {
+            OutputDebugString(_T("无法查看系统权限的特权值\n"));
+            ret = FALSE;
+        }
+
+        tp.PrivilegeCount = 1;
+        tp.Privileges[0].Luid = luid;
+        if (bEnablePrivilege) {
+            tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+        } else {
+            tp.Privileges[0].Attributes = 0;
+        }
+
+        if (ret && !AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), NULL, NULL)) {
+            OutputDebugString(_T("无法指定访问令牌的特权\n"));
+            ret = FALSE;
+        }
+
+        if(!ret || ERROR_SUCCESS != GetLastError()) {
+            OutputDebugString(_T("权限设置失败！\n"));
+            ret = FALSE;
+        }
+
+        CloseHandle(hToken);
+        return ret;
     }
 
     REGSAM RegistryHelperPrivate::GetAccessMask(AccessMode mode, AccessType type)
@@ -191,15 +241,20 @@ namespace UtilTools
         assert(m_hKey);
         assert(lpFileName);
 
-        long lReturn = ::RegRestoreKey(m_hKey, lpFileName, REG_WHOLE_HIVE_VOLATILE);
+        SetPrivilege(Restore, TRUE); // 打开恢复特权
+        long lReturn = ::RegRestoreKey(m_hKey, lpFileName, REG_FORCE_RESTORE);
         if(ERROR_SUCCESS == lReturn) {
+            SetPrivilege(Restore, FALSE);
             return TRUE;
         }
         if (ERROR_FILE_NOT_FOUND == lReturn) {
             OutputDebugString(_T("ERROR_FILE_NOT_FOUND：文件已经存在\n"));
         } else if (ERROR_PRIVILEGE_NOT_HELD == lReturn) {
             OutputDebugString(_T("ERROR_PRIVILEGE_NOT_HELD：没有读写权限\n"));
+        } else if (ERROR_ACCESS_DENIED == lReturn) {
+            OutputDebugString(_T("ERROR_ACCESS_DENIED：注册表项访问被拒绝\n"));
         }
+        SetPrivilege(Restore, FALSE);
         return FALSE;
     }
 
@@ -208,15 +263,20 @@ namespace UtilTools
         assert(m_hKey);
         assert(lpFileName);
 
+        SetPrivilege(Backup, TRUE); // 打开备份特权
         long lReturn = ::RegSaveKey(m_hKey, lpFileName, NULL);
         if(ERROR_SUCCESS == lReturn) {
+            SetPrivilege(Backup, FALSE);
             return TRUE;
         }
         if (ERROR_ALREADY_EXISTS == lReturn) {
             OutputDebugString(_T("ERROR_ALREADY_EXISTS：文件已经存在\n"));
         } else if (ERROR_PRIVILEGE_NOT_HELD == lReturn) {
             OutputDebugString(_T("ERROR_PRIVILEGE_NOT_HELD：没有读写权限\n"));
+        } else if (ERROR_ACCESS_DENIED == lReturn) {
+            OutputDebugString(_T("ERROR_ACCESS_DENIED：注册表项访问被拒绝\n"));
         }
+        SetPrivilege(Backup, FALSE);
         return FALSE;
     }
 
@@ -486,15 +546,21 @@ namespace UtilTools
         return true;
     }
 
-    bool RegistryHelper::saveKey(HKEY hKey, LPCTSTR lpFileName)
+    bool RegistryHelper::saveKey(HKEY hKey, LPCTSTR lpSubKey, LPCTSTR lpFileName, AccessType type)
     {
         RegistryHelperPrivate d(hKey);
+        if (!d.Open(lpSubKey, RegistryHelperPrivate::AllAccess, type)) {
+            return false;
+        }
         return !!d.SaveKey(lpFileName);
     }
 
-    bool RegistryHelper::restoreKey(HKEY hKey, LPCTSTR lpFileName)
+    bool RegistryHelper::restoreKey(HKEY hKey, LPCTSTR lpSubKey, LPCTSTR lpFileName, AccessType type)
     {
         RegistryHelperPrivate d(hKey);
+        if (!d.Open(lpSubKey, RegistryHelperPrivate::AllAccess, type)) {
+            return false;
+        }
         return !!d.RestoreKey(lpFileName);
     }
 }
