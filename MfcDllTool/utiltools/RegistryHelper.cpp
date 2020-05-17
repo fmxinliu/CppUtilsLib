@@ -198,7 +198,7 @@ namespace UtilTools
 
         HKEY hKey;
         REGSAM accessMask = GetAccessMask(AllAccess, type);
-        long lReturn = ::RegCreateKeyEx(m_hKey, lpSubKey, 0L, NULL, REG_OPTION_VOLATILE, accessMask, NULL, &hKey, NULL);
+        long lReturn = ::RegCreateKeyEx(m_hKey, lpSubKey, 0L, NULL, REG_OPTION_NON_VOLATILE, accessMask, NULL, &hKey, NULL);
         if(ERROR_SUCCESS == lReturn) {
             m_hKey = hKey;
             return TRUE;
