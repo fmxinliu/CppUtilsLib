@@ -263,6 +263,9 @@ namespace UtilTools
         assert(m_hKey);
         assert(lpFileName);
 
+        if (PathFileExists(lpFileName)) {
+            DeleteFile(lpFileName);
+        }
         SetPrivilege(Backup, TRUE); // 打开备份特权
         long lReturn = ::RegSaveKey(m_hKey, lpFileName, NULL);
         if(ERROR_SUCCESS == lReturn) {
