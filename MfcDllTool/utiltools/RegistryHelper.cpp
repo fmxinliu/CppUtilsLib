@@ -3,6 +3,7 @@
 #include <winreg.h>
 #include <assert.h>
 
+#if defined(WIN32)
 using namespace std;
 namespace UtilTools
 {
@@ -473,9 +474,9 @@ namespace UtilTools
 namespace UtilTools
 {
     template<class T>
-    static bool Read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, T &value, AccessType type)
+    static bool Read(HKEY hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, T &value, AccessType type)
     {
-        RegistryHelperPrivate d(m_hKey);
+        RegistryHelperPrivate d(hKey);
         if (!d.Open(lpSubKey, RegistryHelperPrivate::OnlyRead, type)) {
             return false;
         }
@@ -483,9 +484,9 @@ namespace UtilTools
     }
 
     template<class T>
-    static bool Write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const T &value, AccessType type)
+    static bool Write(HKEY hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const T &value, AccessType type)
     {
-        RegistryHelperPrivate d(m_hKey);
+        RegistryHelperPrivate d(hKey);
         if (!d.Open(lpSubKey, RegistryHelperPrivate::AllAccess, type)) {
             return false;
         }
@@ -493,13 +494,13 @@ namespace UtilTools
     }
 
 #define READ(TYPE) \
-    bool RegistryHelper::read(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, TYPE &value, AccessType type) { \
-        return Read(m_hKey, lpSubKey, lpValueName, value, type); \
+    bool RegistryHelper::read(HKEY hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, TYPE &value, AccessType type) { \
+        return Read(hKey, lpSubKey, lpValueName, value, type); \
     }
 
 #define WRITE(TYPE) \
-    bool RegistryHelper::write(HKEY m_hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const TYPE &value, AccessType type) { \
-        return Write(m_hKey, lpSubKey, lpValueName, value, type); \
+    bool RegistryHelper::write(HKEY hKey, LPCTSTR lpSubKey, LPCTSTR lpValueName, const TYPE &value, AccessType type) { \
+        return Write(hKey, lpSubKey, lpValueName, value, type); \
     } \
 
     READ(int);
@@ -567,3 +568,4 @@ namespace UtilTools
         return !!d.RestoreKey(lpFileName);
     }
 }
+#endif
