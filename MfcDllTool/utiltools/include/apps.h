@@ -11,6 +11,7 @@ namespace UtilTools
         STATIC bool runAsAdmin(LPTSTR exepath);
         STATIC bool restartWithAdminPrivilege(LPTSTR exepath);
         STATIC bool enableDebugPrivilege(); // 开启本进程调试特权
+        STATIC bool setPrivilege(HANDLE pHandle, LPCTSTR lpszPrivilege, bool enable); // 开启/关闭进程特权
 
         // 窗体显示
         STATIC bool showWindow(LPTSTR title);

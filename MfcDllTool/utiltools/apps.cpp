@@ -88,15 +88,20 @@ namespace UtilTools
     //*********************************************
     bool Apps::enableDebugPrivilege()
     {
+        return setPrivilege(GetCurrentProcess(), SE_DEBUG_NAME, true);
+    }
+
+    bool Apps::setPrivilege(HANDLE pHandle, LPCTSTR lpszPrivilege, bool enable)
+    {
+        LUID luid;
         HANDLE hToken;
-        LUID sedebugnameValue;
         TOKEN_PRIVILEGES tkp;
 
-        if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
+        if (!OpenProcessToken(pHandle, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
             return false;
         }
 
-        if (!LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &sedebugnameValue)) {
+        if (!LookupPrivilegeValue(NULL, lpszPrivilege, &luid)) {
             __try {
                 if (hToken) {
                     CloseHandle(hToken);
@@ -106,8 +111,12 @@ namespace UtilTools
         }
 
         tkp.PrivilegeCount = 1;
-        tkp.Privileges[0].Luid = sedebugnameValue;
-        tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+        tkp.Privileges[0].Luid = luid;
+        if (enable) {
+            tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+        } else {
+            tkp.Privileges[0].Attributes = 0;
+        }
         if (!AdjustTokenPrivileges(hToken, FALSE, &tkp, sizeof(tkp), NULL, NULL)) {
             __try {
                 if(hToken) {
@@ -118,7 +127,8 @@ namespace UtilTools
         }
 
         DWORD dw = GetLastError();
-        return !dw;
+        CloseHandle(hToken);
+        return ERROR_SUCCESS == dw;
     }
 
     bool Apps::showWindow(LPTSTR title)
