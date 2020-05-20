@@ -26,5 +26,14 @@ namespace UtilTools
 
         // 重命名 or 移动(目标目录必须存在)
         STATIC bool rename(const String &oldname, const String &newname, bool overwrite);
+
+        // 路径
+        STATIC String getAppPath();
+        STATIC String getDirName(const String &path);
+        STATIC String getExtName(const String &path);
+        STATIC String getFileName(const String &path);
+        STATIC String getFileNameWithoutExtension(const String &path);
+        STATIC String getCurWorkDir(const String &path);
+        STATIC bool hasExtension(const String &path);
     };
 }
