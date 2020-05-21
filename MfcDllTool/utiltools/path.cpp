@@ -12,6 +12,16 @@
 #define RW_OK 6
 #pragma warning(disable: 4996)
 
+#ifdef UNICODE
+#define finddata_t _wfinddata_t
+#define findfirst  _wfindfirst
+#define findnext   _wfindnext
+#else
+#define finddata_t _finddata_t
+#define findfirst  _findfirst
+#define findnext   _findnext
+#endif
+
 #else
 #include <unistd.h>
 #include <dirent.h>
@@ -43,14 +53,91 @@ typedef char TCHAR;
 using namespace std;
 namespace UtilTools
 {
+    int __cdecl _access(const String &filename, int accessMode)
+    {
+#ifdef UNICODE
+        return access(StringUtils::wstringToString(filename).c_str(), accessMode);
+#else
+        return access(filename.c_str(), accessMode);
+#endif
+    }
+
+    int __cdecl _chdir(const String &path)
+    {
+#ifdef UNICODE
+        return chdir(StringUtils::wstringToString(path).c_str());
+#else
+        return chdir(path.c_str());
+#endif
+    }
+
+    int __cdecl _mkdir(const String &path)
+    {
+#ifdef UNICODE
+        return mkdir(StringUtils::wstringToString(path).c_str());
+#else
+        return mkdir(path.c_str());
+#endif
+    }
+
+    int __cdecl _rmdir(const String &path)
+    {
+#ifdef UNICODE
+        return rmdir(StringUtils::wstringToString(path).c_str());
+#else
+        return rmdir(path.c_str());
+#endif
+    }
+
+    int __cdecl _rename(const String &oldname, const String &newname)
+    {
+#ifdef UNICODE
+        return std::rename(StringUtils::wstringToString(oldname).c_str(), StringUtils::wstringToString(newname).c_str());
+#else
+        return std::rename(oldname.c_str(), newname.c_str());
+#endif
+    }
+
+    int __cdecl _remove(const String &path)
+    {
+#ifdef UNICODE
+        return remove(StringUtils::wstringToString(path).c_str());
+#else
+        return remove(path.c_str());
+#endif
+    }
+
+    String __cdecl _getcwd()
+    {
+        char szCurWorkDir[MAX_PATH] = {};
+        //GetCurrentDirectory(MAX_PATH, szCurWorkDir);
+#ifdef UNICODE
+        return StringUtils::stringToWString(getcwd(szCurWorkDir, MAX_PATH));
+#else
+        return getcwd(szCurWorkDir, MAX_PATH);
+#endif
+    }
+
+    int __cdecl _system(const String &command)
+    {
+#ifdef UNICODE
+        return system(StringUtils::wstringToString(command).c_str());
+#else
+        return system(command.c_str());
+#endif
+    }
+}
+
+namespace UtilTools
+{
 #if defined(WIN32)
     bool listFiles(const String &pathname, bool listsubdir, bool listhiddenfiles, vector<String> &result)
     {
         long hFile = 0;
-        struct _finddata_t fileInfo;
-        string pathName = StringUtils::endsWith(pathname, _T("\\")) ? pathName : pathname + _T("\\");
+        struct finddata_t fileInfo;
+        String pathName = StringUtils::endsWith(pathname, _T("\\")) ? pathName : pathname + _T("\\");
 
-        if ((hFile = _findfirst((pathName + _T("*")).c_str(), &fileInfo)) == -1) {
+        if ((hFile = findfirst((pathName + _T("*")).c_str(), &fileInfo)) == -1) {
             return false;
         }
         // List all the files in the directory with some info about them.
@@ -67,7 +154,7 @@ namespace UtilTools
                 result.push_back(pathName + fileInfo.name);
             }
             //cout << fileInfo.name << (fileInfo.attrib&_A_SUBDIR? "[folder]":"[file]") << endl;
-        } while (_findnext(hFile, &fileInfo) == 0);
+        } while (findnext(hFile, &fileInfo) == 0);
         _findclose(hFile);
         return true;
     }
@@ -75,24 +162,25 @@ namespace UtilTools
     bool deleteDirectory(const String &pathname)
     {
         long hFile = 0;
-        struct _finddata_t fileInfo;
+
+        struct finddata_t fileInfo;
         String pathName = StringUtils::endsWith(pathname, _T("\\")) ? pathname : pathname + _T("\\");
 
-        if ((hFile = _findfirst((pathName + _T("*")).c_str(), &fileInfo)) == -1) {
+        if ((hFile = findfirst((pathName + _T("*")).c_str(), &fileInfo)) == -1) {
             return false;
         }
         // Recursively delete all the file in the directory.
         do {
-            if (!strcmp(fileInfo.name, _T(".")) || !strcmp(fileInfo.name, _T(".."))) {
+            if (!_tcscmp(fileInfo.name, _T(".")) || !_tcscmp(fileInfo.name, _T(".."))) {
                 continue;
             } else if ((fileInfo.attrib & _A_SUBDIR)) {
                 deleteDirectory(pathName + fileInfo.name);
             } else {
-                remove((pathName + fileInfo.name).c_str());
+                _remove(pathName + fileInfo.name);
             }
-        } while (_findnext(hFile, &fileInfo) == 0);
+        } while (findnext(hFile, &fileInfo) == 0);
         _findclose(hFile);
-        return !rmdir(pathname.c_str()); // 删除空目录
+        return !_rmdir(pathname); // 删除空目录
     }
 
 #else
@@ -195,17 +283,17 @@ namespace UtilTools
 {
     bool Path::isExist(const String &filename)
     {
-        return !access(filename.c_str(), F_OK);
+        return !_access(filename, F_OK);
     }
 
     bool Path::isReadable(const String &filename)
     {
-        return !access(filename.c_str(), R_OK);
+        return !_access(filename, R_OK);
     }
 
     bool Path::isWriteable(const String &filename)
     {
-        return !access(filename.c_str(), W_OK);
+        return !_access(filename, W_OK);
     }
 
     bool Path::isExecutable(const String &filename)
@@ -225,7 +313,7 @@ namespace UtilTools
     bool Path::isFile(const String &pathname)
     {
 #if defined(WIN32)
-        return !!chdir(pathname.c_str()); // CreateFile 属性判断
+        return !!_chdir(pathname); // CreateFile 属性判断
 #else
         struct stat st;
         if (lstat(pathname.c_str(), &st) != -1) && (S_ISREG(st.st_mode)); // 普通文件
@@ -235,7 +323,7 @@ namespace UtilTools
     bool Path::isFolder(const String &pathname)
     {
 #if defined(WIN32)
-        return !chdir(pathname.c_str());
+        return !_chdir(pathname);
 #else
         struct stat st;
         if (lstat(pathname.c_str(), &st) != -1) && (S_ISDIR(st.st_mode));
@@ -250,7 +338,7 @@ namespace UtilTools
 
 #if defined(WIN32)
         String cmd = _T("mkdir ") + pathname;
-        return !system(cmd.c_str());
+        return !_system(cmd.c_str());
 #else
         return !mkdir(pathname, RW_OK);
 #endif
@@ -273,7 +361,7 @@ namespace UtilTools
             return true;
         }
         if (isFile(pathname)) {
-            return !std::remove(pathname.c_str());
+            return !_remove(pathname);
         }
         return false;
     }
@@ -287,10 +375,16 @@ namespace UtilTools
                 deleteDirectory(newname);
             }
         }
-        return !std::rename(oldname.c_str(), newname.c_str());
+        return !_rename(oldname, newname);
     }
 
-    //获取当前程序绝对路径
+    // 当前工作目录
+    String Path::getCurWorkDir()
+    {
+        return _getcwd();
+    }
+
+    // 获取当前程序绝对路径
     String Path::getAppPath()
     {
 #if defined(WIN32)
@@ -391,16 +485,6 @@ namespace UtilTools
             return fileName.substr(0, index);
         }
         return fileName;
-    }
-
-    // 当前工作目录
-    String Path::getCurWorkDir(const String &path)
-    {
-        //chdir("d:\\");
-        char szCurWorkDir[MAX_PATH] = {};
-        //GetCurrentDirectory(MAX_PATH, szCurWorkDir);
-        getcwd(szCurWorkDir, MAX_PATH);
-        return szCurWorkDir;
     }
 
     bool Path::hasExtension(const String &path)

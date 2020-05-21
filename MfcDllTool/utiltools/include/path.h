@@ -29,11 +29,11 @@ namespace UtilTools
 
         // Â·¾¶
         STATIC String getAppPath();
+        STATIC String getCurWorkDir();
         STATIC String getDirName(const String &path);
         STATIC String getExtName(const String &path);
         STATIC String getFileName(const String &path);
         STATIC String getFileNameWithoutExtension(const String &path);
-        STATIC String getCurWorkDir(const String &path);
         STATIC bool hasExtension(const String &path);
     };
 }

@@ -123,7 +123,11 @@ namespace UtilTools
     {
         String si;
         vector<String> sv;
+#ifdef UNICODE
+        wstringstream iss(s);
+#else
         istringstream iss(s);
+#endif
         while (getline(iss, si, delimiter)) {
             if (bRemoveEmptyEntries && !si.length()) {
                 continue;
