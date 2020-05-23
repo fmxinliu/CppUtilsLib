@@ -2,6 +2,17 @@
 #include <vector>
 #include "dllexport.h"
 
+#define VAR(str) str ## var
+#define CONV_PTR(str, ptr, func) \
+    string VAR(str) = func(str); \
+    const char * ptr = VAR(str).c_str()
+
+// 提供 2 个宏，处理字符串转换，并防止临时对象析构，造成内存非法访问
+#ifdef UTILTOOLS_EXPORTS_STATIC
+#define S2WS_PTR(str, ptr)  CONV_PTR(str, ptr, UtilTools::StringUtils::stringToWString)
+#define WS2S_PTR(wstr, ptr) CONV_PTR(wstr, ptr, UtilTools::StringUtils::wstringToString)
+#endif
+
 namespace UtilTools
 {
     class DLL_API StringUtils

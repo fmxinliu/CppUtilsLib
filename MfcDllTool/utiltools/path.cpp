@@ -53,15 +53,10 @@ typedef char TCHAR;
 using namespace std;
 namespace UtilTools
 {
-#define VAR(ws) ws ## s
-#define CONV_PTR(ws, ptr) \
-    string VAR(ws) = StringUtils::wstringToString(ws); \
-    const char * ptr = VAR(ws).c_str()
-
     int __cdecl _access(const String &filename, int accessMode)
     {
 #ifdef UNICODE;
-        CONV_PTR(filename, ptr);
+        WS2S_PTR(filename, ptr);
         return access(ptr, accessMode);
 #else
         return access(filename.c_str(), accessMode);
@@ -71,7 +66,7 @@ namespace UtilTools
     int __cdecl _chdir(const String &path)
     {
 #ifdef UNICODE
-        CONV_PTR(path, ptr);
+        WS2S_PTR(path, ptr);
         return chdir(ptr);
 #else
         return chdir(path.c_str());
@@ -81,7 +76,7 @@ namespace UtilTools
     int __cdecl _mkdir(const String &path)
     {
 #ifdef UNICODE
-        CONV_PTR(path, ptr);
+        WS2S_PTR(path, ptr);
         return mkdir(ptr);
 #else
         return mkdir(path.c_str());
@@ -91,7 +86,7 @@ namespace UtilTools
     int __cdecl _rmdir(const String &path)
     {
 #ifdef UNICODE
-        CONV_PTR(path, ptr);
+        WS2S_PTR(path, ptr);
         return rmdir(ptr);
 #else
         return rmdir(path.c_str());
@@ -101,8 +96,8 @@ namespace UtilTools
     int __cdecl _rename(const String &oldname, const String &newname)
     {
 #ifdef UNICODE
-        CONV_PTR(oldname, ptr1);
-        CONV_PTR(newname, ptr2);
+        WS2S_PTR(oldname, ptr1);
+        WS2S_PTR(newname, ptr2);
         return std::rename(ptr1, ptr2);
 #else
         return std::rename(oldname.c_str(), newname.c_str());
@@ -112,7 +107,7 @@ namespace UtilTools
     int __cdecl _remove(const String &path)
     {
 #ifdef UNICODE
-        CONV_PTR(path, ptr);
+        WS2S_PTR(path, ptr);
         return remove(ptr);
 #else
         return remove(path.c_str());
@@ -133,7 +128,7 @@ namespace UtilTools
     int __cdecl _system(const String &command)
     {
 #ifdef UNICODE
-        CONV_PTR(command, ptr);
+        WS2S_PTR(command, ptr);
         return system(ptr);
 #else
         return system(command.c_str());
