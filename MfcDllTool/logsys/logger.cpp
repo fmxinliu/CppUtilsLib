@@ -108,7 +108,7 @@ bool Logger::WriteLog(String strMessage, String strSuffix)
         _tprintf(_T("%s"), strMessageTemp.data());
 
         TCHAR *pOldLocale = _tcsdup(_tsetlocale(LC_CTYPE, NULL));
-        _tsetlocale(LC_CTYPE, _T("chs"));
+        _tsetlocale(LC_CTYPE, _T(""));
         logfile.WriteString(strMessageTemp.data());
         _tsetlocale(LC_CTYPE, pOldLocale);
         free(pOldLocale);

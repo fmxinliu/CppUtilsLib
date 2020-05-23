@@ -56,7 +56,10 @@ namespace UtilTools
     int __cdecl _access(const String &filename, int accessMode)
     {
 #ifdef UNICODE
-        return access(StringUtils::wstringToString(filename).c_str(), accessMode);
+        //WS2S_PTR(filename, ptr);
+        //return access(ptr, accessMode);
+        string s;
+        return access(StringUtils::wstringToString(filename, s).c_str(), accessMode);
 #else
         return access(filename.c_str(), accessMode);
 #endif
@@ -65,7 +68,8 @@ namespace UtilTools
     int __cdecl _chdir(const String &path)
     {
 #ifdef UNICODE
-        return chdir(StringUtils::wstringToString(path).c_str());
+        WS2S_PTR(path, ptr);
+        return chdir(ptr);
 #else
         return chdir(path.c_str());
 #endif
@@ -74,7 +78,8 @@ namespace UtilTools
     int __cdecl _mkdir(const String &path)
     {
 #ifdef UNICODE
-        return mkdir(StringUtils::wstringToString(path).c_str());
+        WS2S_PTR(path, ptr);
+        return mkdir(ptr);
 #else
         return mkdir(path.c_str());
 #endif
@@ -83,7 +88,8 @@ namespace UtilTools
     int __cdecl _rmdir(const String &path)
     {
 #ifdef UNICODE
-        return rmdir(StringUtils::wstringToString(path).c_str());
+        WS2S_PTR(path, ptr);
+        return rmdir(ptr);
 #else
         return rmdir(path.c_str());
 #endif
@@ -92,7 +98,9 @@ namespace UtilTools
     int __cdecl _rename(const String &oldname, const String &newname)
     {
 #ifdef UNICODE
-        return std::rename(StringUtils::wstringToString(oldname).c_str(), StringUtils::wstringToString(newname).c_str());
+        WS2S_PTR(oldname, ptr1);
+        WS2S_PTR(newname, ptr2);
+        return std::rename(ptr1, ptr2);
 #else
         return std::rename(oldname.c_str(), newname.c_str());
 #endif
@@ -101,7 +109,8 @@ namespace UtilTools
     int __cdecl _remove(const String &path)
     {
 #ifdef UNICODE
-        return remove(StringUtils::wstringToString(path).c_str());
+        WS2S_PTR(path, ptr);
+        return remove(ptr);
 #else
         return remove(path.c_str());
 #endif
@@ -121,7 +130,8 @@ namespace UtilTools
     int __cdecl _system(const String &command)
     {
 #ifdef UNICODE
-        return system(StringUtils::wstringToString(command).c_str());
+        WS2S_PTR(command, ptr);
+        return system(ptr);
 #else
         return system(command.c_str());
 #endif
