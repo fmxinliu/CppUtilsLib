@@ -36,6 +36,8 @@ namespace UtilTools
         STATIC String format(const TCHAR *pszFmt, ...);
         STATIC std::wstring stringToWString(const std::string &s);
         STATIC std::string wstringToString(const std::wstring &ws);
+        STATIC std::string& wstringToString(const std::wstring &ws, std::string &s);
+        STATIC std::wstring& stringToWString(const std::string &s, std::wstring &ws);
 
         // ·Ö¸î
         STATIC std::vector<String> spilt(const String &s, TCHAR delimiter, bool bRemoveEmptyEntries = false);

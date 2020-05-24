@@ -55,9 +55,11 @@ namespace UtilTools
 {
     int __cdecl _access(const String &filename, int accessMode)
     {
-#ifdef UNICODE;
-        WS2S_PTR(filename, ptr);
-        return access(ptr, accessMode);
+#ifdef UNICODE
+        //WS2S_PTR(filename, ptr);
+        //return access(ptr, accessMode);
+        string s;
+        return access(StringUtils::wstringToString(filename, s).c_str(), accessMode);
 #else
         return access(filename.c_str(), accessMode);
 #endif

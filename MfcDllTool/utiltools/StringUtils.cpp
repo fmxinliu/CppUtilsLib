@@ -86,24 +86,19 @@ namespace UtilTools
     wstring StringUtils::stringToWString(const string &s)
     {
         wstring ws;
-        int len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), s.size(), NULL, 0);
-        if (len <= 0) {
-            return ws;
-        }
-        wchar_t* buffer = new wchar_t[len + 1];
-        if (NULL == buffer) {
-            return ws;
-        }
-        MultiByteToWideChar(CP_ACP, 0, s.c_str(), s.size(), buffer, len);
-        buffer[len] = '\0';
-        ws.append(buffer);
-        delete[] buffer;
+        ws = stringToWString(s, ws);
         return ws;
     }
 
     string StringUtils::wstringToString(const wstring &ws)
     {
         string s;
+        s = wstringToString(ws, s);
+        return s;
+    }
+
+    std::string& StringUtils::wstringToString(const wstring &ws, string &s)
+    {
         int len = WideCharToMultiByte(CP_ACP, 0, ws.c_str(), ws.size(), NULL, 0, NULL, NULL);
         if (len <= 0) {
             return s;
@@ -117,6 +112,23 @@ namespace UtilTools
         s.append(buffer);
         delete[] buffer;
         return s;
+    }
+
+    wstring& StringUtils::stringToWString(const string &s, wstring &ws)
+    {
+        int len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), s.size(), NULL, 0);
+        if (len <= 0) {
+            return ws;
+        }
+        wchar_t* buffer = new wchar_t[len + 1];
+        if (NULL == buffer) {
+            return ws;
+        }
+        MultiByteToWideChar(CP_ACP, 0, s.c_str(), s.size(), buffer, len);
+        buffer[len] = '\0';
+        ws.append(buffer);
+        delete[] buffer;
+        return ws;
     }
 
     vector<String> StringUtils::spilt(const String &s, TCHAR delimiter, bool bRemoveEmptyEntries)
