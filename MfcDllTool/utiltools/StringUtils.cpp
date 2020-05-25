@@ -99,7 +99,11 @@ namespace UtilTools
 
     std::string& StringUtils::wstringToString(const wstring &ws, string &s)
     {
-        int len = WideCharToMultiByte(CP_ACP, 0, ws.c_str(), ws.size(), NULL, 0, NULL, NULL);
+        char *curLocale = setlocale(LC_ALL, NULL); // 查看当前地域设置
+        setlocale(LC_ALL, ""); // 使用当前操作系统默认的地域设置
+
+        const wchar_t *source = ws.c_str();
+        size_t len = wcstombs(NULL, source, 0);
         if (len <= 0) {
             return s;
         }
@@ -107,27 +111,35 @@ namespace UtilTools
         if (NULL == buffer) {
             return s;
         }
-        WideCharToMultiByte(CP_ACP, 0, ws.c_str(), ws.size(), buffer, len, NULL, NULL);
+        wcstombs(buffer, source, len);
         buffer[len] = '\0';
-        s.append(buffer);
+        s.assign(buffer);
         delete[] buffer;
+
+        setlocale(LC_ALL, curLocale); // 恢复地域设置
         return s;
     }
 
     wstring& StringUtils::stringToWString(const string &s, wstring &ws)
     {
-        int len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), s.size(), NULL, 0);
+        char *curLocale = setlocale(LC_ALL, NULL); // 查看当前地域设置
+        setlocale(LC_ALL, ""); // 使用当前操作系统默认的地域设置
+
+        const char *source = s.c_str();
+        size_t len = mbstowcs(NULL, source, 0);
         if (len <= 0) {
             return ws;
         }
-        wchar_t* buffer = new wchar_t[len + 1];
+        wchar_t *buffer = new wchar_t[len + 1];
         if (NULL == buffer) {
             return ws;
         }
-        MultiByteToWideChar(CP_ACP, 0, s.c_str(), s.size(), buffer, len);
+        mbstowcs(buffer, source, len);
         buffer[len] = '\0';
-        ws.append(buffer);
+        ws.assign(buffer);
         delete[] buffer;
+
+        setlocale(LC_ALL, curLocale); // 恢复地域设置
         return ws;
     }
 
