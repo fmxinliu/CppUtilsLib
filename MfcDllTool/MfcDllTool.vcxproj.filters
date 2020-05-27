@@ -93,6 +93,9 @@
     <ClCompile Include="utiltools\path.cpp">
       <Filter>utiltools</Filter>
     </ClCompile>
+    <ClCompile Include="utiltools\IniHelper.cpp">
+      <Filter>utiltools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MfcDllTool.h">
@@ -162,6 +165,9 @@
       <Filter>utiltools\include</Filter>
     </ClInclude>
     <ClInclude Include="utiltools\include\path.h">
+      <Filter>utiltools\include</Filter>
+    </ClInclude>
+    <ClInclude Include="utiltools\include\IniHelper.h">
       <Filter>utiltools\include</Filter>
     </ClInclude>
   </ItemGroup>
