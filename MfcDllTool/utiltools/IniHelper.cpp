@@ -124,6 +124,16 @@ namespace UtilTools
     {
         return !!WritePrivateProfileString(lpSection, lpKey, value.c_str(), lpIniFileName);
     }
+
+    bool IniHelper::read(LPCTSTR lpIniFileName, LPCTSTR lpSection, LPCTSTR lpKey, LPVOID lpStruct, UINT uSizeStruct)
+    {
+        return !!GetPrivateProfileStruct(lpSection, lpKey, lpStruct, uSizeStruct, lpIniFileName);
+    }
+
+    bool IniHelper::write(LPCTSTR lpIniFileName, LPCTSTR lpSection, LPCTSTR lpKey, LPVOID lpStruct, UINT uSizeStruct)
+    {
+        return !!WritePrivateProfileStruct(lpSection, lpKey, lpStruct, uSizeStruct, lpIniFileName);
+    }
 }
 
 namespace UtilTools
