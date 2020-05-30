@@ -40,7 +40,7 @@ namespace UtilTools
         STATIC bool sectionExist(LPCTSTR lpIniFileName, LPCTSTR lpSection);
         STATIC bool removeSection(LPCTSTR lpIniFileName, LPCTSTR lpSection);
 
-        // key
+        // Key
         STATIC bool keyExist(LPCTSTR lpIniFileName, LPCTSTR lpSection, LPCTSTR lpKey);
         STATIC bool removeKey(LPCTSTR lpIniFileName, LPCTSTR lpSection, LPCTSTR lpKey);
     };
