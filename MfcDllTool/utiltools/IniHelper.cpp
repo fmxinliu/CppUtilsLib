@@ -2,6 +2,7 @@
 #include "IniHelper.h"
 #include <assert.h>
 #include <sstream>     // std::stringstream
+#include <algorithm>
 
 #ifndef USE_STRINGUTILS
 #include "StringUtils.h"
@@ -111,28 +112,28 @@ namespace UtilTools
     bool IniHelper::write(LPCTSTR lpIniFileName, LPCTSTR lpSection, LPCTSTR lpKey, const int &value)
     {
         String s = toString(value);
-        return !!WritePrivateProfileString(lpSection, lpKey, s.c_str(), lpIniFileName);
+        return !!::WritePrivateProfileString(lpSection, lpKey, s.c_str(), lpIniFileName);
     }
 
     bool IniHelper::write(LPCTSTR lpIniFileName, LPCTSTR lpSection, LPCTSTR lpKey, const double &value)
     {
         String s = toString(value);
-        return !!WritePrivateProfileString(lpSection, lpKey, s.c_str(), lpIniFileName);
+        return !!::WritePrivateProfileString(lpSection, lpKey, s.c_str(), lpIniFileName);
     }
 
     bool IniHelper::write(LPCTSTR lpIniFileName, LPCTSTR lpSection, LPCTSTR lpKey, const String &value)
     {
-        return !!WritePrivateProfileString(lpSection, lpKey, value.c_str(), lpIniFileName);
+        return !!::WritePrivateProfileString(lpSection, lpKey, value.c_str(), lpIniFileName);
     }
 
     bool IniHelper::read(LPCTSTR lpIniFileName, LPCTSTR lpSection, LPCTSTR lpKey, LPVOID lpStruct, UINT uSizeStruct)
     {
-        return !!GetPrivateProfileStruct(lpSection, lpKey, lpStruct, uSizeStruct, lpIniFileName);
+        return !!::GetPrivateProfileStruct(lpSection, lpKey, lpStruct, uSizeStruct, lpIniFileName);
     }
 
     bool IniHelper::write(LPCTSTR lpIniFileName, LPCTSTR lpSection, LPCTSTR lpKey, LPVOID lpStruct, UINT uSizeStruct)
     {
-        return !!WritePrivateProfileStruct(lpSection, lpKey, lpStruct, uSizeStruct, lpIniFileName);
+        return !!::WritePrivateProfileStruct(lpSection, lpKey, lpStruct, uSizeStruct, lpIniFileName);
     }
 }
 
@@ -143,7 +144,7 @@ namespace UtilTools
     {
         vector<String> sectionNames;
         TCHAR mDataStr[2049];
-        DWORD length = GetPrivateProfileSectionNames(mDataStr, sizeof(mDataStr)-1, lpIniFileName);
+        DWORD length = ::GetPrivateProfileSectionNames(mDataStr, sizeof(mDataStr)-1, lpIniFileName);
         size_t startpos = 0;
         for (int i = 0; i < length; i++) {
             if ('\0' == mDataStr[i]) {
@@ -158,7 +159,7 @@ namespace UtilTools
     {
         vector<String> keys;
         TCHAR mDataStr[2049];
-        DWORD length = GetPrivateProfileSection(lpSection, mDataStr, sizeof(mDataStr)-1, lpIniFileName);
+        DWORD length = ::GetPrivateProfileSection(lpSection, mDataStr, sizeof(mDataStr)-1, lpIniFileName);
         size_t startpos = 0;
         for (int i = 0; i < length; i++) {
             if ('\0' == mDataStr[i]) {
@@ -174,11 +175,11 @@ namespace UtilTools
         return keys;
     }
 
-    vector<String> IniHelper::readFields(LPCTSTR lpIniFileName, LPCTSTR lpSection)
+    vector<String> readSection(LPCTSTR lpIniFileName, LPCTSTR lpSection)
     {
         vector<String> fields;
         TCHAR mDataStr[2049];
-        DWORD length = GetPrivateProfileSection(lpSection, mDataStr, sizeof(mDataStr)-1, lpIniFileName);
+        DWORD length = ::GetPrivateProfileSection(lpSection, mDataStr, sizeof(mDataStr)-1, lpIniFileName);
         size_t startpos = 0;
         for (int i = 0; i < length; i++) {
             if ('\0' == mDataStr[i]) {
@@ -189,11 +190,11 @@ namespace UtilTools
         return fields;
     }
 
-    map<String, String> IniHelper::parseFields(LPCTSTR lpIniFileName, LPCTSTR lpSection)
+    map<String, String> IniHelper::readSection(LPCTSTR lpIniFileName, LPCTSTR lpSection)
     {
-        map<String, String> sections;
+        map<String, String> feilds;
         TCHAR mDataStr[2049];
-        DWORD length = GetPrivateProfileSection(lpSection, mDataStr, sizeof(mDataStr)-1, lpIniFileName);
+        DWORD length = ::GetPrivateProfileSection(lpSection, mDataStr, sizeof(mDataStr)-1, lpIniFileName);
         size_t startpos = 0;
         for (int i = 0; i < length; i++) {
             if ('\0' == mDataStr[i]) {
@@ -202,8 +203,8 @@ namespace UtilTools
                 if (string::npos != endpos) {
                     String key = feild.substr(0, endpos);
                     String value = feild.substr(endpos + 1);
-                    if (0 == sections.count(key)) {
-                        sections.insert(make_pair(key, value));
+                    if (0 == feilds.count(key)) {
+                        feilds.insert(make_pair(key, value));
                     } else {
                         assert(false); // Key ÒÔ´æÔÚ
                     }
@@ -212,6 +213,67 @@ namespace UtilTools
                 startpos = i + 1;
             }
         }
+
+        return feilds;
+    }
+
+    map<String, map<String, String>> IniHelper::readSections(LPCTSTR lpIniFileName)
+    {
+        map<String, map<String, String>> sections;
+        vector<String> sectionNames = readSectionNames(lpIniFileName);
+        for (vector<String>::const_iterator it = sectionNames.cbegin(); it != sectionNames.cend(); ++it) {
+            sections.insert(make_pair(*it, readSection(lpIniFileName, it->c_str())));
+        }
         return sections;
+    }
+
+    bool IniHelper::sectionExist(LPCTSTR lpIniFileName, LPCTSTR lpSection)
+    {
+        vector<String> sections = readSectionNames(lpIniFileName);
+        vector<String>::const_iterator it = find(sections.begin(), sections.end(), lpSection);
+        if (sections.end() != it) {
+            return true;
+        }
+        return false;
+    }
+
+    bool IniHelper::removeSection(LPCTSTR lpIniFileName, LPCTSTR lpSection)
+    {
+        return !!::WritePrivateProfileSection(lpSection, NULL, lpIniFileName);
+    }
+
+    bool IniHelper::keyExist(LPCTSTR lpIniFileName, LPCTSTR lpSection, LPCTSTR lpKey)
+    {
+        vector<String> keys = readKeys(lpIniFileName, lpSection);
+        vector<String>::const_iterator it = find(keys.begin(), keys.end(), lpKey);
+        if (keys.end() != it) {
+            return true;
+        }
+        return false;
+    }
+
+    bool IniHelper::removeKey(LPCTSTR lpIniFileName, LPCTSTR lpSection, LPCTSTR lpKey)
+    {
+        return !!::WritePrivateProfileString(lpSection, lpKey, NULL, lpIniFileName);
+    }
+
+    bool IniHelper::write(LPCTSTR lpIniFileName, LPCTSTR lpSection, const map<String, String> &value)
+    {
+        bool ok = true;
+        map<String, String>::const_iterator it = value.cbegin();
+        for (; it != value.cend(); ++it) {
+            ok = ok && write(lpIniFileName, lpSection, it->first.c_str(), it->second);
+        }
+        return ok;
+    }
+
+    bool IniHelper::write(LPCTSTR lpIniFileName, const map<String, map<String, String>> &value)
+    {
+        bool ok = true;
+        map<String, map<String, String>>::const_iterator it = value.cbegin();
+        for (; it != value.cend(); ++it) {
+            ok = ok && write(lpIniFileName, it->first.c_str(), it->second);
+        }
+        return ok;
     }
 }
