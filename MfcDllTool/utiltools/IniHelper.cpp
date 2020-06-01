@@ -127,8 +127,8 @@ namespace UtilTools
         vector<String> sectionNames;
         TCHAR mDataStr[MAX_LENGTH];
         DWORD length = ::GetPrivateProfileSectionNames(mDataStr, sizeof(mDataStr)-1, lpIniFileName);
-        size_t startpos = 0;
-        for (int i = 0; i < length; i++) {
+        DWORD startpos = 0;
+        for (DWORD i = 0; i < length; i++) {
             if ('\0' == mDataStr[i]) {
                 sectionNames.push_back(String(mDataStr + startpos));
                 startpos = i + 1;
@@ -142,8 +142,8 @@ namespace UtilTools
         vector<String> keys;
         TCHAR mDataStr[MAX_LENGTH];
         DWORD length = ::GetPrivateProfileSection(lpSection, mDataStr, sizeof(mDataStr)-1, lpIniFileName);
-        size_t startpos = 0;
-        for (int i = 0; i < length; i++) {
+        DWORD startpos = 0;
+        for (DWORD i = 0; i < length; i++) {
             if ('\0' == mDataStr[i]) {
                 String feild = mDataStr + startpos;
                 size_t endpos = feild.find_first_of('=');
@@ -162,8 +162,8 @@ namespace UtilTools
         vector<String> fields;
         TCHAR mDataStr[MAX_LENGTH];
         DWORD length = ::GetPrivateProfileSection(lpSection, mDataStr, sizeof(mDataStr)-1, lpIniFileName);
-        size_t startpos = 0;
-        for (int i = 0; i < length; i++) {
+        DWORD startpos = 0;
+        for (DWORD i = 0; i < length; i++) {
             if ('\0' == mDataStr[i]) {
                 fields.push_back(String(mDataStr + startpos));
                 startpos = i + 1;
@@ -177,11 +177,11 @@ namespace UtilTools
         map<String, String> feilds;
         TCHAR mDataStr[MAX_LENGTH];
         DWORD length = ::GetPrivateProfileSection(lpSection, mDataStr, sizeof(mDataStr)-1, lpIniFileName);
-        size_t startpos = 0;
-        for (int i = 0; i < length; i++) {
+        DWORD startpos = 0;
+        for (DWORD i = 0; i < length; i++) {
             if ('\0' == mDataStr[i]) {
                 String feild = mDataStr + startpos;
-                size_t endpos = feild.find_first_of('=');
+                DWORD endpos = feild.find_first_of('=');
                 if (string::npos != endpos) {
                     String key = feild.substr(0, endpos);
                     String value = feild.substr(endpos + 1);
