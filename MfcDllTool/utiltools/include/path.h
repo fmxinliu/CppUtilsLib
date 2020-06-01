@@ -22,7 +22,7 @@ namespace UtilTools
         STATIC bool rmdir(const String &pathname);
 
         // 删除文件
-        STATIC bool rmove(const String &pathname);
+        STATIC bool remove(const String &pathname);
 
         // 重命名 or 移动(目标目录必须存在)
         STATIC bool rename(const String &oldname, const String &newname, bool overwrite);

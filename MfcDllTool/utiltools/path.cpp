@@ -365,7 +365,7 @@ namespace UtilTools
         return false;
     }
 
-    bool Path::rmove(const String &pathname)
+    bool Path::remove(const String &pathname)
     {
         if (!isExist(pathname)) {
             return true;
@@ -380,7 +380,7 @@ namespace UtilTools
     {
         if (overwrite) {
             if (isFile(oldname) && isFile(newname)) {
-                rmove(newname);
+                remove(newname);
             } else if (isFolder(oldname) && isFolder(newname)) {
                 deleteDirectory(newname);
             }
