@@ -14,10 +14,12 @@
 using namespace std;
 namespace UtilTools
 {
-    bool wtite(const String &filename, const String &contents, ios_base::openmode mode)
+    bool writeFile(const String &path, const String &contents, ios_base::openmode mode)
     {
+        // ios::app 文件不存在，则创建；若存在，末尾追加
+        // ios::trunc 文件不存在，则创建；若存在，清空文件
         OutputStream of;
-        of.open(filename, mode);
+        of.open(path, mode);
         if (!of.is_open()) {
             return false;
         }
@@ -27,7 +29,10 @@ namespace UtilTools
         of.close();
         return true;
     }
+}
 
+namespace UtilTools
+{
     bool FileHelper::create(const String &filename)
     {
         if (Path::isFolder(filename)) {
@@ -36,7 +41,7 @@ namespace UtilTools
         if (Path::isExist(filename)) {
             return false;
         }
-        return wtite(filename, _T(""), ios::trunc);
+        return writeFile(filename, _T(""), ios::trunc);
     }
 
     bool FileHelper::exists(const String &filename)
@@ -84,5 +89,95 @@ namespace UtilTools
             return false;
         }
         return Path::rename(sourceFileName, destFileName, overwrite);
+    }
+}
+
+namespace UtilTools
+{
+    bool FileHelper::write(const String &path, const String &contents)
+    {
+        return writeFile(path, contents, ios::trunc);
+    }
+
+    bool FileHelper::write(const String &path, const vector<String> &contents)
+    {
+        return write(path, contents, _T(""));
+    }
+
+    bool FileHelper::write(const String &path, const vector<String> &contents, const String &separator)
+    {
+        OutputStream of;
+        of.open(path, ios::trunc);
+        if (!of.is_open()) {
+            return false;
+        }
+
+        vector<String>::const_iterator it = contents.cbegin();
+        for (; it != contents.cend(); ++it) {
+            of << *it << separator;
+        }
+
+        of.close();
+        return true;
+    }
+
+    bool FileHelper::append(const String &path, const String &contents)
+    {
+        return writeFile(path, contents, ios::app);
+    }
+
+    bool FileHelper::append(const String &path, const vector<String> &contents)
+    {
+        return append(path, contents, _T(""));
+    }
+
+    bool FileHelper::append(const String &path, const vector<String> &contents, const String &separator)
+    {
+        OutputStream of;
+        of.open(path, ios::app);
+        if (!of.is_open()) {
+            return false;
+        }
+
+        vector<String>::const_iterator it = contents.cbegin();
+        for (; it != contents.cend(); ++it) {
+            of << *it << separator;
+        }
+
+        of.close();
+        return true;
+    }
+
+    bool FileHelper::appendLine(const String &path, const String &contents)
+    {
+        return writeFile(path, _T("\n") + contents, ios::app);
+    }
+
+    bool FileHelper::appendLine(const String &path, const vector<String> &contents)
+    {
+        return appendLine(path, contents, _T(""));
+    }
+
+    bool FileHelper::appendLine(const String &path, const vector<String> &contents, const String &separator)
+    {
+        OutputStream of;
+        of.open(path, ios::app);
+        if (!of.is_open()) {
+            return false;
+        }
+
+        vector<String>::const_iterator it = contents.cbegin();
+        while (it != contents.cend()) {
+            of << *it++;
+            if (it != contents.cend()) {
+                of << separator;
+            } else {
+                of << endl;
+                break;
+            }
+        }
+
+        of.close();
+        return true;
     }
 }
