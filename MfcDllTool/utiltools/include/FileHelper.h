@@ -28,5 +28,11 @@ namespace UtilTools
         STATIC bool appendLine(const String &path, const String &contents);
         STATIC bool appendLine(const String &path, const std::vector<String> &contents);
         STATIC bool appendLine(const String &path, const std::vector<String> &contents, const String &separator);
+
+        // ¶ÁÎÄ¼þ
+        STATIC bool read(const String &path, String &contents);
+        STATIC bool read(const String &path, std::vector<String> &contents, bool removeBlankLine);
+        STATIC bool readLines(const String &path, std::vector<String> &contents);
+        STATIC bool readLines(const String &path, std::vector<String> &contents, bool removeBlankLine);
     };
 }

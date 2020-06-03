@@ -1,26 +1,65 @@
 #include "StdAfx.h"
 #include "FileHelper.h"
 #include <fstream>
+#include <sstream>
+#include <streambuf>
 #include "path.h"
 
 #ifdef UNICODE
-#define InputStream  wifstream
-#define OutputStream wofstream
+#define InputStream     wifstream
+#define OutputStream    wofstream
+#define StreamBuffer    wstringstream
 #else
-#define InputStream  ifstream
-#define OutputStream ofstream
+#define InputStream     ifstream
+#define OutputStream    ofstream
+#define StreamBuffer    stringstream
+#endif
+
+#if !defined(_WIN32)
+#ifdef UNICODE
+#define TCHAR           wchar_t
+#else
+#define TCHAR           char
+#endif
 #endif
 
 using namespace std;
 namespace UtilTools
 {
+    bool readFile(const String &path, String &contents, ios_base::openmode mode)
+    {
+        InputStream in(path, mode);
+        if (!in) {
+            return false;
+        }
+
+        // 方法1：
+        StreamBuffer buffer;
+        buffer << in.rdbuf();
+        contents = buffer.str();
+
+        // 方法2：
+        //String contents2 = String(istreambuf_iterator<TCHAR>(in), istreambuf_iterator<TCHAR>());
+
+        // 方法3：
+        //in.seekg(0, ios::end);
+        //streampos sp = in.tellg(); // 文件大小
+        //in.seekg(0, ios::beg);
+        //TCHAR *buffer = new TCHAR[sp];
+        //memset(buffer, 0, sp);
+        //streamsize length = in.read(buffer, sp).gcount(); // 读取的字节长度
+        //delete[] buffer;
+
+        in.close();
+        return true;
+    }
+
     bool writeFile(const String &path, const String &contents, ios_base::openmode mode)
     {
         // ios::app 文件不存在，则创建；若存在，末尾追加
         // ios::trunc 文件不存在，则创建；若存在，清空文件
-        OutputStream of;
-        of.open(path, mode);
-        if (!of.is_open()) {
+        OutputStream of(path, mode);
+        if (!of) {
             return false;
         }
 
@@ -178,6 +217,75 @@ namespace UtilTools
         }
 
         of.close();
+        return true;
+    }
+}
+
+namespace UtilTools
+{
+    bool FileHelper::read(const String &path, String &contents)
+    {
+        return readFile(path, contents, ios::in);
+    }
+
+    bool isBlank(const String &s)
+    {
+        if (s.empty()) {
+            return true;
+        }
+        size_t length = s.length();
+        for(size_t i = 0; i < length; ++i) {
+            if (!isspace(s.at(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool FileHelper::read(const String &path, vector<String> &contents, bool removeBlankLine)
+    {
+        String content;
+        if (!read(path, content)) {
+            return false;
+        }
+        size_t startpos = 0;
+        for (size_t i = 0; i < content.length(); i++) {
+            if ('\n' == content[i]) {
+                String &lineString = content.substr(startpos, i - startpos);
+                if (!removeBlankLine || !isBlank(lineString)) {
+                    contents.push_back(lineString);
+                }
+                startpos = i + 1;
+            }
+        }
+        if (startpos < content.length()) {
+            String &lineString = content.substr(startpos);
+            if (!removeBlankLine || !isBlank(lineString)) {
+                contents.push_back(lineString);
+            }
+        }
+        return true;
+    }
+
+    bool FileHelper::readLines(const String &path, vector<String> &contents)
+    {
+        return readLines(path, contents, false);
+    }
+
+    bool FileHelper::readLines(const String &path, vector<String> &contents, bool removeBlankLine)
+    {
+        InputStream in;
+        in.open(path);
+        if (!in.is_open()) {
+            return false;
+        }
+        String lineString;
+        while (getline(in, lineString)) {
+            if (!removeBlankLine || !isBlank(lineString)) {
+                contents.push_back(lineString);
+            }
+        }
+        in.close();
         return true;
     }
 }
