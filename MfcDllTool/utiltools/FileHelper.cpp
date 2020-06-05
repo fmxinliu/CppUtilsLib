@@ -15,17 +15,23 @@
 #define StreamBuffer    stringstream
 #endif
 
-#if !defined(_WIN32)
-#ifdef UNICODE
-#define TCHAR           wchar_t
-#else
-#define TCHAR           char
-#endif
-#endif
-
 using namespace std;
 namespace UtilTools
 {
+    bool isBlank(const String &s)
+    {
+        if (s.empty()) {
+            return true;
+        }
+        size_t length = s.length();
+        for(size_t i = 0; i < length; ++i) {
+            if (!isspace(s.at(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     bool readFile(const String &path, String &contents, ios_base::openmode mode)
     {
         InputStream in(path, mode);
@@ -138,11 +144,6 @@ namespace UtilTools
         return writeFile(path, contents, ios::trunc);
     }
 
-    bool FileHelper::write(const String &path, const vector<String> &contents)
-    {
-        return write(path, contents, _T(""));
-    }
-
     bool FileHelper::write(const String &path, const vector<String> &contents, const String &separator)
     {
         OutputStream of;
@@ -165,11 +166,6 @@ namespace UtilTools
         return writeFile(path, contents, ios::app);
     }
 
-    bool FileHelper::append(const String &path, const vector<String> &contents)
-    {
-        return append(path, contents, _T(""));
-    }
-
     bool FileHelper::append(const String &path, const vector<String> &contents, const String &separator)
     {
         OutputStream of;
@@ -190,11 +186,6 @@ namespace UtilTools
     bool FileHelper::appendLine(const String &path, const String &contents)
     {
         return writeFile(path, _T("\n") + contents, ios::app);
-    }
-
-    bool FileHelper::appendLine(const String &path, const vector<String> &contents)
-    {
-        return appendLine(path, contents, _T(""));
     }
 
     bool FileHelper::appendLine(const String &path, const vector<String> &contents, const String &separator)
@@ -228,50 +219,6 @@ namespace UtilTools
         return readFile(path, contents, ios::in);
     }
 
-    bool isBlank(const String &s)
-    {
-        if (s.empty()) {
-            return true;
-        }
-        size_t length = s.length();
-        for(size_t i = 0; i < length; ++i) {
-            if (!isspace(s.at(i))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    bool FileHelper::read(const String &path, vector<String> &contents, bool removeBlankLine)
-    {
-        String content;
-        if (!read(path, content)) {
-            return false;
-        }
-        size_t startpos = 0;
-        for (size_t i = 0; i < content.length(); i++) {
-            if ('\n' == content[i]) {
-                String &lineString = content.substr(startpos, i - startpos);
-                if (!removeBlankLine || !isBlank(lineString)) {
-                    contents.push_back(lineString);
-                }
-                startpos = i + 1;
-            }
-        }
-        if (startpos < content.length()) {
-            String &lineString = content.substr(startpos);
-            if (!removeBlankLine || !isBlank(lineString)) {
-                contents.push_back(lineString);
-            }
-        }
-        return true;
-    }
-
-    bool FileHelper::readLines(const String &path, vector<String> &contents)
-    {
-        return readLines(path, contents, false);
-    }
-
     bool FileHelper::readLines(const String &path, vector<String> &contents, bool removeBlankLine)
     {
         InputStream in;
@@ -287,5 +234,118 @@ namespace UtilTools
         }
         in.close();
         return true;
+    }
+
+    bool FileHelper::readLines(const String &path, vector<vector<String>> &contents, const TCHAR &separator, bool removeBlankLine)
+    {
+        InputStream in;
+        in.open(path);
+        if (!in.is_open()) {
+            return false;
+        }
+        String lineString;
+        while (getline(in, lineString)) {
+            if (!removeBlankLine || !isBlank(lineString)) {
+                String splitString;
+                StreamBuffer ss(lineString);
+                vector<String> lineSplitStrings;
+                while (getline(ss, splitString, separator)) {
+                    lineSplitStrings.push_back(splitString);
+                }
+                contents.push_back(lineSplitStrings);
+            }
+        }
+        in.close();
+        return true;
+    }
+}
+
+namespace UtilTools
+{
+/// 一次性读取所有文本
+#define READ_ALL_TEXT() \
+    String text; \
+    if (!read(path, text)) { \
+        return false; \
+    }
+
+/// 一次性写所有文本到文件
+#define WRITE_ALL_TEXT(func) \
+    StreamBuffer ss_lines; \
+    vector<String>::const_iterator it = contents.cbegin(); \
+    while (it != contents.cend()) { \
+        ss_lines << *it++; \
+        if (it != contents.cend()) { \
+            ss_lines << separator; \
+        } else { \
+            ss_lines << endl; \
+            break; \
+        } \
+    } \
+    return func(path, ss_lines.str())
+
+    bool FileHelper::readLinesEx(const String &path, vector<String> &contents, bool removeBlankLine)
+    {
+        READ_ALL_TEXT();
+        String lineString;
+        StreamBuffer ss_all_lines(text);
+        while (getline(ss_all_lines, lineString, '\n')) {
+            if (!removeBlankLine || !isBlank(lineString)) {
+                contents.push_back(lineString);
+            }
+        }
+#pragma region 逐个字符遍历解析
+        //size_t startpos = 0;
+        //for (size_t i = 0; i < text.length(); i++) {
+        //    if ('\n' == text[i]) {
+        //        String &lineString = text.substr(startpos, i - startpos);
+        //        if (!removeBlankLine || !isBlank(lineString)) {
+        //            contents.push_back(lineString);
+        //        }
+        //        startpos = i + 1;
+        //    }
+        //}
+        //if (startpos < text.length()) {
+        //    String &lineString = text.substr(startpos);
+        //    if (!removeBlankLine || !isBlank(lineString)) {
+        //        contents.push_back(lineString);
+        //    }
+        //}
+#pragma endregion
+        return true;
+    }
+
+    bool FileHelper::readLinesEx(const String &path, vector<vector<String>> &contents, const TCHAR &separator, bool removeBlankLine)
+    {
+        READ_ALL_TEXT();
+        String lineString;
+        StreamBuffer ss_all_lines(text);
+        while (getline(ss_all_lines, lineString, '\n')) {
+            if (!removeBlankLine || !isBlank(lineString)) {
+                String splitString;
+                StreamBuffer ss_one_line(lineString);
+                vector<String> lineSplitStrings;
+                while (getline(ss_one_line, splitString, separator)) {
+                    lineSplitStrings.push_back(splitString);
+                }
+                contents.push_back(lineSplitStrings);
+            }
+        }
+        return true;
+    }
+
+    bool FileHelper::writeEx(const String &path, const vector<String> &contents, const String &separator)
+    {
+        WRITE_ALL_TEXT(write);
+    }
+
+    bool FileHelper::appendEx(const String &path, const vector<String> &contents, const String &separator)
+    {
+        WRITE_ALL_TEXT(append);
+    }
+
+    bool FileHelper::appendLineEx(const String &path, const vector<String> &contents, const String &separator)
+    {
+        WRITE_ALL_TEXT(appendLine);
     }
 }

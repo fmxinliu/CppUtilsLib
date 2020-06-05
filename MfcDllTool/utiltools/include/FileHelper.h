@@ -16,23 +16,28 @@ namespace UtilTools
 
         // 写文件：覆盖方式
         STATIC bool write(const String &path, const String &contents);
-        STATIC bool write(const String &path, const std::vector<String> &contents);
-        STATIC bool write(const String &path, const std::vector<String> &contents, const String &separator);
+        STATIC bool write(const String &path, const std::vector<String> &contents, const String &separator = _T(""));
 
         // 写文件：追加方式
         STATIC bool append(const String &path, const String &contents);
-        STATIC bool append(const String &path, const std::vector<String> &contents);
-        STATIC bool append(const String &path, const std::vector<String> &contents, const String &separator);
+        STATIC bool append(const String &path, const std::vector<String> &contents, const String &separator = _T(""));
 
         // 写文件：追加方式，写行
         STATIC bool appendLine(const String &path, const String &contents);
-        STATIC bool appendLine(const String &path, const std::vector<String> &contents);
-        STATIC bool appendLine(const String &path, const std::vector<String> &contents, const String &separator);
+        STATIC bool appendLine(const String &path, const std::vector<String> &contents, const String &separator = _T(""));
 
-        // 读文件
+        // 读文件：所有文本、按行读、分割行
         STATIC bool read(const String &path, String &contents);
-        STATIC bool read(const String &path, std::vector<String> &contents, bool removeBlankLine);
-        STATIC bool readLines(const String &path, std::vector<String> &contents);
-        STATIC bool readLines(const String &path, std::vector<String> &contents, bool removeBlankLine);
+        STATIC bool readLines(const String &path, std::vector<String> &contents, bool removeBlankLine = false);
+        STATIC bool readLines(const String &path, std::vector<std::vector<String>> &contents, const TCHAR &separator, bool removeBlankLine = false);
+
+        // 读大文件
+        STATIC bool readLinesEx(const String &path, std::vector<String> &contents, bool removeBlankLine = false);
+        STATIC bool readLinesEx(const String &path, std::vector<std::vector<String>> &contents, const TCHAR &separator, bool removeBlankLine = false);
+
+        // 写大文件
+        STATIC bool writeEx(const String &path, const std::vector<String> &contents, const String &separator = _T(""));
+        STATIC bool appendEx(const String &path, const std::vector<String> &contents, const String &separator = _T(""));
+        STATIC bool appendLineEx(const String &path, const std::vector<String> &contents, const String &separator = _T(""));
     };
 }
