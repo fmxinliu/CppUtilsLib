@@ -4,6 +4,8 @@
 
 namespace UtilTools
 {
+    enum LineEndOptions { IgnoreNone, IgnoreCR };
+
     class DLL_API FileHelper
     {
     public:
@@ -16,7 +18,7 @@ namespace UtilTools
 
         STATIC bool empty(const String &filename);
         STATIC INT64 size(const String &filename);
-        STATIC INT64 length(const String &filename);
+        STATIC INT64 length(const String &filename, LineEndOptions options = IgnoreNone);
 
         // 写文件：覆盖方式
         STATIC bool write(const String &path, const String &contents);

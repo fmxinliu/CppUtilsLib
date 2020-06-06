@@ -15,6 +15,8 @@
 #define InputStringStream   wistringstream
 #define OutputStringStream  wostringstream
 
+#define StringBuffer        wstreambuf
+
 #else
 #define IOStream            iostream
 #define InputStream         ifstream
@@ -23,6 +25,8 @@
 #define StringStream        stringstream
 #define InputStringStream   istringstream
 #define OutputStringStream  ostringstream
+
+#define StringBuffer        streambuf
 #endif
 
 using namespace std;
@@ -173,13 +177,20 @@ namespace UtilTools
         return -1;
     }
 
-    INT64 FileHelper::length(const String &filename)
+    INT64 FileHelper::length(const String &filename, LineEndOptions options)
     {
+        // fstream 默认以文本方式打开文件, windows 换行符 \r\n 仅能读取到 \n。改用二进制方式打开文件即可
         INT64 len = -1;
-        InputStream in(filename);
-        if (!in) {
+        InputStream in(filename, (IgnoreCR == options) ? ios::in : ios::binary);
+        if (in) {
             len = 0;
-            while (in.get() != EOF) {
+            int ch;
+            //while ((ch = in.get()) != EOF) {
+            //    len++;
+            //}
+            istream::sentry se(in, true);
+            StringBuffer *sb = in.rdbuf();
+            while (sb && (ch = sb->sbumpc()) != EOF) {
                 len++;
             }
             in.close();
