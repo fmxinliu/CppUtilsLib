@@ -14,6 +14,10 @@ namespace UtilTools
         STATIC bool copy(const String &sourceFileName, const String &destFileName, bool overwrite = false);
         STATIC bool move(const String &sourceFileName, const String &destFileName, bool overwrite = false);
 
+        STATIC bool empty(const String &filename);
+        STATIC INT64 size(const String &filename);
+        STATIC INT64 length(const String &filename);
+
         // 写文件：覆盖方式
         STATIC bool write(const String &path, const String &contents);
         STATIC bool write(const String &path, const std::vector<String> &contents, const String &separator = _T(""));

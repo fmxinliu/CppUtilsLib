@@ -4,15 +4,25 @@
 #include <sstream>
 #include <streambuf>
 #include "path.h"
+#include <sys/stat.h>
 
 #ifdef UNICODE
-#define InputStream     wifstream
-#define OutputStream    wofstream
-#define StreamBuffer    wstringstream
+#define IOStream            wiostream
+#define InputStream         wifstream
+#define OutputStream        wofstream
+
+#define StringStream        wstringstream
+#define InputStringStream   wistringstream
+#define OutputStringStream  wostringstream
+
 #else
-#define InputStream     ifstream
-#define OutputStream    ofstream
-#define StreamBuffer    stringstream
+#define IOStream            iostream
+#define InputStream         ifstream
+#define OutputStream        ofstream
+
+#define StringStream        stringstream
+#define InputStringStream   istringstream
+#define OutputStringStream  ostringstream
 #endif
 
 using namespace std;
@@ -40,9 +50,9 @@ namespace UtilTools
         }
 
         // 方法1：
-        StreamBuffer buffer;
-        buffer << in.rdbuf();
-        contents = buffer.str();
+        StringStream ss;
+        ss << in.rdbuf();
+        contents = ss.str();
 
         // 方法2：
         //String contents2 = String(istreambuf_iterator<TCHAR>(in), istreambuf_iterator<TCHAR>());
@@ -134,6 +144,47 @@ namespace UtilTools
             return false;
         }
         return Path::rename(sourceFileName, destFileName, overwrite);
+    }
+}
+
+namespace UtilTools
+{
+    bool FileHelper::empty(const String &filename)
+    {
+        InputStream in(filename);
+        if (!in) {
+            return false;
+        }
+        int c = in.peek();
+        in.close();
+        return EOF == c;
+    }
+
+    INT64 FileHelper::size(const String &filename)
+    {
+#ifdef UNICODE
+        WS2S_PTR(filename, fname);
+#else
+        const char * fname = filename.c_str();
+#endif
+        struct stat statbuf;
+        if(stat(fname, &statbuf) == 0)
+            return statbuf.st_size;
+        return -1;
+    }
+
+    INT64 FileHelper::length(const String &filename)
+    {
+        INT64 len = -1;
+        InputStream in(filename);
+        if (!in) {
+            len = 0;
+            while (in.get() != EOF) {
+                len++;
+            }
+            in.close();
+        }
+        return len;
     }
 }
 
@@ -247,7 +298,7 @@ namespace UtilTools
         while (getline(in, lineString)) {
             if (!removeBlankLine || !isBlank(lineString)) {
                 String splitString;
-                StreamBuffer ss(lineString);
+                StringStream ss(lineString);
                 vector<String> lineSplitStrings;
                 while (getline(ss, splitString, separator)) {
                     lineSplitStrings.push_back(splitString);
@@ -271,7 +322,7 @@ namespace UtilTools
 
 /// 一次性写所有文本到文件
 #define WRITE_ALL_TEXT(func) \
-    StreamBuffer ss_lines; \
+    StringStream ss_lines; \
     vector<String>::const_iterator it = contents.cbegin(); \
     while (it != contents.cend()) { \
         ss_lines << *it++; \
@@ -288,7 +339,7 @@ namespace UtilTools
     {
         READ_ALL_TEXT();
         String lineString;
-        StreamBuffer ss_all_lines(text);
+        StringStream ss_all_lines(text);
         while (getline(ss_all_lines, lineString, '\n')) {
             if (!removeBlankLine || !isBlank(lineString)) {
                 contents.push_back(lineString);
@@ -319,11 +370,11 @@ namespace UtilTools
     {
         READ_ALL_TEXT();
         String lineString;
-        StreamBuffer ss_all_lines(text);
+        StringStream ss_all_lines(text);
         while (getline(ss_all_lines, lineString, '\n')) {
             if (!removeBlankLine || !isBlank(lineString)) {
                 String splitString;
-                StreamBuffer ss_one_line(lineString);
+                StringStream ss_one_line(lineString);
                 vector<String> lineSplitStrings;
                 while (getline(ss_one_line, splitString, separator)) {
                     lineSplitStrings.push_back(splitString);
