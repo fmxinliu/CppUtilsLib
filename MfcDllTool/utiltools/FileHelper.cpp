@@ -152,11 +152,6 @@ namespace UtilTools
 
 namespace UtilTools
 {
-    bool FileHelper::empty(const String &filename)
-    {
-        return (0 == size(filename));
-    }
-
     INT64 FileHelper::size(const String &filename)
     {
         return Path::getSize(filename);
@@ -196,6 +191,21 @@ namespace UtilTools
     String FileHelper::lastAccessTime(const String &filename)
     {
         return Path::getTime(filename, LastAccessTime);
+    }
+
+    bool FileHelper::empty(const String &filename)
+    {
+        return (0 == size(filename));
+    }
+
+    bool FileHelper::setHidden(const String &filename)
+    {
+        return Path::setHiddenAttr(filename, true);
+    }
+
+    bool FileHelper::setUnHidden(const String &filename)
+    {
+        return Path::setHiddenAttr(filename, false);
     }
 }
 

@@ -368,6 +368,29 @@ namespace UtilTools
         return time;
     }
 
+    bool Path::isHidden(const String &filename)
+    {
+#if defined(WIN32)
+        return (GetFileAttributes(filename.c_str()) & FILE_ATTRIBUTE_HIDDEN) != 0;
+#else
+        String fname = getFileName(filename);
+        return isExist(filename) && StringUtils::startsWith(fname, _T("."));
+#endif
+    }
+
+    bool Path::setHiddenAttr(const String &filename, bool hidden)
+    {
+#if defined(WIN32)
+        DWORD dw = GetFileAttributes(filename.c_str());
+        dw = hidden ? dw | FILE_ATTRIBUTE_HIDDEN : dw & (~FILE_ATTRIBUTE_HIDDEN);
+        return !!SetFileAttributes(filename.c_str(), dw);
+#else
+        String fname = getFileName(filename);
+        String filenameNew = getDirName(filename) + _T(".") + fname;
+        return rename(filename, filenameNew, true);
+#endif
+    }
+
     bool Path::isFile(const String &pathname)
     {
 #if defined(WIN32)

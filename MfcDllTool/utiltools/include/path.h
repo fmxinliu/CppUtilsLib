@@ -18,6 +18,8 @@ namespace UtilTools
         // 属性
         STATIC INT64 getSize(const String &filename);
         STATIC String getTime(const String &filename, FileTimeOptions options);
+        STATIC bool isHidden(const String &filename);
+        STATIC bool setHiddenAttr(const String &filename, bool hidden);
 
         // 判断文件 or 目录
         STATIC bool isFile(const String &pathname);

@@ -17,12 +17,14 @@ namespace UtilTools
         STATIC bool move(const String &sourceFileName, const String &destFileName, bool overwrite = false);
 
         // 文件属性
-        STATIC bool empty(const String &filename);
         STATIC INT64 size(const String &filename);
         STATIC INT64 length(const String &filename, LineEndOptions options = IgnoreNone);
         STATIC String createTime(const String &filename);
         STATIC String lastWriteTime(const String &filename);
         STATIC String lastAccessTime(const String &filename);
+        STATIC bool empty(const String &filename);
+        STATIC bool setHidden(const String &filename);
+        STATIC bool setUnHidden(const String &filename);
 
         // 写文件：覆盖方式
         STATIC bool write(const String &path, const String &contents);
