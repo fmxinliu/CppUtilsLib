@@ -2,6 +2,7 @@
 #include "path.h"
 #include "StringUtils.h"
 #include <stdio.h>
+#include <sys/stat.h>
 
 #ifdef WIN32
 #include <io.h>
@@ -53,7 +54,7 @@ typedef char TCHAR;
 using namespace std;
 namespace UtilTools
 {
-    int __cdecl _access(const String &filename, int accessMode)
+    int _access(const String &filename, int accessMode)
     {
 #ifdef UNICODE
         //WS2S_PTR(filename, ptr);
@@ -65,7 +66,7 @@ namespace UtilTools
 #endif
     }
 
-    int __cdecl _chdir(const String &path)
+    int _chdir(const String &path)
     {
 #ifdef UNICODE
         WS2S_PTR(path, ptr);
@@ -75,7 +76,7 @@ namespace UtilTools
 #endif
     }
 
-    int __cdecl _mkdir(const String &path)
+    int _mkdir(const String &path)
     {
 #ifdef UNICODE
         WS2S_PTR(path, ptr);
@@ -85,7 +86,7 @@ namespace UtilTools
 #endif
     }
 
-    int __cdecl _rmdir(const String &path)
+    int _rmdir(const String &path)
     {
 #ifdef UNICODE
         WS2S_PTR(path, ptr);
@@ -95,7 +96,7 @@ namespace UtilTools
 #endif
     }
 
-    int __cdecl _rename(const String &oldname, const String &newname)
+    int _rename(const String &oldname, const String &newname)
     {
 #ifdef UNICODE
         WS2S_PTR(oldname, ptr1);
@@ -106,7 +107,7 @@ namespace UtilTools
 #endif
     }
 
-    int __cdecl _remove(const String &path)
+    int _remove(const String &path)
     {
 #ifdef UNICODE
         WS2S_PTR(path, ptr);
@@ -116,7 +117,7 @@ namespace UtilTools
 #endif
     }
 
-    String __cdecl _getcwd()
+    String _getcwd()
     {
         char szCurWorkDir[MAX_PATH] = {};
         //GetCurrentDirectory(MAX_PATH, szCurWorkDir);
@@ -127,7 +128,7 @@ namespace UtilTools
 #endif
     }
 
-    int __cdecl _system(const String &command)
+    int _system(const String &command)
     {
 #ifdef UNICODE
         WS2S_PTR(command, ptr);
@@ -135,6 +136,19 @@ namespace UtilTools
 #else
         return system(command.c_str());
 #endif
+    }
+
+    String parseTime(time_t rawtime)
+    {
+        TCHAR buffer[80];
+        struct tm *info = localtime(&rawtime);
+
+#ifdef UNICODE
+        wcsftime(buffer, 80, L"%Y-%m-%d %H:%M:%S", info);
+#else
+        strftime(buffer, 80, "%Y-%m-%d %H:%M:%S", info);
+#endif
+        return String(buffer);
     }
 }
 
@@ -320,13 +334,47 @@ namespace UtilTools
         return isReadable(filename) && isWriteable(filename);
     }
 
+    INT64 Path::getSize(const String &filename)
+    {
+#ifdef UNICODE
+        WS2S_PTR(filename, fname);
+#else
+        const char * fname = filename.c_str();
+#endif
+        struct stat statbuf;
+        if(stat(fname, &statbuf) == 0)
+            return statbuf.st_size;
+        return -1;
+    }
+
+    String Path::getTime(const String &filename, FileTimeOptions options)
+    {
+#ifdef UNICODE
+        WS2S_PTR(filename, fname);
+#else
+        const char * fname = filename.c_str();
+#endif
+        String time;
+        struct stat statbuf;
+        if(stat(fname, &statbuf) == 0) {
+            if (CreateTime == options) {
+                time = parseTime(statbuf.st_ctime);
+            } else if (LastWriteTime) {
+                time = parseTime(statbuf.st_mtime);
+            } else if (LastAccessTime) {
+                time = parseTime(statbuf.st_atime);
+            }
+        }
+        return time;
+    }
+
     bool Path::isFile(const String &pathname)
     {
 #if defined(WIN32)
         return !!_chdir(pathname); // CreateFile 属性判断
 #else
         struct stat st;
-        if (lstat(pathname.c_str(), &st) != -1) && (S_ISREG(st.st_mode)); // 普通文件
+        return (lstat(pathname.c_str(), &st) != -1) && (S_ISREG(st.st_mode)); // 普通文件
 #endif
     }
 
@@ -336,7 +384,7 @@ namespace UtilTools
         return !_chdir(pathname);
 #else
         struct stat st;
-        if (lstat(pathname.c_str(), &st) != -1) && (S_ISDIR(st.st_mode));
+        return (lstat(pathname.c_str(), &st) != -1) && (S_ISDIR(st.st_mode)); // 目录
 #endif
     }
 

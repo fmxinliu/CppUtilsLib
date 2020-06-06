@@ -3,6 +3,8 @@
 
 namespace UtilTools
 {
+    enum FileTimeOptions { CreateTime, LastWriteTime, LastAccessTime };
+
     class DLL_API Path
     {
     public:
@@ -12,6 +14,10 @@ namespace UtilTools
         STATIC bool isWriteable(const String &filename);
         STATIC bool isExecutable(const String &filename);
         STATIC bool isReadwrite(const String &filename);
+
+        // 属性
+        STATIC INT64 getSize(const String &filename);
+        STATIC String getTime(const String &filename, FileTimeOptions options);
 
         // 判断文件 or 目录
         STATIC bool isFile(const String &pathname);

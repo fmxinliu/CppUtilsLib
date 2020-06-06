@@ -4,7 +4,6 @@
 #include <sstream>
 #include <streambuf>
 #include "path.h"
-#include <sys/stat.h>
 
 #ifdef UNICODE
 #define IOStream            wiostream
@@ -155,26 +154,12 @@ namespace UtilTools
 {
     bool FileHelper::empty(const String &filename)
     {
-        InputStream in(filename);
-        if (!in) {
-            return false;
-        }
-        int c = in.peek();
-        in.close();
-        return EOF == c;
+        return (0 == size(filename));
     }
 
     INT64 FileHelper::size(const String &filename)
     {
-#ifdef UNICODE
-        WS2S_PTR(filename, fname);
-#else
-        const char * fname = filename.c_str();
-#endif
-        struct stat statbuf;
-        if(stat(fname, &statbuf) == 0)
-            return statbuf.st_size;
-        return -1;
+        return Path::getSize(filename);
     }
 
     INT64 FileHelper::length(const String &filename, LineEndOptions options)
@@ -196,6 +181,21 @@ namespace UtilTools
             in.close();
         }
         return len;
+    }
+
+    String FileHelper::createTime(const String &filename)
+    {
+        return Path::getTime(filename, CreateTime);
+    }
+
+    String FileHelper::lastWriteTime(const String &filename)
+    {
+        return Path::getTime(filename, LastWriteTime);
+    }
+
+    String FileHelper::lastAccessTime(const String &filename)
+    {
+        return Path::getTime(filename, LastAccessTime);
     }
 }
 
