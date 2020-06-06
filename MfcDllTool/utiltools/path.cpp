@@ -334,7 +334,7 @@ namespace UtilTools
         return isReadable(filename) && isWriteable(filename);
     }
 
-    INT64 Path::getSize(const String &filename)
+    INT64 Path::getSizeAttr(const String &filename)
     {
 #ifdef UNICODE
         WS2S_PTR(filename, fname);
@@ -347,7 +347,7 @@ namespace UtilTools
         return -1;
     }
 
-    String Path::getTime(const String &filename, FileTimeOptions options)
+    String Path::getTimeAttr(const String &filename, FileTimeOptions options)
     {
 #ifdef UNICODE
         WS2S_PTR(filename, fname);
@@ -378,16 +378,30 @@ namespace UtilTools
 #endif
     }
 
-    bool Path::setHiddenAttr(const String &filename, bool hidden)
+    bool Path::setHiddenAttr(const String &filename, FileHiddenOptions options)
     {
 #if defined(WIN32)
         DWORD dw = GetFileAttributes(filename.c_str());
-        dw = hidden ? dw | FILE_ATTRIBUTE_HIDDEN : dw & (~FILE_ATTRIBUTE_HIDDEN);
+        dw = (Hidden == options) ? dw | FILE_ATTRIBUTE_HIDDEN : dw & (~FILE_ATTRIBUTE_HIDDEN);
         return !!SetFileAttributes(filename.c_str(), dw);
 #else
         String fname = getFileName(filename);
         String filenameNew = getDirName(filename) + _T(".") + fname;
         return rename(filename, filenameNew, true);
+#endif
+    }
+
+    bool Path::setReadOnlyAttr(const String &filename, FileReadOnlyOptions options)
+    {
+#if defined(WIN32)
+        DWORD dw = GetFileAttributes(filename.c_str());
+        dw = (ReadOnly == options) ? dw | FILE_ATTRIBUTE_READONLY : dw & (~FILE_ATTRIBUTE_READONLY);
+        return !!SetFileAttributes(filename.c_str(), dw);
+#else
+        String cmd = (ReadOnly == options)
+            _T("sudo chmod +r-w ") + filename :
+            _T("sudo chmod +r+w ") + filename ;
+        return !_system(cmd);
 #endif
     }
 

@@ -154,7 +154,7 @@ namespace UtilTools
 {
     INT64 FileHelper::size(const String &filename)
     {
-        return Path::getSize(filename);
+        return Path::getSizeAttr(filename);
     }
 
     INT64 FileHelper::length(const String &filename, LineEndOptions options)
@@ -180,17 +180,17 @@ namespace UtilTools
 
     String FileHelper::createTime(const String &filename)
     {
-        return Path::getTime(filename, CreateTime);
+        return Path::getTimeAttr(filename, CreateTime);
     }
 
     String FileHelper::lastWriteTime(const String &filename)
     {
-        return Path::getTime(filename, LastWriteTime);
+        return Path::getTimeAttr(filename, LastWriteTime);
     }
 
     String FileHelper::lastAccessTime(const String &filename)
     {
-        return Path::getTime(filename, LastAccessTime);
+        return Path::getTimeAttr(filename, LastAccessTime);
     }
 
     bool FileHelper::empty(const String &filename)
@@ -200,12 +200,22 @@ namespace UtilTools
 
     bool FileHelper::setHidden(const String &filename)
     {
-        return Path::setHiddenAttr(filename, true);
+        return Path::setHiddenAttr(filename, Hidden);
     }
 
     bool FileHelper::setUnHidden(const String &filename)
     {
-        return Path::setHiddenAttr(filename, false);
+        return Path::setHiddenAttr(filename, UnHidden);
+    }
+
+    bool FileHelper::setReadOnly(const String &filename)
+    {
+        return Path::setReadOnlyAttr(filename, ReadOnly);
+    }
+
+    bool FileHelper::setWritable(const String &filename)
+    {
+        return Path::setReadOnlyAttr(filename, Writable);
     }
 }
 

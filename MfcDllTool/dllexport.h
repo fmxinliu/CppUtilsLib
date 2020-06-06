@@ -21,7 +21,7 @@
 #    define STATIC
 #  endif
 
-#if !defined(_WIN32)
+#if !defined(WIN32)
 #ifdef UNICODE
 #define TCHAR           wchar_t
 #else

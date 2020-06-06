@@ -25,6 +25,8 @@ namespace UtilTools
         STATIC bool empty(const String &filename);
         STATIC bool setHidden(const String &filename);
         STATIC bool setUnHidden(const String &filename);
+        STATIC bool setReadOnly(const String &filename);
+        STATIC bool setWritable(const String &filename);
 
         // 写文件：覆盖方式
         STATIC bool write(const String &path, const String &contents);

@@ -4,6 +4,8 @@
 namespace UtilTools
 {
     enum FileTimeOptions { CreateTime, LastWriteTime, LastAccessTime };
+    enum FileHiddenOptions { UnHidden, Hidden };
+    enum FileReadOnlyOptions { Writable, ReadOnly };
 
     class DLL_API Path
     {
@@ -16,10 +18,12 @@ namespace UtilTools
         STATIC bool isReadwrite(const String &filename);
 
         // 属性
-        STATIC INT64 getSize(const String &filename);
-        STATIC String getTime(const String &filename, FileTimeOptions options);
+        STATIC INT64 getSizeAttr(const String &filename);
+        STATIC String getTimeAttr(const String &filename, FileTimeOptions options);
+        STATIC bool setHiddenAttr(const String &filename, FileHiddenOptions options);
+        STATIC bool setReadOnlyAttr(const String &filename, FileReadOnlyOptions options);
         STATIC bool isHidden(const String &filename);
-        STATIC bool setHiddenAttr(const String &filename, bool hidden);
+        STATIC bool isReadOnly(const String &filename);
 
         // 判断文件 or 目录
         STATIC bool isFile(const String &pathname);
