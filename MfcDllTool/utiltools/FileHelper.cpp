@@ -154,7 +154,11 @@ namespace UtilTools
 {
     INT64 FileHelper::size(const String &filename)
     {
-        return Path::getSizeAttr(filename);
+        INT64 fsize = -1;
+        if (exists(filename)) {
+            fsize = Path::getSizeAttr(filename);
+        }
+        return fsize;
     }
 
     INT64 FileHelper::length(const String &filename, LineEndOptions options)
@@ -180,17 +184,29 @@ namespace UtilTools
 
     String FileHelper::createTime(const String &filename)
     {
-        return Path::getTimeAttr(filename, CreateTime);
+        String time;
+        if (exists(filename)) {
+            time = Path::getTimeAttr(filename, CreateTime);
+        }
+        return time;
     }
 
     String FileHelper::lastWriteTime(const String &filename)
     {
-        return Path::getTimeAttr(filename, LastWriteTime);
+        String time;
+        if (exists(filename)) {
+            time = Path::getTimeAttr(filename, LastWriteTime);
+        }
+        return time;
     }
 
     String FileHelper::lastAccessTime(const String &filename)
     {
-        return Path::getTimeAttr(filename, LastAccessTime);
+        String time;
+        if (exists(filename)) {
+            time = Path::getTimeAttr(filename, LastAccessTime);
+        }
+        return time;
     }
 
     bool FileHelper::empty(const String &filename)
@@ -200,22 +216,22 @@ namespace UtilTools
 
     bool FileHelper::setHidden(const String &filename)
     {
-        return Path::setHiddenAttr(filename, Hidden);
+        return exists(filename) && Path::setHiddenAttr(filename, Hidden);
     }
 
     bool FileHelper::setUnHidden(const String &filename)
     {
-        return Path::setHiddenAttr(filename, UnHidden);
+        return exists(filename) && Path::setHiddenAttr(filename, UnHidden);
     }
 
     bool FileHelper::setReadOnly(const String &filename)
     {
-        return Path::setReadOnlyAttr(filename, ReadOnly);
+        return exists(filename) && Path::setReadOnlyAttr(filename, ReadOnly);
     }
 
     bool FileHelper::setWritable(const String &filename)
     {
-        return Path::setReadOnlyAttr(filename, Writable);
+        return exists(filename) && Path::setReadOnlyAttr(filename, Writable);
     }
 }
 

@@ -7,10 +7,10 @@
 #ifdef WIN32
 #include <io.h>
 #include <direct.h>
-#define F_OK  0
-#define W_OK  2
-#define R_OK  4
-#define RW_OK 6
+#define F_OK  0 // 文件存在
+#define W_OK  2 // 写权限
+#define R_OK  4 // 读权限
+#define RW_OK 6 // 读写权限
 #pragma warning(disable: 4996)
 
 #ifdef UNICODE
@@ -54,15 +54,15 @@ typedef char TCHAR;
 using namespace std;
 namespace UtilTools
 {
-    int _access(const String &filename, int accessMode)
+    int _access(const String &path, int accessMode)
     {
 #ifdef UNICODE
-        //WS2S_PTR(filename, ptr);
+        //WS2S_PTR(path, ptr);
         //return access(ptr, accessMode);
         string s;
-        return access(StringUtils::wstringToString(filename, s).c_str(), accessMode);
+        return access(StringUtils::wstringToString(path, s).c_str(), accessMode);
 #else
-        return access(filename.c_str(), accessMode);
+        return access(path.c_str(), accessMode);
 #endif
     }
 
@@ -305,41 +305,41 @@ namespace UtilTools
 
 namespace UtilTools
 {
-    bool Path::isExist(const String &filename)
+    bool Path::isExist(const String &path)
     {
-        return !_access(filename, F_OK);
+        return !_access(path, F_OK);
     }
 
-    bool Path::isReadable(const String &filename)
+    bool Path::isReadable(const String &path)
     {
-        return !_access(filename, R_OK);
+        return !_access(path, R_OK);
     }
 
-    bool Path::isWriteable(const String &filename)
+    bool Path::isWriteable(const String &path)
     {
-        return !_access(filename, W_OK);
+        return !_access(path, W_OK);
     }
 
-    bool Path::isExecutable(const String &filename)
+    bool Path::isExecutable(const String &path)
     {
 #if defined(WIN32)
-        return StringUtils::endsWith(StringUtils::toLower(StringUtils::trimRight(filename)), _T(".exe"));
+        return StringUtils::endsWith(StringUtils::toLower(StringUtils::trimRight(path)), _T(".exe"));
 #else
-        return !access(filename.c_str(), X_OK);
+        return !access(path.c_str(), X_OK);
 #endif
     }
 
-    bool Path::isReadwrite(const String &filename)
+    bool Path::isReadwrite(const String &path)
     {
-        return isReadable(filename) && isWriteable(filename);
+        return isReadable(path) && isWriteable(path);
     }
 
-    INT64 Path::getSizeAttr(const String &filename)
+    INT64 Path::getSizeAttr(const String &path)
     {
 #ifdef UNICODE
-        WS2S_PTR(filename, fname);
+        WS2S_PTR(path, fname);
 #else
-        const char * fname = filename.c_str();
+        const char * fname = path.c_str();
 #endif
         struct stat statbuf;
         if(stat(fname, &statbuf) == 0)
@@ -347,12 +347,12 @@ namespace UtilTools
         return -1;
     }
 
-    String Path::getTimeAttr(const String &filename, FileTimeOptions options)
+    String Path::getTimeAttr(const String &path, FileTimeOptions options)
     {
 #ifdef UNICODE
-        WS2S_PTR(filename, fname);
+        WS2S_PTR(path, fname);
 #else
-        const char * fname = filename.c_str();
+        const char * fname = path.c_str();
 #endif
         String time;
         struct stat statbuf;
@@ -368,95 +368,104 @@ namespace UtilTools
         return time;
     }
 
-    bool Path::isHidden(const String &filename)
+    bool Path::isHidden(const String &path)
     {
 #if defined(WIN32)
-        return (GetFileAttributes(filename.c_str()) & FILE_ATTRIBUTE_HIDDEN) != 0;
+        return (GetFileAttributes(path.c_str()) & FILE_ATTRIBUTE_HIDDEN) != 0;
 #else
-        String fname = getFileName(filename);
-        return isExist(filename) && StringUtils::startsWith(fname, _T("."));
+        String fname = getFileName(path);
+        return isExist(path) && StringUtils::startsWith(fname, _T("."));
 #endif
     }
 
-    bool Path::setHiddenAttr(const String &filename, FileHiddenOptions options)
+    bool Path::isReadOnly(const String &path)
     {
 #if defined(WIN32)
-        DWORD dw = GetFileAttributes(filename.c_str());
+        return (GetFileAttributes(path.c_str()) & FILE_ATTRIBUTE_READONLY) != 0;
+#else
+        return isReadable(path) && !isWriteable(path) && !isExecutable(path);
+#endif
+    }
+
+    bool Path::setHiddenAttr(const String &path, FileHiddenOptions options)
+    {
+#if defined(WIN32)
+        DWORD dw = GetFileAttributes(path.c_str());
         dw = (Hidden == options) ? dw | FILE_ATTRIBUTE_HIDDEN : dw & (~FILE_ATTRIBUTE_HIDDEN);
-        return !!SetFileAttributes(filename.c_str(), dw);
+        return !!SetFileAttributes(path.c_str(), dw);
 #else
-        String fname = getFileName(filename);
-        String filenameNew = getDirName(filename) + _T(".") + fname;
-        return rename(filename, filenameNew, true);
+        String fname = getFileName(path);
+        String filename = getDirName(path) + _T(".") + fname;
+        return rename(path, filename, true);
 #endif
     }
 
-    bool Path::setReadOnlyAttr(const String &filename, FileReadOnlyOptions options)
+    bool Path::setReadOnlyAttr(const String &path, FileReadOnlyOptions options)
     {
 #if defined(WIN32)
-        DWORD dw = GetFileAttributes(filename.c_str());
+        DWORD dw = GetFileAttributes(path.c_str());
         dw = (ReadOnly == options) ? dw | FILE_ATTRIBUTE_READONLY : dw & (~FILE_ATTRIBUTE_READONLY);
-        return !!SetFileAttributes(filename.c_str(), dw);
+        return !!SetFileAttributes(path.c_str(), dw);
 #else
         String cmd = (ReadOnly == options)
-            _T("sudo chmod +r-w ") + filename :
-            _T("sudo chmod +r+w ") + filename ;
+            _T("sudo chmod +r-w ") + path :
+            _T("sudo chmod +r+w ") + path ;
         return !_system(cmd);
 #endif
     }
 
-    bool Path::isFile(const String &pathname)
+    bool Path::isFile(const String &path)
     {
 #if defined(WIN32)
-        return !!_chdir(pathname); // CreateFile 属性判断
+        return !!_chdir(path); // CreateFile 属性判断
 #else
         struct stat st;
-        return (lstat(pathname.c_str(), &st) != -1) && (S_ISREG(st.st_mode)); // 普通文件
+        return (lstat(path.c_str(), &st) != -1) && (S_ISREG(st.st_mode)); // 普通文件
 #endif
     }
 
-    bool Path::isFolder(const String &pathname)
+    bool Path::isFolder(const String &path)
     {
 #if defined(WIN32)
-        return !_chdir(pathname);
+        return !_chdir(path);
 #else
         struct stat st;
-        return (lstat(pathname.c_str(), &st) != -1) && (S_ISDIR(st.st_mode)); // 目录
+        return (lstat(path.c_str(), &st) != -1) && (S_ISDIR(st.st_mode)); // 目录
 #endif
     }
 
-    bool Path::mkdir(const String &pathname)
+    bool Path::mkdir(const String &path)
     {
-        if (isExist(pathname)) {
+        if (isExist(path)) {
             return true;
         }
 
 #if defined(WIN32)
-        String cmd = _T("mkdir ") + pathname;
+        String cmd = _T("mkdir ") + path;
         return !_system(cmd.c_str());
 #else
-        return !mkdir(pathname, RW_OK);
+        return !mkdir(path, RW_OK);
 #endif
     }
 
-    bool Path::rmdir(const String &pathname)
+    bool Path::rmdir(const String &path)
     {
-        if (!isExist(pathname)) {
+        if (!isExist(path)) {
             return true;
         }
-        if (isFolder(pathname)) {
-            return deleteDirectory(pathname);
+        if (isFolder(path)) {
+            return deleteDirectory(path);
         }
         return false;
     }
 
-    bool Path::remove(const String &pathname)
+    bool Path::remove(const String &path)
     {
-        if (!isExist(pathname)) {
+        if (!isExist(path)) {
             return true;
         }
-        if (isFile(pathname)) {
-            return !_remove(pathname);
+        if (isFile(path)) {
+            return !_remove(path);
         }
         return false;
     }
