@@ -57,5 +57,9 @@ namespace UtilTools
         STATIC bool writeEx(const String &path, const std::vector<String> &contents, const String &separator = _T(""));
         STATIC bool appendEx(const String &path, const std::vector<String> &contents, const String &separator = _T(""));
         STATIC bool appendLineEx(const String &path, const std::vector<String> &contents, const String &separator = _T(""));
+
+        // 安全写文件
+        STATIC bool safeSave(const String &path, const String &contents, bool append);
+        STATIC bool safeSave(const String &path, const std::vector<String> &contents, bool append);
     };
 }

@@ -507,3 +507,77 @@ namespace UtilTools
         WRITE_ALL_TEXT(appendLine);
     }
 }
+
+namespace UtilTools
+{
+    // 文件内容全部缓存到内容才有效，一般用于 xml 保存文件
+    bool xmlSafeSave(const String &path, const String &contents, bool app)
+    {
+        String bakpath = path + _T(".bak");
+
+        // 写临时文件
+        bool savesuccess = false;
+        savesuccess = app ? FileHelper::append(bakpath, contents) : FileHelper::write(bakpath, contents);
+        if (!savesuccess) {
+            return false;
+        }
+
+        // 临时文件 -> 目标文件
+        savesuccess = FileHelper::move(bakpath, path, OverWriteIfExist);
+        if (!savesuccess) {
+            return false;
+        }
+
+        // 删除临时文件
+        FileHelper::remove(bakpath);
+        return true;
+    }
+
+    bool FileHelper::safeSave(const String &path, const String &contents, bool app)
+    {
+        bool savesuccess = false;
+        String bakpath = path + _T(".bak");
+        if (exists(bakpath)) { // 存在备份文件，说明目标文件最后一次写入失败，备份文件内容是最新的，直接写备份文件
+            savesuccess = app ? append(bakpath, contents) : write(bakpath, contents);
+            if (savesuccess) { // 备份文件写成功，将备份文件改名为目标文件
+                savesuccess = move(bakpath, path, OverWriteIfExist);
+                if (savesuccess) { // 目标文件写成功，删除备份文件
+                    remove(bakpath);
+                }
+            }
+        } else { // 不存在备份文件，说明目标文件最后一次写入成功，直接写目标文件
+            savesuccess = app ? append(path, contents) : write(path, contents);
+            if (!savesuccess) { // 目标文件写失败（如被打开查看），先备份目标文件
+                savesuccess = copy(path, bakpath, OverWriteIfExist);
+                if (savesuccess) { // 备份成功，将内容写入备份文件
+                    savesuccess = app ? append(bakpath, contents) : write(bakpath, contents);
+                }
+            }
+        }
+        return savesuccess;
+    }
+
+    bool FileHelper::safeSave(const String &path, const std::vector<String> &contents, bool app)
+    {
+        bool savesuccess = false;
+        String bakpath = path + _T(".bak");
+        if (exists(bakpath)) { // 存在备份文件，说明目标文件最后一次写入失败，备份文件内容是最新的，直接写备份文件
+            savesuccess = app ? append(bakpath, contents) : write(bakpath, contents);
+            if (savesuccess) { // 备份文件写成功，将备份文件改名为目标文件
+                savesuccess = move(bakpath, path, OverWriteIfExist);
+                if (savesuccess) { // 目标文件写成功，删除备份文件
+                    remove(bakpath);
+                }
+            }
+        } else { // 不存在备份文件，说明目标文件最后一次写入成功，直接写目标文件
+            savesuccess = app ? append(path, contents) : write(path, contents);
+            if (!savesuccess) { // 目标文件写失败（如被打开查看），先备份目标文件
+                savesuccess = copy(path, bakpath, OverWriteIfExist);
+                if (savesuccess) { // 备份成功，将内容写入备份文件
+                    savesuccess = app ? append(bakpath, contents) : write(bakpath, contents);
+                }
+            }
+        }
+        return savesuccess;
+    }
+}
