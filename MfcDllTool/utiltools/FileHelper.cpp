@@ -214,13 +214,13 @@ namespace UtilTools
         InputStream in(filename, (IgnoreCR == options) ? ios::in : ios::binary);
         if (in) {
             len = 0;
-            int ch;
+            TCHAR ch;
             //while ((ch = in.get()) != EOF) {
             //    len++;
             //}
             InputStream::sentry se(in, true);
             StringBuffer *sb = in.rdbuf();
-            while (sb && (ch = sb->sbumpc()) != EOF) {
+            while (sb && (ch = sb->sbumpc()) != (TCHAR)EOF) {
                 len++;
             }
             in.close();
