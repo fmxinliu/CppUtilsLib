@@ -4,6 +4,7 @@
 #include <sstream>
 #include <streambuf>
 #include "path.h"
+#include "StringUtils.h"
 
 #ifdef UNICODE
 #define IOStream            wiostream
@@ -87,6 +88,51 @@ namespace UtilTools
         of.close();
         return true;
     }
+
+    INT64 lineCountFast(const String &filename)
+    {
+#ifdef UNICODE
+        WS2S_PTR(filename, fname);
+#else
+        const char * fname = filename.c_str();
+#endif
+#ifdef WIN32
+        FILE * fp = fopen(fname, "rb");
+        if (NULL == fp) {
+            return -1;
+        }
+#else
+        int fd = open(file, O_RDONLY | O_BINARY);
+        if (-1 == fd) {
+            return -1;
+        }
+#endif
+        char buf[BUFSIZ];
+        int len = 0;
+        INT64 c = 0;
+#ifdef WIN32
+        while ((len = fread(buf, 1, BUFSIZ, fp)) != 0) {
+#else
+        while ((len = read(fd, buf, BUFSIZ)) != 0) {
+#endif
+            char * p  = buf;
+            char * pe = buf + len;
+            while ((p = (char*)memchr((void*)p, '\n', pe - p)) != NULL) {
+                ++p;
+                ++c;
+            }
+
+            if (p < pe) {
+                ++c; // 处理最后一行
+            }
+        }
+#ifdef WIN32
+        fclose(fp);
+#else
+        close(fd);
+#endif
+        return c;
+    }
 }
 
 namespace UtilTools
@@ -112,12 +158,12 @@ namespace UtilTools
         return Path::isFile(filename) && Path::remove(filename);
     }
 
-    bool FileHelper::copy(const String &sourceFileName, const String &destFileName, bool overwrite)
+    bool FileHelper::copy(const String &sourceFileName, const String &destFileName, OverWriteOptions options)
     {
         if (!Path::isExist(sourceFileName)) {
             return false;
         }
-        if (Path::isExist(destFileName) && !overwrite) {
+        if (Path::isExist(destFileName) && (OverWriteIfExist != options)) {
             return false;
         }
 
@@ -141,12 +187,12 @@ namespace UtilTools
         return true;
     }
 
-    bool FileHelper::move(const String &sourceFileName, const String &destFileName, bool overwrite)
+    bool FileHelper::move(const String &sourceFileName, const String &destFileName, OverWriteOptions options)
     {
         if (!Path::isFile(sourceFileName)) {
             return false;
         }
-        return Path::rename(sourceFileName, destFileName, overwrite);
+        return Path::rename(sourceFileName, destFileName, (OverWriteIfExist == options));
     }
 }
 
@@ -172,7 +218,7 @@ namespace UtilTools
             //while ((ch = in.get()) != EOF) {
             //    len++;
             //}
-            istream::sentry se(in, true);
+            InputStream::sentry se(in, true);
             StringBuffer *sb = in.rdbuf();
             while (sb && (ch = sb->sbumpc()) != EOF) {
                 len++;
@@ -180,6 +226,16 @@ namespace UtilTools
             in.close();
         }
         return len;
+    }
+
+    INT64 FileHelper::lineCount(const String &filename, LineCountOptions options)
+    {
+        if (UnCountBlankLine != options) {
+            return lineCountFast(filename);
+        }
+        vector<String> contents;
+        readLinesEx(filename, contents, RemoveBlankLine);
+        return contents.size();
     }
 
     String FileHelper::createTime(const String &filename)
@@ -317,7 +373,7 @@ namespace UtilTools
         return readFile(path, contents, ios::in);
     }
 
-    bool FileHelper::readLines(const String &path, vector<String> &contents, bool removeBlankLine)
+    bool FileHelper::readLines(const String &path, vector<String> &contents, BlankLineOptions options)
     {
         InputStream in;
         in.open(path);
@@ -325,6 +381,7 @@ namespace UtilTools
             return false;
         }
         String lineString;
+        bool removeBlankLine = (RemoveBlankLine == options);
         while (getline(in, lineString)) {
             if (!removeBlankLine || !isBlank(lineString)) {
                 contents.push_back(lineString);
@@ -334,7 +391,7 @@ namespace UtilTools
         return true;
     }
 
-    bool FileHelper::readLines(const String &path, vector<vector<String>> &contents, const TCHAR &separator, bool removeBlankLine)
+    bool FileHelper::readLines(const String &path, vector<vector<String>> &contents, const TCHAR &separator, BlankLineOptions options)
     {
         InputStream in;
         in.open(path);
@@ -342,6 +399,7 @@ namespace UtilTools
             return false;
         }
         String lineString;
+        bool removeBlankLine = (RemoveBlankLine == options);
         while (getline(in, lineString)) {
             if (!removeBlankLine || !isBlank(lineString)) {
                 String splitString;
@@ -382,12 +440,13 @@ namespace UtilTools
     } \
     return func(path, ss_lines.str())
 
-    bool FileHelper::readLinesEx(const String &path, vector<String> &contents, bool removeBlankLine)
+    bool FileHelper::readLinesEx(const String &path, vector<String> &contents, BlankLineOptions options)
     {
         READ_ALL_TEXT();
         String lineString;
         StringStream ss_all_lines(text);
-        while (getline(ss_all_lines, lineString, '\n')) {
+        bool removeBlankLine = (RemoveBlankLine == options);
+        while (getline(ss_all_lines, lineString, TCHAR('\n'))) {
             if (!removeBlankLine || !isBlank(lineString)) {
                 contents.push_back(lineString);
             }
@@ -413,12 +472,13 @@ namespace UtilTools
         return true;
     }
 
-    bool FileHelper::readLinesEx(const String &path, vector<vector<String>> &contents, const TCHAR &separator, bool removeBlankLine)
+    bool FileHelper::readLinesEx(const String &path, vector<vector<String>> &contents, const TCHAR &separator, BlankLineOptions options)
     {
         READ_ALL_TEXT();
         String lineString;
         StringStream ss_all_lines(text);
-        while (getline(ss_all_lines, lineString, '\n')) {
+        bool removeBlankLine = (RemoveBlankLine == options);
+        while (getline(ss_all_lines, lineString, TCHAR('\n'))) {
             if (!removeBlankLine || !isBlank(lineString)) {
                 String splitString;
                 StringStream ss_one_line(lineString);
