@@ -4,7 +4,6 @@
 #include <sstream>
 #include <streambuf>
 #include "path.h"
-#include "StringUtils.h"
 
 #ifdef UNICODE
 #define IOStream            wiostream
@@ -15,7 +14,9 @@
 #define InputStringStream   wistringstream
 #define OutputStringStream  wostringstream
 
-#define StringBuffer        wstreambuf
+#define StreamBuffer        wstreambuf
+#define StringBuffer        wstringbuf
+#define FileBuffer          wfilebuf
 
 #else
 #define IOStream            iostream
@@ -26,7 +27,9 @@
 #define InputStringStream   istringstream
 #define OutputStringStream  ostringstream
 
-#define StringBuffer        streambuf
+#define StreamBuffer        streambuf
+#define StringBuffer        stringbuf
+#define FileBuffer          filebuf
 #endif
 
 using namespace std;
@@ -219,7 +222,7 @@ namespace UtilTools
             //    len++;
             //}
             InputStream::sentry se(in, true);
-            StringBuffer *sb = in.rdbuf();
+            StreamBuffer *sb = in.rdbuf();
             while (sb && (ch = sb->sbumpc()) != (TCHAR)EOF) {
                 len++;
             }
@@ -234,7 +237,7 @@ namespace UtilTools
             return lineCountFast(filename);
         }
         vector<String> contents;
-        readLinesEx(filename, contents, RemoveBlankLine);
+        read(filename, contents, RemoveBlankLine);
         return contents.size();
     }
 
@@ -293,59 +296,15 @@ namespace UtilTools
 
 namespace UtilTools
 {
-    bool FileHelper::write(const String &path, const String &contents)
+    bool FileHelper::write(const String &path, const String &contents, BOOL append)
     {
-        return writeFile(path, contents, ios::trunc);
+        return UtilTools::writeFile(path, contents, !!append ? ios::app : ios::trunc);
     }
 
-    bool FileHelper::write(const String &path, const vector<String> &contents, const String &separator)
+    bool FileHelper::write(const String &path, const std::vector<String> &contents, const String &separator, BOOL append)
     {
         OutputStream of;
-        of.open(path, ios::trunc);
-        if (!of.is_open()) {
-            return false;
-        }
-
-        vector<String>::const_iterator it = contents.cbegin();
-        for (; it != contents.cend(); ++it) {
-            of << *it << separator;
-        }
-
-        of.close();
-        return true;
-    }
-
-    bool FileHelper::append(const String &path, const String &contents)
-    {
-        return writeFile(path, contents, ios::app);
-    }
-
-    bool FileHelper::append(const String &path, const vector<String> &contents, const String &separator)
-    {
-        OutputStream of;
-        of.open(path, ios::app);
-        if (!of.is_open()) {
-            return false;
-        }
-
-        vector<String>::const_iterator it = contents.cbegin();
-        for (; it != contents.cend(); ++it) {
-            of << *it << separator;
-        }
-
-        of.close();
-        return true;
-    }
-
-    bool FileHelper::appendLine(const String &path, const String &contents)
-    {
-        return writeFile(path, _T("\n") + contents, ios::app);
-    }
-
-    bool FileHelper::appendLine(const String &path, const vector<String> &contents, const String &separator)
-    {
-        OutputStream of;
-        of.open(path, ios::app);
+        of.open(path, !!append ? ios::app : ios::trunc);
         if (!of.is_open()) {
             return false;
         }
@@ -360,7 +319,7 @@ namespace UtilTools
                 break;
             }
         }
-
+        of.flush();
         of.close();
         return true;
     }
@@ -370,10 +329,10 @@ namespace UtilTools
 {
     bool FileHelper::read(const String &path, String &contents)
     {
-        return readFile(path, contents, ios::in);
+        return UtilTools::readFile(path, contents, ios::in);
     }
 
-    bool FileHelper::readLines(const String &path, vector<String> &contents, BlankLineOptions options)
+    bool FileHelper::read(const String &path, vector<String> &contents, BOOL removeBlankLine)
     {
         InputStream in;
         in.open(path);
@@ -381,7 +340,6 @@ namespace UtilTools
             return false;
         }
         String lineString;
-        bool removeBlankLine = (RemoveBlankLine == options);
         while (getline(in, lineString)) {
             if (!removeBlankLine || !isBlank(lineString)) {
                 contents.push_back(lineString);
@@ -391,7 +349,7 @@ namespace UtilTools
         return true;
     }
 
-    bool FileHelper::readLines(const String &path, vector<vector<String>> &contents, const TCHAR &separator, BlankLineOptions options)
+    bool FileHelper::read(const String &path, vector<vector<String>> &contents, const TCHAR &separator, BOOL removeBlankLine)
     {
         InputStream in;
         in.open(path);
@@ -399,7 +357,6 @@ namespace UtilTools
             return false;
         }
         String lineString;
-        bool removeBlankLine = (RemoveBlankLine == options);
         while (getline(in, lineString)) {
             if (!removeBlankLine || !isBlank(lineString)) {
                 String splitString;
@@ -418,98 +375,6 @@ namespace UtilTools
 
 namespace UtilTools
 {
-/// 一次性读取所有文本
-#define READ_ALL_TEXT() \
-    String text; \
-    if (!read(path, text)) { \
-        return false; \
-    }
-
-/// 一次性写所有文本到文件
-#define WRITE_ALL_TEXT(func) \
-    StringStream ss_lines; \
-    vector<String>::const_iterator it = contents.cbegin(); \
-    while (it != contents.cend()) { \
-        ss_lines << *it++; \
-        if (it != contents.cend()) { \
-            ss_lines << separator; \
-        } else { \
-            ss_lines << endl; \
-            break; \
-        } \
-    } \
-    return func(path, ss_lines.str())
-
-    bool FileHelper::readLinesEx(const String &path, vector<String> &contents, BlankLineOptions options)
-    {
-        READ_ALL_TEXT();
-        String lineString;
-        StringStream ss_all_lines(text);
-        bool removeBlankLine = (RemoveBlankLine == options);
-        while (getline(ss_all_lines, lineString, TCHAR('\n'))) {
-            if (!removeBlankLine || !isBlank(lineString)) {
-                contents.push_back(lineString);
-            }
-        }
-#pragma region 逐个字符遍历解析
-        //size_t startpos = 0;
-        //for (size_t i = 0; i < text.length(); i++) {
-        //    if ('\n' == text[i]) {
-        //        String &lineString = text.substr(startpos, i - startpos);
-        //        if (!removeBlankLine || !isBlank(lineString)) {
-        //            contents.push_back(lineString);
-        //        }
-        //        startpos = i + 1;
-        //    }
-        //}
-        //if (startpos < text.length()) {
-        //    String &lineString = text.substr(startpos);
-        //    if (!removeBlankLine || !isBlank(lineString)) {
-        //        contents.push_back(lineString);
-        //    }
-        //}
-#pragma endregion
-        return true;
-    }
-
-    bool FileHelper::readLinesEx(const String &path, vector<vector<String>> &contents, const TCHAR &separator, BlankLineOptions options)
-    {
-        READ_ALL_TEXT();
-        String lineString;
-        StringStream ss_all_lines(text);
-        bool removeBlankLine = (RemoveBlankLine == options);
-        while (getline(ss_all_lines, lineString, TCHAR('\n'))) {
-            if (!removeBlankLine || !isBlank(lineString)) {
-                String splitString;
-                StringStream ss_one_line(lineString);
-                vector<String> lineSplitStrings;
-                while (getline(ss_one_line, splitString, separator)) {
-                    lineSplitStrings.push_back(splitString);
-                }
-                contents.push_back(lineSplitStrings);
-            }
-        }
-        return true;
-    }
-
-    bool FileHelper::writeEx(const String &path, const vector<String> &contents, const String &separator)
-    {
-        WRITE_ALL_TEXT(write);
-    }
-
-    bool FileHelper::appendEx(const String &path, const vector<String> &contents, const String &separator)
-    {
-        WRITE_ALL_TEXT(append);
-    }
-
-    bool FileHelper::appendLineEx(const String &path, const vector<String> &contents, const String &separator)
-    {
-        WRITE_ALL_TEXT(appendLine);
-    }
-}
-
-namespace UtilTools
-{
     // 文件内容全部缓存到内容才有效，一般用于 xml 保存文件
     bool xmlSafeSave(const String &path, const String &contents, bool app)
     {
@@ -517,7 +382,7 @@ namespace UtilTools
 
         // 写临时文件
         bool savesuccess = false;
-        savesuccess = app ? FileHelper::append(bakpath, contents) : FileHelper::write(bakpath, contents);
+        savesuccess = FileHelper::write(bakpath, contents, app);
         if (!savesuccess) {
             return false;
         }
@@ -533,48 +398,48 @@ namespace UtilTools
         return true;
     }
 
-    bool FileHelper::safeSave(const String &path, const String &contents, bool app)
+    bool FileHelper::safeSave(const String &path, const String &contents, BOOL app)
     {
         bool savesuccess = false;
         String bakpath = path + _T(".bak");
-        if (exists(bakpath)) { // 存在备份文件，说明目标文件最后一次写入失败，备份文件内容是最新的，直接写备份文件
-            savesuccess = app ? append(bakpath, contents) : write(bakpath, contents);
+        if (FileHelper::exists(bakpath)) { // 存在备份文件，说明目标文件最后一次写入失败，备份文件内容是最新的，直接写备份文件
+            savesuccess = FileHelper::write(bakpath, contents, app);
             if (savesuccess) { // 备份文件写成功，将备份文件改名为目标文件
-                savesuccess = move(bakpath, path, OverWriteIfExist);
+                savesuccess = FileHelper::move(bakpath, path, OverWriteIfExist);
                 if (savesuccess) { // 目标文件写成功，删除备份文件
-                    remove(bakpath);
+                    FileHelper::remove(bakpath);
                 }
             }
         } else { // 不存在备份文件，说明目标文件最后一次写入成功，直接写目标文件
-            savesuccess = app ? append(path, contents) : write(path, contents);
+            savesuccess = FileHelper::write(path, contents, app);
             if (!savesuccess) { // 目标文件写失败（如被打开查看），先备份目标文件
-                savesuccess = copy(path, bakpath, OverWriteIfExist);
+                savesuccess = FileHelper::copy(path, bakpath, OverWriteIfExist);
                 if (savesuccess) { // 备份成功，将内容写入备份文件
-                    savesuccess = app ? append(bakpath, contents) : write(bakpath, contents);
+                    savesuccess = FileHelper::write(bakpath, contents, app);
                 }
             }
         }
         return savesuccess;
     }
 
-    bool FileHelper::safeSave(const String &path, const std::vector<String> &contents, bool app)
+    bool FileHelper::safeSave(const String &path, const std::vector<String> &contents, BOOL app)
     {
         bool savesuccess = false;
         String bakpath = path + _T(".bak");
-        if (exists(bakpath)) { // 存在备份文件，说明目标文件最后一次写入失败，备份文件内容是最新的，直接写备份文件
-            savesuccess = app ? append(bakpath, contents) : write(bakpath, contents);
+        if (FileHelper::exists(bakpath)) { // 存在备份文件，说明目标文件最后一次写入失败，备份文件内容是最新的，直接写备份文件
+            savesuccess = FileHelper::write(bakpath, contents, _T(""), app);
             if (savesuccess) { // 备份文件写成功，将备份文件改名为目标文件
-                savesuccess = move(bakpath, path, OverWriteIfExist);
+                savesuccess = FileHelper::move(bakpath, path, OverWriteIfExist);
                 if (savesuccess) { // 目标文件写成功，删除备份文件
-                    remove(bakpath);
+                    FileHelper::remove(bakpath);
                 }
             }
         } else { // 不存在备份文件，说明目标文件最后一次写入成功，直接写目标文件
-            savesuccess = app ? append(path, contents) : write(path, contents);
+            savesuccess = FileHelper::write(path, contents, _T(""), app);
             if (!savesuccess) { // 目标文件写失败（如被打开查看），先备份目标文件
-                savesuccess = copy(path, bakpath, OverWriteIfExist);
+                savesuccess = FileHelper::copy(path, bakpath, OverWriteIfExist);
                 if (savesuccess) { // 备份成功，将内容写入备份文件
-                    savesuccess = app ? append(bakpath, contents) : write(bakpath, contents);
+                    savesuccess = FileHelper::write(bakpath, contents, _T(""), app);
                 }
             }
         }

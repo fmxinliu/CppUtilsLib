@@ -8,6 +8,7 @@ namespace UtilTools
     enum OverWriteOptions { SkipIfExist, OverWriteIfExist };
     enum BlankLineOptions { RetainBlankLine, RemoveBlankLine };
     enum LineCountOptions { UnCountBlankLine, CountBlankLine };
+    enum FileAppendOptions { OverWriteFile, AppendFile };
 
     class DLL_API FileHelper
     {
@@ -32,34 +33,17 @@ namespace UtilTools
         STATIC bool setReadOnly(const String &filename);
         STATIC bool setWritable(const String &filename);
 
-        // 写文件：覆盖方式
-        STATIC bool write(const String &path, const String &contents);
-        STATIC bool write(const String &path, const std::vector<String> &contents, const String &separator = _T(""));
+        // 写文件
+        STATIC bool write(const String &path, const String &contents, BOOL append = OverWriteFile);
+        STATIC bool write(const String &path, const std::vector<String> &contents, const String &separator = _T("\n"), BOOL append = OverWriteFile);
 
-        // 写文件：追加方式
-        STATIC bool append(const String &path, const String &contents);
-        STATIC bool append(const String &path, const std::vector<String> &contents, const String &separator = _T(""));
-
-        // 写文件：追加方式，写行
-        STATIC bool appendLine(const String &path, const String &contents);
-        STATIC bool appendLine(const String &path, const std::vector<String> &contents, const String &separator = _T(""));
-
-        // 读文件：所有文本、按行读、分割行
+        // 读文件
         STATIC bool read(const String &path, String &contents);
-        STATIC bool readLines(const String &path, std::vector<String> &contents, BlankLineOptions options = RetainBlankLine);
-        STATIC bool readLines(const String &path, std::vector<std::vector<String>> &contents, const TCHAR &separator, BlankLineOptions options = RetainBlankLine);
-
-        // 读大文件
-        STATIC bool readLinesEx(const String &path, std::vector<String> &contents, BlankLineOptions options = RetainBlankLine);
-        STATIC bool readLinesEx(const String &path, std::vector<std::vector<String>> &contents, const TCHAR &separator, BlankLineOptions options = RetainBlankLine);
-
-        // 写大文件
-        STATIC bool writeEx(const String &path, const std::vector<String> &contents, const String &separator = _T(""));
-        STATIC bool appendEx(const String &path, const std::vector<String> &contents, const String &separator = _T(""));
-        STATIC bool appendLineEx(const String &path, const std::vector<String> &contents, const String &separator = _T(""));
+        STATIC bool read(const String &path, std::vector<String> &contents, BOOL removeBlankLine = RetainBlankLine);
+        STATIC bool read(const String &path, std::vector<std::vector<String>> &contents, const TCHAR &separator, BOOL removeBlankLine = RetainBlankLine);
 
         // 安全写文件
-        STATIC bool safeSave(const String &path, const String &contents, bool append);
-        STATIC bool safeSave(const String &path, const std::vector<String> &contents, bool append);
+        STATIC bool safeSave(const String &path, const String &contents, BOOL append = OverWriteFile);
+        STATIC bool safeSave(const String &path, const std::vector<String> &contents, BOOL append = OverWriteFile);
     };
 }
