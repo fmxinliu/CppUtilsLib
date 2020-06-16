@@ -17,13 +17,13 @@ namespace UtilTools
         STATIC bool create(const String &filename);
         STATIC bool exists(const String &filename);
         STATIC bool remove(const String &filename);
-        STATIC bool copy(const String &sourceFileName, const String &destFileName, OverWriteOptions options = SkipIfExist);
-        STATIC bool move(const String &sourceFileName, const String &destFileName, OverWriteOptions options = SkipIfExist);
+        STATIC bool copy(const String &sourceFileName, const String &destFileName, BOOL skipIfExist = SkipIfExist);
+        STATIC bool move(const String &sourceFileName, const String &destFileName, BOOL skipIfExist = SkipIfExist);
 
         // ÎÄ¼þÊôÐÔ
-        STATIC INT64 size(const String &filename);
-        STATIC INT64 length(const String &filename, LineEndOptions options = IgnoreNone);
-        STATIC INT64 lineCount(const String &filename, LineCountOptions options = CountBlankLine);
+        STATIC long size(const String &filename);
+        STATIC long length(const String &filename, BOOL ignoreLineEndCR = IgnoreNone);
+        STATIC long lineCount(const String &filename, BOOL countBlankLine = CountBlankLine);
         STATIC String createTime(const String &filename);
         STATIC String lastWriteTime(const String &filename);
         STATIC String lastAccessTime(const String &filename);

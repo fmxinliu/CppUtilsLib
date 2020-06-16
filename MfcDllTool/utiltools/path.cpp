@@ -334,7 +334,7 @@ namespace UtilTools
         return isReadable(path) && isWriteable(path);
     }
 
-    INT64 Path::getSizeAttr(const String &path)
+    long Path::getSizeAttr(const String &path)
     {
 #ifdef UNICODE
         WS2S_PTR(path, fname);

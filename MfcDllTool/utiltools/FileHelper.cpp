@@ -92,7 +92,7 @@ namespace UtilTools
         return true;
     }
 
-    INT64 lineCountFast(const String &filename)
+    size_t lineCountFast(const String &filename)
     {
 #ifdef UNICODE
         WS2S_PTR(filename, fname);
@@ -112,7 +112,7 @@ namespace UtilTools
 #endif
         char buf[BUFSIZ];
         int len = 0;
-        INT64 c = 0;
+        size_t c = 0;
 #ifdef WIN32
         while ((len = fread(buf, 1, BUFSIZ, fp)) != 0) {
 #else
@@ -161,12 +161,12 @@ namespace UtilTools
         return Path::isFile(filename) && Path::remove(filename);
     }
 
-    bool FileHelper::copy(const String &sourceFileName, const String &destFileName, OverWriteOptions options)
+    bool FileHelper::copy(const String &sourceFileName, const String &destFileName, BOOL skipIfExist)
     {
         if (!Path::isExist(sourceFileName)) {
             return false;
         }
-        if (Path::isExist(destFileName) && (OverWriteIfExist != options)) {
+        if (Path::isExist(destFileName) && !skipIfExist) {
             return false;
         }
 
@@ -190,31 +190,31 @@ namespace UtilTools
         return true;
     }
 
-    bool FileHelper::move(const String &sourceFileName, const String &destFileName, OverWriteOptions options)
+    bool FileHelper::move(const String &sourceFileName, const String &destFileName, BOOL skipIfExist)
     {
         if (!Path::isFile(sourceFileName)) {
             return false;
         }
-        return Path::rename(sourceFileName, destFileName, (OverWriteIfExist == options));
+        return Path::rename(sourceFileName, destFileName, !skipIfExist);
     }
 }
 
 namespace UtilTools
 {
-    INT64 FileHelper::size(const String &filename)
+    long FileHelper::size(const String &filename)
     {
-        INT64 fsize = -1;
+        long fsize = -1;
         if (exists(filename)) {
             fsize = Path::getSizeAttr(filename);
         }
         return fsize;
     }
 
-    INT64 FileHelper::length(const String &filename, LineEndOptions options)
+    long FileHelper::length(const String &filename, BOOL ignoreLineEndCR)
     {
         // fstream 默认以文本方式打开文件, windows 换行符 \r\n 仅能读取到 \n。改用二进制方式打开文件即可
-        INT64 len = -1;
-        InputStream in(filename, (IgnoreCR == options) ? ios::in : ios::binary);
+        long len = -1;
+        InputStream in(filename, ignoreLineEndCR ? ios::in : ios::binary);
         if (in) {
             len = 0;
             TCHAR ch;
@@ -231,9 +231,9 @@ namespace UtilTools
         return len;
     }
 
-    INT64 FileHelper::lineCount(const String &filename, LineCountOptions options)
+    long FileHelper::lineCount(const String &filename, BOOL countBlankLine)
     {
-        if (UnCountBlankLine != options) {
+        if (countBlankLine) {
             return lineCountFast(filename);
         }
         vector<String> contents;

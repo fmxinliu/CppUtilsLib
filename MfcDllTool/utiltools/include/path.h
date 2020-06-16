@@ -18,7 +18,7 @@ namespace UtilTools
         STATIC bool isReadwrite(const String &path);
 
         //  Ù–‘
-        STATIC INT64 getSizeAttr(const String &path);
+        STATIC long getSizeAttr(const String &path);
         STATIC String getTimeAttr(const String &path, FileTimeOptions options);
         STATIC bool setHiddenAttr(const String &path, FileHiddenOptions options);
         STATIC bool setReadOnlyAttr(const String &path, FileReadOnlyOptions options);
