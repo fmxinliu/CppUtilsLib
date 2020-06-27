@@ -4,6 +4,7 @@
 #include <sstream>
 #include <streambuf>
 #include "path.h"
+#include "StringUtils.h"
 
 #ifdef UNICODE
 #define IOStream            wiostream
@@ -56,6 +57,8 @@ namespace UtilTools
             return false;
         }
 
+        in.imbue(locale(""));
+
         // ·½·¨1£º
         StringStream ss;
         ss << in.rdbuf();
@@ -86,6 +89,7 @@ namespace UtilTools
             return false;
         }
 
+        of.imbue(locale(""));
         of << contents;
         //of.write(value.c_str(), value.length());
         of.close();
@@ -182,7 +186,8 @@ namespace UtilTools
             in.close();
             return false;
         }
-
+        in.imbue(locale(""));
+        out.imbue(locale(""));
         out << in.rdbuf();
         in.close();
         out.flush();
@@ -221,6 +226,7 @@ namespace UtilTools
             //while ((ch = in.get()) != EOF) {
             //    len++;
             //}
+            in.imbue(locale(""));
             InputStream::sentry se(in, true);
             StreamBuffer *sb = in.rdbuf();
             while (sb && (ch = sb->sbumpc()) != (TCHAR)EOF) {
@@ -309,6 +315,7 @@ namespace UtilTools
             return false;
         }
 
+        of.imbue(locale(""));
         vector<String>::const_iterator it = contents.cbegin();
         while (it != contents.cend()) {
             of << *it++;
@@ -339,6 +346,7 @@ namespace UtilTools
         if (!in.is_open()) {
             return false;
         }
+        in.imbue(locale(""));
         String lineString;
         while (getline(in, lineString)) {
             if (!removeBlankLine || !isBlank(lineString)) {
@@ -356,6 +364,7 @@ namespace UtilTools
         if (!in.is_open()) {
             return false;
         }
+        in.imbue(locale(""));
         String lineString;
         while (getline(in, lineString)) {
             if (!removeBlankLine || !isBlank(lineString)) {
