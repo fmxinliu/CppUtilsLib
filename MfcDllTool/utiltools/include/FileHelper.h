@@ -35,6 +35,7 @@ namespace UtilTools
 
         // 写文件
         STATIC bool write(const String &path, const String &contents, BOOL append = OverWriteFile);
+        STATIC bool write(const String &path, const unsigned char *contents, size_t length, BOOL append = OverWriteFile);
         STATIC bool write(const String &path, const std::vector<String> &contents, const String &separator = _T("\n"), BOOL append = OverWriteFile);
 
         // 读文件

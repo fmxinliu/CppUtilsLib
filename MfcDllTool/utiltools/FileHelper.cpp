@@ -91,7 +91,7 @@ namespace UtilTools
 
         of.imbue(locale(""));
         of << contents;
-        //of.write(value.c_str(), value.length());
+        //of.write(contents.c_str(), contents.length());
         of.close();
         return true;
     }
@@ -329,6 +329,11 @@ namespace UtilTools
         of.flush();
         of.close();
         return true;
+    }
+
+    bool FileHelper::write(const String &path, const unsigned char *contents, size_t length, BOOL append)
+    {
+        return FileHelper::write(path, String ((const char *)contents, length), append);
     }
 }
 
