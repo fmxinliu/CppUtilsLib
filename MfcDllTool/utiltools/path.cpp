@@ -414,6 +414,30 @@ namespace UtilTools
 #endif
     }
 
+    // 设置文件夹属性， recursionFiles - 是否递归设置所有包含文件
+    bool Path::setReadOnlyAttr(const String &path, FileReadOnlyOptions options, bool recursionFiles)
+    {
+        if (!recursionFiles) {
+            return setReadOnlyAttr(path, options);
+        }
+
+#if defined(WIN32)
+        vector<String> files;
+        bool ret = listFiles(path, true, false, files);
+        for (int i = 0; i < files.size(); ++i) {
+            DWORD dw = GetFileAttributes(files[i].c_str());
+            dw = (ReadOnly == options) ? dw | FILE_ATTRIBUTE_READONLY : dw & (~FILE_ATTRIBUTE_READONLY);
+            SetFileAttributes(files[i].c_str(), dw);
+        }
+        return ret;
+#else
+        String cmd = (ReadOnly == options)
+            _T("sudo chmod +r-w ") + path :
+        _T("sudo chmod +r+w ") + path ;
+        return !_system(cmd);
+#endif
+    }
+
     bool Path::isFile(const String &path)
     {
 #if defined(WIN32)

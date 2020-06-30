@@ -22,6 +22,7 @@ namespace UtilTools
         STATIC String getTimeAttr(const String &path, FileTimeOptions options);
         STATIC bool setHiddenAttr(const String &path, FileHiddenOptions options);
         STATIC bool setReadOnlyAttr(const String &path, FileReadOnlyOptions options);
+        STATIC bool setReadOnlyAttr(const String &path, FileReadOnlyOptions options, bool recursionFiles);
         STATIC bool isHidden(const String &path);
         STATIC bool isReadOnly(const String &path);
 
