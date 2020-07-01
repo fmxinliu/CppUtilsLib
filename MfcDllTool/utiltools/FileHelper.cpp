@@ -210,7 +210,7 @@ namespace UtilTools
     {
         long fsize = -1;
         if (exists(filename)) {
-            fsize = Path::getSizeAttr(filename);
+            fsize = Path::getSelfSizeAttr(filename);
         }
         return fsize;
     }
