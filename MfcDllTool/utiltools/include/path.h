@@ -6,6 +6,7 @@ namespace UtilTools
     enum FileTimeOptions { CreateTime, LastWriteTime, LastAccessTime };
     enum FileHiddenOptions { UnHidden, Hidden };
     enum FileReadOnlyOptions { Writable, ReadOnly };
+    enum FolderSelfSizeOptions { Exclude, Include };
 
     class DLL_API Path
     {
@@ -18,7 +19,8 @@ namespace UtilTools
         STATIC bool isReadwrite(const String &path);
 
         // 属性
-        STATIC long getSizeAttr(const String &path);
+        STATIC long getSelfSizeAttr(const String &path); // 文件/目录自身大小（不包括目录中文件大小）
+        STATIC long getSizeAttr(const String &path, FolderSelfSizeOptions options);
         STATIC String getTimeAttr(const String &path, FileTimeOptions options);
         STATIC bool setHiddenAttr(const String &path, FileHiddenOptions options);
         STATIC bool setReadOnlyAttr(const String &path, FileReadOnlyOptions options);

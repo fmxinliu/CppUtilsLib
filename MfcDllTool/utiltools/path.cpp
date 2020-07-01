@@ -155,6 +155,33 @@ namespace UtilTools
 namespace UtilTools
 {
 #if defined(WIN32)
+    bool listFolders(const String &pathname, bool listhiddenfolders, vector<String> &result)
+    {
+        long hFile = 0;
+        struct finddata_t fileInfo;
+        String pathName = StringUtils::endsWith(pathname, _T("\\")) ? pathName : pathname + _T("\\");
+
+        if ((hFile = findfirst((pathName + _T("*")).c_str(), &fileInfo)) == -1) {
+            return false;
+        }
+
+        result.push_back(pathname);
+
+        // List all subdirectory
+        do {
+            if (!_tcscmp(fileInfo.name, _T(".")) || !_tcscmp(fileInfo.name, _T(".."))) {
+                continue;
+            } else if (fileInfo.attrib & _A_SUBDIR) {
+                String subdir = pathName + fileInfo.name;
+                if ((GetFileAttributes(subdir.c_str()) & FILE_ATTRIBUTE_HIDDEN) == 0 || listhiddenfolders) {
+                    listFolders(subdir, listhiddenfolders, result);
+                }
+            }
+        } while (findnext(hFile, &fileInfo) == 0);
+        _findclose(hFile);
+        return true;
+    }
+
     bool listFiles(const String &pathname, bool listsubdir, bool listhiddenfiles, vector<String> &result)
     {
         long hFile = 0;
@@ -208,6 +235,72 @@ namespace UtilTools
     }
 
 #else
+    bool listFolders(const String &pathname, bool listhiddenfolders, vector<String> &result)
+    {
+        DIR *dirp;
+        if((dirp = opendir(pathname.c_str()) == NULL) {
+            return false;
+        }
+
+        string dir_full_path = endsWith(pathname, _T("/")) ? pathname : pathname + _T("/");
+        struct dirent *dir;
+        struct stat st;
+
+        result.push_back(pathname);
+
+        // Recursively all subdirectory.
+        while ((dir = readdir(dirp)) != NULL) {
+            if (!_tcscmp(dir->d_name, _T(".")) || !_tcscmp(dir->d_name, _T(".."))) {
+                continue;
+            }
+
+            String sub_path = dir_full_path + dir->d_name;
+            if (lstat(sub_path.c_str(), &st) == -1) {
+                continue;
+            } else if (S_ISDIR(st.st_mode)) {
+                if (!StringUtils::startsWith(dir->d_name, _T(".") || listhiddenfolders) {
+                    listFolders(sub_path, listhiddenfolders, result);
+                }
+            } else {
+                result.push_back(sub_path);
+            }
+        }
+        closedir(dirp);
+        return true;
+    }
+
+    bool listFiles(const String &pathname, bool listsubdir, bool listhiddenfiles, vector<String> &result)
+    {
+        DIR *dirp;
+        if((dirp = opendir(pathname.c_str()) == NULL) {
+            return false;
+        }
+
+        string dir_full_path = endsWith(pathname, _T("/")) ? pathname : pathname + _T("/");
+        struct dirent *dir;
+        struct stat st;
+
+        // Recursively find all the file in the directory.
+        while ((dir = readdir(dirp)) != NULL) {
+            if (!_tcscmp(dir->d_name, _T(".")) || !_tcscmp(dir->d_name, _T(".."))) {
+                continue;
+            }
+
+            String sub_path = dir_full_path + dir->d_name;
+            if (lstat(sub_path.c_str(), &st) == -1) {
+                continue;
+            } else if (!listhiddenfiles && StringUtils::startsWith(dir->d_name, _T("."))) {
+                continue;
+            } else if (listsubdir && S_ISDIR(st.st_mode)) {
+                listFiles(sub_path, true, listhiddenfiles, result);
+            } else {
+                result.push_back(sub_path);
+            }
+        }
+        closedir(dirp);
+        return true;
+    }
+
     bool deleteDirectory(const String &pathname)
     {
         DIR *dirp;
@@ -334,7 +427,7 @@ namespace UtilTools
         return isReadable(path) && isWriteable(path);
     }
 
-    long Path::getSizeAttr(const String &path)
+    long Path::getSelfSizeAttr(const String &path)
     {
 #ifdef UNICODE
         WS2S_PTR(path, fname);
@@ -345,6 +438,32 @@ namespace UtilTools
         if(stat(fname, &statbuf) == 0)
             return statbuf.st_size;
         return -1;
+    }
+
+    long Path::getSizeAttr(const String &path, FolderSelfSizeOptions options)
+    {
+#ifdef UNICODE
+        WS2S_PTR(path, fname);
+#else
+        const char * fname = path.c_str();
+#endif
+        if (isFolder(fname)) {
+            long size = 0;
+            vector<String> files;
+            bool ret = listFiles(path, true, true, files);
+            for (size_t i = 0; i < files.size(); ++i) {
+                size += getSelfSizeAttr(files[i]);
+            }
+            if (Exclude != options) {
+                vector<String> folders;
+                ret = ret && listFolders(path, true, folders);
+                for (size_t i = 0; i < folders.size(); ++i) {
+                    size += getSelfSizeAttr(folders[i]);
+                }
+            }
+            return ret ? size : -1;
+        }
+        return getSelfSizeAttr(fname);
     }
 
     String Path::getTimeAttr(const String &path, FileTimeOptions options)
@@ -424,7 +543,7 @@ namespace UtilTools
 #if defined(WIN32)
         vector<String> files;
         bool ret = listFiles(path, true, false, files);
-        for (int i = 0; i < files.size(); ++i) {
+        for (size_t i = 0; i < files.size(); ++i) {
             DWORD dw = GetFileAttributes(files[i].c_str());
             dw = (ReadOnly == options) ? dw | FILE_ATTRIBUTE_READONLY : dw & (~FILE_ATTRIBUTE_READONLY);
             SetFileAttributes(files[i].c_str(), dw);
