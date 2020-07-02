@@ -124,13 +124,15 @@ namespace UtilTools
 #endif
             char * p  = buf;
             char * pe = buf + len;
+            char * pr = buf; // 记录每行起始位置
             while ((p = (char*)memchr((void*)p, '\n', pe - p)) != NULL) {
                 ++p;
                 ++c;
+                pr = p;
             }
 
-            if (p < pe) {
-                ++c; // 处理最后一行
+            if (pr != pe) {
+                ++c; // 处理最后一行：非空，至少含有一个字符
             }
         }
 #ifdef WIN32
