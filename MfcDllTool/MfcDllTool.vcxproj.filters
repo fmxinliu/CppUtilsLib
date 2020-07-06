@@ -99,6 +99,9 @@
     <ClCompile Include="utiltools\FileHelper.cpp">
       <Filter>utiltools</Filter>
     </ClCompile>
+    <ClCompile Include="utiltools\DateTime.cpp">
+      <Filter>utiltools</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MfcDllTool.h">
@@ -174,6 +177,9 @@
       <Filter>utiltools\include</Filter>
     </ClInclude>
     <ClInclude Include="utiltools\include\FileHelper.h">
+      <Filter>utiltools\include</Filter>
+    </ClInclude>
+    <ClInclude Include="utiltools\include\DateTime.h">
       <Filter>utiltools\include</Filter>
     </ClInclude>
   </ItemGroup>
