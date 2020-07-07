@@ -115,7 +115,7 @@ namespace UtilTools
 
         size_t c = 0;
         size_t n = 0;
-        while ((n = wcstombs(buffer + c, source + c, len - c)) != -1 && c < len) {
+        while ((c < len) && (n = wcstombs(buffer + c, source + c, len - c)) != -1) {
             n++;
             c+=n;
         }
@@ -147,7 +147,7 @@ namespace UtilTools
 
         size_t c = 0;
         size_t n = 0;
-        while ((n = mbstowcs(buffer + c, source + c, len - c)) != -1 && c < len) {
+        while ((c < len) && (n = mbstowcs(buffer + c, source + c, len - c)) != -1) {
             n++;
             c+=n;
         }
