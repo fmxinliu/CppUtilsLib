@@ -103,7 +103,8 @@ namespace UtilTools
         setlocale(LC_ALL, ""); // 使用当前操作系统默认的地域设置
 
         const wchar_t *source = ws.c_str();
-        size_t len = wcstombs(NULL, source, 0);
+        //size_t len = wcstombs(NULL, source, 0);
+        size_t len = ws.length();
         if (len <= 0) {
             return s;
         }
@@ -111,9 +112,16 @@ namespace UtilTools
         if (NULL == buffer) {
             return s;
         }
-        wcstombs(buffer, source, len);
+
+        size_t c = 0;
+        size_t n = 0;
+        while ((c < len) && (n = wcstombs(buffer + c, source + c, len - c)) != -1) {
+            n++;
+            c+=n;
+        }
+
         buffer[len] = '\0';
-        s.assign(buffer);
+        s.assign(buffer, len);
         delete[] buffer;
 
         setlocale(LC_ALL, curLocale); // 恢复地域设置
@@ -126,17 +134,26 @@ namespace UtilTools
         setlocale(LC_ALL, ""); // 使用当前操作系统默认的地域设置
 
         const char *source = s.c_str();
-        size_t len = mbstowcs(NULL, source, 0);
+        //size_t len = mbstowcs(NULL, source, 0);
+        size_t len = s.length();
         if (len <= 0) {
             return ws;
         }
+
         wchar_t *buffer = new wchar_t[len + 1];
         if (NULL == buffer) {
             return ws;
         }
-        mbstowcs(buffer, source, len);
+
+        size_t c = 0;
+        size_t n = 0;
+        while ((c < len) && (n = mbstowcs(buffer + c, source + c, len - c)) != -1) {
+            n++;
+            c+=n;
+        }
+
         buffer[len] = '\0';
-        ws.assign(buffer);
+        ws.assign(buffer, len);
         delete[] buffer;
 
         setlocale(LC_ALL, curLocale); // 恢复地域设置
