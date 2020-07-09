@@ -335,7 +335,13 @@ namespace UtilTools
 
     bool FileHelper::write(const String &path, const unsigned char *contents, size_t length, BOOL append)
     {
-        return FileHelper::write(path, String ((const char *)contents, length), append);
+        string s = string((const char *)contents, length);
+#ifdef UNICODE
+        wstring ws = StringUtils::stringToWString(s);
+        return FileHelper::write(path, ws, append);
+#else
+        return FileHelper::write(path, s, append);
+#endif
     }
 }
 

@@ -442,12 +442,7 @@ namespace UtilTools
 
     long Path::getSizeAttr(const String &path, FolderSelfSizeOptions options)
     {
-#ifdef UNICODE
-        WS2S_PTR(path, fname);
-#else
-        const char * fname = path.c_str();
-#endif
-        if (isFolder(fname)) {
+        if (isFolder(path)) {
             long size = 0;
             vector<String> files;
             bool ret = listFiles(path, true, true, files);
@@ -463,7 +458,7 @@ namespace UtilTools
             }
             return ret ? size : -1;
         }
-        return getSelfSizeAttr(fname);
+        return getSelfSizeAttr(path);
     }
 
     String Path::getTimeAttr(const String &path, FileTimeOptions options)
