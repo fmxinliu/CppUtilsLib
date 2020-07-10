@@ -160,6 +160,69 @@ namespace UtilTools
         return ws;
     }
 
+    wstring& stringToWString(const string &s, wstring &ws)
+    {
+        char *pc = "1我2";
+        int lpc = strlen(pc);
+        wchar_t *wpc = L"1我2";
+        int lwpc = wcslen(wpc);
+
+        ///
+        char *curLocale = setlocale(LC_ALL, NULL); // 查看当前地域设置
+        setlocale(LC_ALL, ""); // 使用当前操作系统默认的地域设置
+
+        //char str[8] = { '1', '2', '3', '我', '0', '5', '我', '1' };
+        //string s1(str, 8);
+        string s1("我你他1");
+
+        const char *source = s1.c_str();
+        vector<DWORD> lengthVec;
+        size_t pi = 0;
+        DWORD len = 0;
+
+        // 检查字符串中间的的 '\0'
+        // 如: char str[8] = { '1', '2', '3', '我', '\0', '5', '我', '0' };
+        for (size_t i = 0; i < s1.length(); ++i) {
+            if (s1[i] == '\0') {
+                DWORD dwSize = MultiByteToWideChar(CP_ACP, 0, source + pi, -1, NULL, 0);
+                lengthVec.push_back(dwSize);
+                len += dwSize;
+                pi = i + 1;
+            }
+        }
+
+        if (pi < s1.length()) {
+            DWORD dwSize = MultiByteToWideChar(CP_ACP, 0, source + pi, -1, NULL, 0);
+            lengthVec.push_back(dwSize);
+            len += dwSize;
+        }
+
+        if (len <= 0) {
+            return ws;
+        }
+
+        wchar_t *buffer = new wchar_t[len];
+        if (NULL == buffer) {
+            return ws;
+        }
+
+        int xx = MultiByteToWideChar(CP_ACP, 0, source, 8, buffer, len);
+        wstring ws1(buffer, len);
+
+        DWORD c = 0;
+        DWORD n = 0;
+        while (c < len) {
+            n = MultiByteToWideChar(CP_ACP, 0, source + c, -1, buffer + c, len - c);
+            c+=n;
+        }
+
+        ws.assign(buffer, len);
+        delete[] buffer;
+
+        setlocale(LC_ALL, curLocale); // 恢复地域设置
+        return ws;
+    }
+
     vector<String> StringUtils::spilt(const String &s, TCHAR delimiter, bool bRemoveEmptyEntries)
     {
         String si;
