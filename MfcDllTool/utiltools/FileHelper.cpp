@@ -333,15 +333,22 @@ namespace UtilTools
         return true;
     }
 
+    // Ð´×Ö½Ú
     bool FileHelper::write(const String &path, const unsigned char *contents, size_t length, BOOL append)
     {
-        string s = string((const char *)contents, length);
 #ifdef UNICODE
-        wstring ws = StringUtils::stringToWString(s);
-        return FileHelper::write(path, ws, append);
+        string s = StringUtils::wstringToString(path);
+        const char *fname = s.c_str();
 #else
-        return FileHelper::write(path, s, append);
+        const char *fname = path.c_str();
 #endif
+        FILE *fp = fopen(fname, append ? "a": "w");
+        if (!fp) {
+            return false;
+        }
+        size_t len = fwrite(contents, 1, length, fp);
+        fclose(fp);
+        return len == length;
     }
 }
 
