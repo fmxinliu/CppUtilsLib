@@ -132,19 +132,38 @@ namespace UtilTools
     {
         char *curLocale = setlocale(LC_ALL, NULL); // 查看当前地域设置
         setlocale(LC_ALL, ""); // 使用当前操作系统默认的地域设置
-
         const char *source = s.c_str();
-        //size_t len = mbstowcs(NULL, source, 0);
-        size_t len = s.length();
-        if (len <= 0) {
+
+        // 1.计算长度
+        size_t pi = 0;
+        size_t len = 0;
+        for (size_t i = 0; i < s.length(); ++i) {
+            if (s[i] == '\0') {
+                size_t size = mbstowcs(NULL, source + pi, 0);
+                if (-1 == size) {
+                    return ws;
+                }
+                len += size + 1;
+                pi = i + 1;
+            }
+        }
+
+        if (pi < s.length()) {
+            size_t size = mbstowcs(NULL, source + pi, 0);
+            len += size;
+        }
+
+        if (0 == len || -1 == len) {
             return ws;
         }
 
+        // 2.分配临时内存
         wchar_t *buffer = new wchar_t[len + 1];
         if (NULL == buffer) {
             return ws;
         }
 
+        // 3.转换
         size_t c = 0;
         size_t n = 0;
         while ((c < len) && (n = mbstowcs(buffer + c, source + c, len - c)) != -1) {
