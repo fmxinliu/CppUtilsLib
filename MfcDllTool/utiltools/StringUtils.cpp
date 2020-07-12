@@ -97,22 +97,42 @@ namespace UtilTools
         return s;
     }
 
-    std::string& StringUtils::wstringToString(const wstring &ws, string &s)
+    string& StringUtils::wstringToString(const wstring &ws, string &s)
     {
         char *curLocale = setlocale(LC_ALL, NULL); // 查看当前地域设置
         setlocale(LC_ALL, ""); // 使用当前操作系统默认的地域设置
-
         const wchar_t *source = ws.c_str();
-        //size_t len = wcstombs(NULL, source, 0);
-        size_t len = ws.length();
-        if (len <= 0) {
+
+        // 1.计算长度
+        size_t pi = 0;
+        size_t len = 0;
+        for (size_t i = 0; i < ws.length(); ++i) {
+            if (ws[i] == '\0') {
+                size_t size = wcstombs(NULL, source + pi, 0);
+                if (-1 == size) {
+                    return s;
+                }
+                len += size + 1;
+                pi = i + 1;
+            }
+        }
+
+        if (pi < ws.length()) {
+            size_t size = wcstombs(NULL, source + pi, 0);
+            len += size;
+        }
+
+        if (0 == len || -1 == len) {
             return s;
         }
+
+        // 2.分配临时内存
         char *buffer = new char[len + 1];
         if (NULL == buffer) {
             return s;
         }
 
+        // 3.转换
         size_t c = 0;
         size_t n = 0;
         while ((c < len) && (n = wcstombs(buffer + c, source + c, len - c)) != -1) {
